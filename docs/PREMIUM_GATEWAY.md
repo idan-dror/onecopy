@@ -48,6 +48,11 @@ Example from research: 500 GB uploaded over a month with average one-day retenti
 
 A relay's outbound byte charges, infrastructure throughput and connection overhead are distinct from object-storage billing. Benchmark real per-region throughput and effective billed cost before choosing topology.
 
+**Review addendum — RESEARCHED facts (2026-11-12), no decision change:**
+
+- [V] Cloudflare R2 Standard pricing was re-checked on 2026-11-12 and is unchanged: $0.015/GB-month storage, Class A $4.50/million, Class B $0.36/million, no egress charge. The free tier is 10 GB-month storage, 1M Class A and 10M Class B operations per month.
+- [S] The research report's Hetzner figure (20 TB included traffic) applies to EU cloud locations. Secondary sources report about 1–5 TB included in US locations (reduced December 2024), and about 0.5–8 TB in Singapore with roughly €7.40/TB overage, about seven times the EU/US overage rate. Verify on Hetzner's own pages before any relay-region costing.
+
 ## Subscription policy (PROPOSED)
 
 - Premium monthly relay allowance with sensible hard limits.

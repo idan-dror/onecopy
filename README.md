@@ -28,6 +28,7 @@ This documentation is the initial repository baseline. It is **not** an assertio
 | [Traceability](docs/TRACEABILITY.md) | Requirement → design → evidence linkage |
 | [Glossary](docs/GLOSSARY.md) | Consistent project vocabulary |
 | [Research sources](docs/RESEARCH_SOURCES.md) | Research provenance and authoritative references |
+| [Engineering review 2026-11-12](docs/reviews/ENGINEERING_REVIEW_2026-11-12.md) | Independent review findings and proposals — review input, **not approved** |
 | [Claude guidance](CLAUDE.md) | Implementation protocol and PR/review discipline |
 
 ## Decision markers
@@ -63,4 +64,4 @@ If a technology is marked PROPOSED, do not silently promote it to CONFIRMED. A p
 
 ## Evidence and provenance
 
-This package is based on the supplied **OneCopy: Decision-Ready Architecture and Feasibility Research** (2026-11-12) and the product decisions discussed afterward. Research recommendations are clearly distinguished from confirmed product requirements; see `docs/RESEARCH_SOURCES.md` and `docs/DECISIONS.md`. The research report should also be retained in the repository under `docs/research/` when the owner supplies/commits it.
+This package is based on the supplied **OneCopy: Decision-Ready Architecture and Feasibility Research** (2026-11-12) and the product decisions discussed afterward. Research recommendations are clearly distinguished from confirmed product requirements; see `docs/RESEARCH_SOURCES.md` and `docs/DECISIONS.md`. The research report is retained in the repository at `docs/research/onecopy-deep-research-2026-11-12.md` (factual correction, 2026-11-12 review: the report is already committed).

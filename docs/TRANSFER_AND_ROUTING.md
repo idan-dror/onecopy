@@ -24,6 +24,15 @@ The control plane may pay small costs for login, encrypted event sync and connec
 
 Phase 0 must prove which relay network components (discovery, NAT information, temporary coordination) iroh uses, when payload bytes cross a managed relay, whether the policy can disable it completely, and what direct reachability is lost. If it cannot meet requirements cleanly, evaluate a narrow STUN/candidate-exchange mechanism around a standard QUIC implementation. WebRTC/libp2p are secondary comparisons, not committed dependencies.
 
+**Review addendum — RESEARCHED facts (2026-11-12), no decision change.** From iroh's own documentation [V]:
+
+- iroh 1.0 was released 2026-06-15 and promises wire compatibility across v1 releases. It includes iroh's own QUIC multipath and QUIC NAT traversal, and official Swift/Kotlin bindings.
+- The relay is the coordination point for hole punching ("how two devices first find each other and coordinate the simultaneous connection attempt"). Communication starts on the relay path before hole punching completes.
+- `RelayMode::Disabled` is supported but removes relay fallback, peer introduction and hole-punch coordination. iroh estimates roughly one connection in ten stops working without a relay.
+- By default iroh uses four public relays operated by number 0. They are rate-limited and described as free for development and testing. Relays see endpoint IP addresses, which endpoints communicate, and relayed volume, but not content. The relay software is open source and self-hostable.
+
+An independent measurement of libp2p DCUtR hole punching (4.4M+ attempts) reports 70% ± 7.1% success, statistically indistinguishable between TCP and QUIC, and independent of relay characteristics [V, arXiv:2510.27500]. Implications and options are proposals in `docs/reviews/ENGINEERING_REVIEW_2026-11-12.md` §3.7 and §5 (AR-01, AR-02); they require owner decisions.
+
 ## Direct path candidate process (PROPOSED)
 
 1. Discover local network interfaces and IPv4/IPv6 reachability.

@@ -71,6 +71,8 @@ Fault injection: kill either process, restart control plane, sleep/wake endpoint
 
 Targets are hypotheses, not contractual release SLOs. Candidate direct-success goal of ≥90% on non-enterprise consumer networks needs a statistically meaningful real-world trial (research suggests at least 1,000 connection attempts); do not infer from a few local tests.
 
+**Review note — RESEARCHED context (2026-11-12), target unchanged:** the largest public hole-punching measurement found (libp2p DCUtR in IPFS, 4.4M+ attempts, 85,000+ networks) reports 70% ± 7.1% hole-punch success, with TCP and QUIC statistically indistinguishable (arXiv:2510.27500). iroh's own documentation says about 9 in 10 connections go direct. Neither figure is specific to OneCopy's Free direct-only constraint. A revised, per-network-class gate is proposed in `docs/reviews/ENGINEERING_REVIEW_2026-11-12.md` §7.7 for owner review.
+
 ## Go/no-go gates
 
 **Gate A — Clipboard:** Windows reliable, macOS permission behavior acceptable, X11 tested, Wayland matrix accurately scoped. Mobile marketing wording must match limitations.
