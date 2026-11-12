@@ -43,7 +43,8 @@ mod app {
     use std::path::PathBuf;
     use std::sync::OnceLock;
     use std::time::{Duration, Instant};
-    use windows::Win32::Foundation::{HWND, LPARAM, LRESULT, WPARAM};
+    use windows::Win32::Foundation::{ERROR_ALREADY_EXISTS, GetLastError, HANDLE, HWND, LPARAM, LRESULT, WAIT_TIMEOUT, WPARAM};
+    use windows::Win32::System::Threading::{CreateMutexW, OpenProcess, PROCESS_SYNCHRONIZE, WaitForSingleObject};
     use windows::Win32::System::Com::IDataObject;
     use windows::Win32::System::DataExchange::{
         AddClipboardFormatListener, GetClipboardOwner, GetClipboardSequenceNumber, RemoveClipboardFormatListener,
@@ -82,12 +83,24 @@ mod app {
         hold_secs: u64,
         #[arg(long, value_enum, default_value_t = ExitMode::Clear)]
         exit_mode: ExitMode,
+        /// Exit (releasing the clipboard only if still ours) when this harness process exits.
+        #[arg(long)]
+        parent_pid: Option<u32>,
     }
 
     struct StopCondition {
         stop_file: PathBuf,
         deadline: Instant,
+        /// SYNCHRONIZE handle to the harness process, if a parent was given.
+        parent: Option<HANDLE>,
     }
+
+    // SAFETY: the handle is only waited on (never closed) while the process runs.
+    unsafe impl Send for StopCondition {}
+    unsafe impl Sync for StopCondition {}
+
+    /// Named mutex that prevents two agents from fighting over the clipboard.
+    const INSTANCE_MUTEX: windows::core::PCWSTR = w!("Local\\OneCopyE02Agent");
 
     static STOP: OnceLock<StopCondition> = OnceLock::new();
 
@@ -99,6 +112,11 @@ mod app {
 
     pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         let args = Args::parse();
+        // Single instance: refuse to start while another E-02 agent runs in this session.
+        let _instance = unsafe { CreateMutexW(None, true, INSTANCE_MUTEX)? };
+        if unsafe { GetLastError() } == ERROR_ALREADY_EXISTS {
+            return Err("another e02-agent is already running in this session; refusing to start".into());
+        }
         let case = Case::load(&args.case)?;
         std::fs::create_dir_all(&args.run_dir)?;
         log::init(&args.run_dir.join("events.jsonl"), &args.run_id, &case.case_id)?;
@@ -113,9 +131,15 @@ mod app {
                 "exit_mode": format!("{:?}", args.exit_mode), "hold_secs": args.hold_secs,
             }),
         );
+        let parent = match args.parent_pid {
+            Some(pid) => Some(unsafe { OpenProcess(PROCESS_SYNCHRONIZE, false, pid)? }),
+            None => None,
+        };
+        log::event("watchdog", json!({ "parent_watched": parent.is_some(), "hold_secs": args.hold_secs }));
         let _ = STOP.set(StopCondition {
             stop_file: args.run_dir.join("stop"),
             deadline: Instant::now() + Duration::from_secs(args.hold_secs),
+            parent,
         });
         let sampler = memory::Sampler::start();
 
@@ -245,8 +269,9 @@ mod app {
                 if let Some(stop) = STOP.get() {
                     let by_file = stop.stop_file.exists();
                     let by_deadline = Instant::now() >= stop.deadline;
-                    if by_file || by_deadline {
-                        log::event("stop_requested", json!({ "stop_file": by_file, "deadline": by_deadline }));
+                    let by_parent = stop.parent.is_some_and(|h| unsafe { WaitForSingleObject(h, 0) } != WAIT_TIMEOUT);
+                    if by_file || by_deadline || by_parent {
+                        log::event("stop_requested", json!({ "stop_file": by_file, "deadline": by_deadline, "parent_exited": by_parent }));
                         unsafe { PostQuitMessage(0) };
                     }
                 }

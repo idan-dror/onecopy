@@ -8,6 +8,8 @@
 //!
 //! Output never contains user names, machine names or clipboard content.
 
+mod explorer;
+
 use clap::{Parser, Subcommand};
 use e02_synth::{Case, Synth};
 use serde_json::{Value, json};
@@ -55,6 +57,9 @@ enum Command {
         interval_ms: u64,
         #[arg(long, default_value_t = 900)]
         timeout_secs: u64,
+        /// Stop observing if this (harness) process exits.
+        #[arg(long)]
+        parent_pid: Option<u32>,
     },
     /// Print the clipboard's current format names as JSON.
     ClipboardFormats {
@@ -71,22 +76,40 @@ enum Command {
         #[arg(long)]
         out: Option<PathBuf>,
     },
-    /// Post the folder-view Paste command to the Explorer window showing `dest` (driver D2c).
+    /// Record the top-level Explorer windows that exist before a run (handles and tab counts only).
+    ExplorerSnapshot {
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Find the window showing `dest` and report whether it is a new (experiment-owned) window.
+    ExplorerFind {
+        #[arg(long)]
+        dest: PathBuf,
+        #[arg(long)]
+        pre_snapshot: PathBuf,
+        #[arg(long, default_value_t = 15)]
+        timeout_secs: u64,
+    },
+    /// Post the folder-view Paste command to the run's own window (driver D2c, experiment only).
     ExplorerPaste {
         #[arg(long)]
         dest: PathBuf,
-        #[arg(long, default_value_t = 15)]
-        find_timeout_secs: u64,
+        #[arg(long)]
+        expected_top: i64,
     },
     /// Print a case's file names and sizes as JSON (used by the run scripts).
     CaseFiles {
         #[arg(long)]
         case: PathBuf,
     },
-    /// Close the Explorer window showing `dest`.
+    /// Close the run's window only if it is experiment-owned and has no other tabs.
     ExplorerClose {
         #[arg(long)]
         dest: PathBuf,
+        #[arg(long)]
+        pre_snapshot: PathBuf,
+        #[arg(long)]
+        expected_top: Option<i64>,
     },
 }
 
@@ -99,13 +122,21 @@ fn main() {
             Ok(())
         }
         Command::Verify { case, dest, out } => verify(&case, &dest, &out),
-        Command::Watch { dest, out, stop_file, interval_ms, timeout_secs } => {
-            watch(&dest, &out, &stop_file, interval_ms, timeout_secs)
+        Command::Watch { dest, out, stop_file, interval_ms, timeout_secs, parent_pid } => {
+            watch(&dest, &out, &stop_file, interval_ms, timeout_secs, parent_pid)
         }
         Command::ClipboardFormats { out } => win::clipboard_formats().and_then(|v| emit(&v, out.as_deref())),
         Command::Audit { dir, cases, out } => audit(&dir, &cases).and_then(|v| emit(&v, out.as_deref())),
-        Command::ExplorerPaste { dest, find_timeout_secs } => win::explorer_paste(&dest, find_timeout_secs),
-        Command::ExplorerClose { dest } => win::explorer_close(&dest),
+        Command::ExplorerSnapshot { out } => explorer_cmd(|| explorer::win::snapshot()).and_then(|v| emit(&v, Some(&out))),
+        Command::ExplorerFind { dest, pre_snapshot, timeout_secs } => {
+            explorer_cmd(|| explorer::win::find_owned(&dest, &pre_snapshot, timeout_secs)).and_then(|v| emit(&v, None))
+        }
+        Command::ExplorerPaste { dest, expected_top } => {
+            explorer_cmd(|| explorer::win::paste(&dest, expected_top)).and_then(|v| emit(&v, None))
+        }
+        Command::ExplorerClose { dest, pre_snapshot, expected_top } => {
+            explorer_cmd(|| explorer::win::close_owned(&dest, &pre_snapshot, expected_top)).and_then(|v| emit(&v, None))
+        }
         Command::CaseFiles { case } => Case::load(&case).map_err(Into::into).and_then(|c| {
             let files: Vec<Value> = c.files.iter().map(|f| json!({ "name": f.name.replace('/', "\\"), "size": f.size })).collect();
             emit(&json!({ "case_id": c.case_id, "files": files }), None)
@@ -118,6 +149,16 @@ fn main() {
 }
 
 type AnyResult<T> = Result<T, Box<dyn std::error::Error>>;
+
+#[cfg(windows)]
+fn explorer_cmd(f: impl FnOnce() -> AnyResult<Value>) -> AnyResult<Value> {
+    f()
+}
+
+#[cfg(not(windows))]
+fn explorer_cmd(_f: impl FnOnce() -> AnyResult<Value>) -> AnyResult<Value> {
+    Err("Windows only".into())
+}
 
 fn emit(value: &Value, out: Option<&Path>) -> AnyResult<()> {
     let text = serde_json::to_string_pretty(value)?;
@@ -225,7 +266,8 @@ fn verify(case_path: &Path, dest: &Path, out: &Path) -> AnyResult<()> {
     Ok(())
 }
 
-fn watch(dest: &Path, out: &Path, stop_file: &Path, interval_ms: u64, timeout_secs: u64) -> AnyResult<()> {
+fn watch(dest: &Path, out: &Path, stop_file: &Path, interval_ms: u64, timeout_secs: u64, parent_pid: Option<u32>) -> AnyResult<()> {
+    let parent = parent_pid.map(win::ProcessWatch::open).transpose()?;
     let start = Instant::now();
     let mut writer = std::io::BufWriter::new(std::fs::File::create(out)?);
     let mut previous: BTreeMap<String, Option<u64>> = BTreeMap::new();
@@ -244,7 +286,11 @@ fn watch(dest: &Path, out: &Path, stop_file: &Path, interval_ms: u64, timeout_se
             writer.flush()?;
             previous = current;
         }
-        if stop_file.exists() || start.elapsed() > Duration::from_secs(timeout_secs) {
+        let parent_gone = parent.as_ref().is_some_and(|p| p.exited());
+        if stop_file.exists() || parent_gone || start.elapsed() > Duration::from_secs(timeout_secs) {
+            if parent_gone {
+                writeln!(writer, "{}", json!({ "t_ms": start.elapsed().as_secs_f64() * 1000.0, "change": "stopped", "reason": "parent_exited" }))?;
+            }
             break;
         }
         std::thread::sleep(Duration::from_millis(interval_ms));
@@ -301,15 +347,17 @@ fn audit(dir: &Path, cases: &[PathBuf]) -> AnyResult<Value> {
 mod win {
     use super::AnyResult;
     use serde_json::Value;
-    use std::path::Path;
     pub fn clipboard_formats() -> AnyResult<Value> {
         Err("Windows only".into())
     }
-    pub fn explorer_paste(_: &Path, _: u64) -> AnyResult<()> {
-        Err("Windows only".into())
-    }
-    pub fn explorer_close(_: &Path) -> AnyResult<()> {
-        Err("Windows only".into())
+    pub struct ProcessWatch;
+    impl ProcessWatch {
+        pub fn open(_pid: u32) -> AnyResult<Self> {
+            Err("Windows only".into())
+        }
+        pub fn exited(&self) -> bool {
+            false
+        }
     }
 }
 
@@ -317,28 +365,14 @@ mod win {
 mod win {
     use super::AnyResult;
     use serde_json::{Value, json};
-    use std::path::Path;
-    use std::time::{Duration, Instant};
-    use windows::Win32::Foundation::{HWND, LPARAM, WPARAM};
-    use windows::Win32::System::Com::{
-        CLSCTX_ALL, COINIT_APARTMENTTHREADED, CoCreateInstance, CoInitializeEx, CoTaskMemFree, IServiceProvider,
-    };
+    use std::time::Duration;
+    use windows::Win32::Foundation::{CloseHandle, HANDLE, WAIT_TIMEOUT};
     use windows::Win32::System::DataExchange::{
         CloseClipboard, EnumClipboardFormats, GetClipboardFormatNameW, GetClipboardSequenceNumber, OpenClipboard,
     };
-    use windows::Win32::System::Variant::VARIANT;
-    use windows::Win32::UI::Shell::{
-        IFolderView, IPersistFolder2, IShellBrowser, IShellWindows, SHGetPathFromIDListW, ShellWindows,
-    };
-    use windows::Win32::UI::WindowsAndMessaging::{PostMessageW, WM_CLOSE, WM_COMMAND};
-    use windows::core::{GUID, Interface};
+    use windows::Win32::System::Threading::{OpenProcess, PROCESS_SYNCHRONIZE, WaitForSingleObject};
 
-    /// SID_STopLevelBrowser (shlguid.h).
-    const SID_STOP_LEVEL_BROWSER: GUID = GUID::from_u128(0x4c96be40_915c_11cf_99d3_00aa004ae837);
-    /// Explorer folder-view Paste command id (undocumented; experiment-only driver, D-041).
-    /// Posted to a freshly created, empty test folder, so a wrong id cannot affect user files.
-    const DEFVIEW_PASTE_COMMAND: usize = 0x701A;
-
+    /// Read-only: opens the clipboard, enumerates format names, closes it. Never empties or sets it.
     pub fn clipboard_formats() -> AnyResult<Value> {
         unsafe {
             let mut opened = false;
@@ -375,86 +409,24 @@ mod win {
         }
     }
 
-    struct ExplorerWindow {
-        top: HWND,
-        view: HWND,
-    }
+    /// Watches a parent process for exit through a SYNCHRONIZE handle (immune to PID reuse
+    /// once opened).
+    pub struct ProcessWatch(HANDLE);
 
-    fn same_path(a: &str, b: &Path) -> bool {
-        let norm = |s: &str| s.trim_end_matches('\\').to_lowercase();
-        norm(a) == norm(&b.to_string_lossy())
-    }
-
-    fn find_explorer(dest: &Path) -> AnyResult<Option<ExplorerWindow>> {
-        unsafe {
-            let windows: IShellWindows = CoCreateInstance(&ShellWindows, None, CLSCTX_ALL)?;
-            let count = windows.Count()?;
-            for i in 0..count {
-                let Ok(disp) = windows.Item(&VARIANT::from(i)) else { continue };
-                let Ok(provider) = disp.cast::<IServiceProvider>() else { continue };
-                let Ok(browser) = provider.QueryService::<IShellBrowser>(&SID_STOP_LEVEL_BROWSER) else { continue };
-                let Ok(view) = browser.QueryActiveShellView() else { continue };
-                let Ok(folder_view) = view.cast::<IFolderView>() else { continue };
-                let Ok(folder) = folder_view.GetFolder::<IPersistFolder2>() else { continue };
-                let Ok(pidl) = folder.GetCurFolder() else { continue };
-                let mut buf = [0u16; 260];
-                let ok = SHGetPathFromIDListW(pidl, &mut buf).as_bool();
-                CoTaskMemFree(Some(pidl as *const _));
-                if !ok {
-                    continue;
-                }
-                let len = buf.iter().position(|&c| c == 0).unwrap_or(buf.len());
-                if same_path(&String::from_utf16_lossy(&buf[..len]), dest) {
-                    // IShellBrowser and IShellView inherit IOleWindow; call GetWindow through their own proxies.
-                    let top = browser.GetWindow()?;
-                    let view_hwnd = view.GetWindow()?;
-                    return Ok(Some(ExplorerWindow { top, view: view_hwnd }));
-                }
-            }
-            Ok(None)
+    impl ProcessWatch {
+        pub fn open(pid: u32) -> AnyResult<Self> {
+            Ok(Self(unsafe { OpenProcess(PROCESS_SYNCHRONIZE, false, pid)? }))
+        }
+        pub fn exited(&self) -> bool {
+            unsafe { WaitForSingleObject(self.0, 0) != WAIT_TIMEOUT }
         }
     }
 
-    fn wait_for_explorer(dest: &Path, timeout_secs: u64) -> AnyResult<ExplorerWindow> {
-        unsafe { CoInitializeEx(None, COINIT_APARTMENTTHREADED).ok()? };
-        let deadline = Instant::now() + Duration::from_secs(timeout_secs);
-        loop {
-            if let Some(w) = find_explorer(dest)? {
-                return Ok(w);
-            }
-            if Instant::now() > deadline {
-                return Err("no Explorer window shows the destination folder".into());
-            }
-            std::thread::sleep(Duration::from_millis(250));
-        }
-    }
-
-    pub fn explorer_paste(dest: &Path, find_timeout_secs: u64) -> AnyResult<()> {
-        wait_for_explorer(dest, find_timeout_secs)?;
-        // The folder view can be recreated while Explorer finishes navigating, which
-        // invalidates a handle found earlier. Let it settle, re-find, and retry.
-        let mut last_error = String::new();
-        for attempt in 1..=5 {
-            std::thread::sleep(Duration::from_millis(750));
-            let Some(w) = find_explorer(dest)? else {
-                last_error = "window disappeared".into();
-                continue;
-            };
-            match unsafe { PostMessageW(Some(w.view), WM_COMMAND, WPARAM(DEFVIEW_PASTE_COMMAND), LPARAM(0)) } {
-                Ok(()) => {
-                    println!("{}", json!({ "posted": "WM_COMMAND", "command_id": DEFVIEW_PASTE_COMMAND, "target": "folder_view", "attempt": attempt }));
-                    return Ok(());
-                }
-                Err(e) => last_error = e.to_string(),
+    impl Drop for ProcessWatch {
+        fn drop(&mut self) {
+            unsafe {
+                let _ = CloseHandle(self.0);
             }
         }
-        Err(format!("could not post Paste after 5 attempts: {last_error}").into())
-    }
-
-    pub fn explorer_close(dest: &Path) -> AnyResult<()> {
-        let w = wait_for_explorer(dest, 5)?;
-        unsafe { PostMessageW(Some(w.top), WM_CLOSE, WPARAM(0), LPARAM(0))? };
-        println!("{}", json!({ "posted": "WM_CLOSE" }));
-        Ok(())
     }
 }
