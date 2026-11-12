@@ -23,6 +23,14 @@ Limitations:
 - The research report contains 59 inline citation markers (`cite…turn…search…`) that reference 82 search-result IDs from the tool that produced it. These IDs cannot be resolved to URLs, so the report's specific claims cannot be traced to sources. Claims that matter to a decision were re-sourced here where possible (see §3 and §9).
 - Vendor prices, OS behavior and library APIs change. Re-check anything here before procurement or a public claim.
 
+### Errata (2026-11-12, after owner and teammate review)
+
+These corrections fix the review's accuracy. They are not new findings.
+
+1. **NAT measurement scope.** The 70% ± 7.1% figure (S8) is a *conditional* hole-punch success rate for libp2p DCUtR in the IPFS network: it counts only attempts that reached the hole-punching stage. It is not an end-to-end connection success rate, and it does not predict OneCopy's overall success. The earlier wording ("Free transfers will fail by design on a large share of Internet paths", "roughly 10–30% of pairs fail") over-extrapolated and has been corrected in §1, §3.7 and §4.
+2. **Consistency trailer scope.** A source-consistency trailer stops OneCopy from signalling end-of-stream on inconsistent data. It does **not** control what Explorer, Finder or a provider framework does with a partially written destination file. The wording in §3.7, AR-03 and R-03 has been corrected. Partial-file behavior is an E-02 measurement.
+3. **Roster freshness.** The example bound ("24 h") in AR-10 was arbitrary and has been removed. Any bound needs a documented security/usability trade-off.
+
 Contents:
 
 1. Executive assessment
@@ -43,7 +51,7 @@ Contents:
 
 The architecture is **feasible as a desktop-first product** and the core product decisions are sound. No CONFIRMED decision needs to be reversed on the evidence gathered. Three areas, however, are materially harder or more expensive than the baseline implies, and each needs an owner decision before or during Phase 0:
 
-1. **Free direct-only Internet connectivity.** iroh's NAT traversal is coordinated through its relay, and application data flows over the relay before a direct path exists [V: S1, S5]. Disabling the relay also disables hole-punch coordination [V: S1]. So "iroh first" and "Free never uses a managed relay" pull in opposite directions. ICE-style designs (STUN plus signaling, no packet forwarding) can satisfy the rule, but a precise definition of what a Free connection may use is missing (§2 DA-03). Independent measurement also suggests that direct hole punching succeeds about **70% ± 7.1%** of the time, not ≥90% [V: S8]. On a large share of Internet paths, Free transfers will therefore fail by design. LAN transfers are not affected.
+1. **Free direct-only Internet connectivity.** iroh's NAT traversal is coordinated through its relay, and application data flows over the relay before a direct path exists [V: S1, S5]. Disabling the relay also disables hole-punch coordination [V: S1]. So "iroh first" and "Free never uses a managed relay" pull in opposite directions. ICE-style designs (STUN plus signaling, no packet forwarding) can satisfy the rule, but a precise definition of what a Free connection may use is missing (§2 DA-03). The ≥90% direct-success target has no independent support. The largest public measurement found a *conditional* hole-punch success rate of about **70% ± 7.1%** for libp2p DCUtR in IPFS, among attempts that reached the hole-punching stage [V: S8]. That is not OneCopy's expected overall success rate, but it means some Free Internet transfers will fail by design and the rate must be measured per network class. LAN transfers are not affected. *(Corrected per Errata 1.)*
 2. **Native lazy file paste outside Windows Explorer.** Forum evidence suggests Finder `Command-V` does not materialize file promises placed on the general pasteboard [S: S22]. The credible macOS route is a File Provider extension with on-demand ("dataless") placeholders [V/S: S23], which is a significant component and edges toward the "not a remote filesystem mount" boundary. Linux has no virtual-file clipboard mechanism (FUSE would be needed) [K]. Even on Windows, Explorer owns the destination write, so OneCopy cannot provide the documented journal, resume and verify-then-rename guarantees for a native paste (§2 DA-04).
 3. **Automatic capture on GNOME Wayland,** the default desktop of Ubuntu and Fedora Workstation. Mutter 51 implements neither `ext-data-control-v1` nor `wlr-data-control` [V: S9]. Every workaround is policy-sensitive (§3.3).
 
@@ -92,7 +100,7 @@ Type codes: **C** contradiction · **A** ambiguity · **G** gap · **F** factual
 | DA-15 | F | `README.md` §Evidence and provenance; `RESEARCH_SOURCES.md` §Primary research input | Both say the report will be committed "when the owner supplies/commits it". It is already in the repository. | **Corrected in this PR.** | N |
 | DA-16 | F | `docs/research/onecopy-deep-research-2026-11-12.md` | 59 unresolvable citation markers (82 distinct IDs). The claims cannot be traced to sources. | **Noted in `RESEARCH_SOURCES.md` in this PR.** Re-source any claim before using it in an ADR. | N |
 | DA-17 | F | `TRANSFER_AND_ROUTING.md` §Transport experiment | The iroh description is accurate but incomplete. The relay is also the hole-punch coordinator, payload flows over it first, and iroh 1.0 has shipped [V: S1–S5]. | **Addendum added in this PR.** | N |
-| DA-18 | F | `PHASE_0_VALIDATION.md` §Proposed performance targets | The ≥90% direct-success target has no independent support. The largest public measurement found 70% ± 7.1% [V: S8]. | **Context note added in this PR.** The target itself is unchanged and is listed as OD-01/OD-06 input. | N |
+| DA-18 | F | `PHASE_0_VALIDATION.md` §Proposed performance targets | The ≥90% direct-success target has no independent support. The largest public measurement found a *conditional* DCUtR hole-punch rate of 70% ± 7.1% [V: S8] (see Errata 1). | **Context note added in this PR.** The target itself is unchanged and is listed as OD-01/OD-06 input. | N |
 | DA-19 | F | `PLATFORM_CAPABILITIES.md` §macOS | Three facts are missing: there is no clipboard-change notification (apps poll `changeCount`) [V/K: S17]; `accessBehavior` exists from macOS 15.4, but whether the prompt is enforced by default on 26 or 27 is unverified [S: S19, S20]; and Local Network privacy applies from macOS 15 [S: S24]. | **Addendum added in this PR.** | N |
 | DA-20 | F | `PLATFORM_CAPABILITIES.md` §Linux Wayland | No compositor snapshot is given. | **Addendum added in this PR** (from S9). | N |
 | DA-21 | F | `PLATFORM_CAPABILITIES.md` §Windows | Four facts are missing: the clipboard-history and cloud-clipboard exclusion formats; `FILEDESCRIPTORW.cFileName` is `MAX_PATH`; the descriptor list is materialized up front; and `OleFlushClipboard` copies storage-medium formats into memory [V: S13–S15]. | **Addendum added in this PR.** | N |
@@ -219,7 +227,14 @@ Type codes: **C** contradiction · **A** ambiguity · **G** gap · **F** factual
 - **B. iroh with `RelayMode::Disabled`.** Candidates are exchanged over OneCopy signaling, plus STUN or QAD-style address discovery and a coordinated simultaneous dial. Whether iroh hole-punches across NATs without a relay path is **unknown** (E-06).
 - **C. Plain QUIC (`quinn`) plus ICE-style connectivity checks.** STUN binding plus signaling carry candidates, and connectivity checks go peer to peer [K]. No server ever forwards a Free packet. Engineering cost is higher, but the policy boundary is unambiguous.
 
-**Hole-punch success.** Trautwein et al. measured libp2p DCUtR across 4.4M+ attempts from 85,000+ networks and found 70% ± 7.1% hole-punch success, statistically indistinguishable between TCP and QUIC, with 97.6% succeeding on the first attempt and success independent of relay characteristics [V: S8 abstract/summary]. iroh self-reports about 9 in 10 [V: S1]. Independent data therefore does not support ≥90% Free Internet direct success. Because success is independent of the relay, a signaling-only design (A without payload, B or C) should not be inherently worse at hole punching than relay-coordinated designs [I].
+**Hole-punch success.** Trautwein et al. measured libp2p DCUtR across 4.4M+ attempts from 85,000+ networks [V: S8 abstract/summary]:
+
+- The *conditional* hole-punch success rate was 70% ± 7.1%, counting only attempts that reached the hole-punching stage.
+- TCP and QUIC were statistically indistinguishable.
+- 97.6% of successful connections succeeded on the first attempt.
+- Success was independent of relay characteristics.
+
+This is neither an end-to-end connection rate nor a OneCopy prediction. iroh self-reports about 9 in 10 [V: S1]. Independent data therefore does not *support* a universal ≥90% Free Internet direct-success target; OneCopy's rate must be measured per network class. Because success is independent of the relay, a signaling-only design (A without payload, B or C) should not be inherently worse at hole punching than relay-coordinated designs [I].
 
 **LAN is not guaranteed either** [K]: Wi-Fi client isolation (guest, hotel and enterprise networks), the macOS and iOS Local Network permission, and Windows Firewall can all block it.
 
@@ -231,7 +246,7 @@ Type codes: **C** contradiction · **A** ambiguity · **G** gap · **F** factual
 - Keep per-chunk digests for on-disk verification and resume. Use keyed BLAKE3 with a per-transfer key so digests are not global content identifiers (consistent with the "no raw hashes" rule).
 - For staging, use a standard streaming AEAD (the STREAM construction as used by the age v1 format, or Tink Streaming AEAD) rather than an ad-hoc chunk scheme.
 
-**Integration with native paste** [I]. The receiver must not release the final bytes to Explorer or File Provider until the sender has delivered a "source unchanged" trailer that follows the post-read revalidation. Otherwise a last-moment modification produces a false success.
+**Integration with native paste** [I]. The receiver should not release the final bytes to Explorer or File Provider until the sender has delivered a "source unchanged" trailer that follows the post-read revalidation. Otherwise OneCopy itself would signal a clean end of stream for inconsistent data. The trailer does **not** determine what the consuming application does with a partially written destination file after an error; that must be measured (E-02). *(Corrected per Errata 2.)*
 
 **Source-consistency hardening** [K]:
 
@@ -349,12 +364,12 @@ Scales: severity (S) and likelihood (L) are 1–5; priority = S × L. "Exp." lis
 | ID | Risk | S | L | P | Impact | Validation / mitigation | Exp. |
 |---|---|---|---|---|---|---|---|
 | R-02 | The chosen transport cannot *prove* that no Free payload crosses a managed relay, or iroh exposes no path control | 5 | 3 | 15 | Breach of a CONFIRMED business rule, or the transport choice is reworked later | Two-track E-06 with packet and byte-counter evidence; OD-01 | E-06 |
-| R-01 | Free Internet direct success too low (roughly 10–30% of pairs fail) | 4 | 4 | 16 | Free UX and perception; support load | Emulated NAT matrix, then a field trial; class-based honest UX | E-06, E-07 |
+| R-01 | Free Internet direct success too low for some network classes (OneCopy-specific rate unknown; see Errata 1) | 4 | 4 | 16 | Free UX and perception; support load | Emulated NAT matrix, then a field trial; class-based honest UX | E-06, E-07 |
 | R-09 | Promoted sensitive items leak into OS or keyboard clipboard history or cloud sync | 4 | 4 | 16 | Privacy breach outside OneCopy's E2EE | Set and honor markers (AR-05); tests per OS | E-01, E-03, E-04 |
 | R-14 | Solo-developer scope: five native shells, a core and a server | 4 | 4 | 16 | Schedule and quality | Sequencing (§7); shared desktop UI decision (OD-12) | — |
 | R-05 | GNOME Wayland auto-capture impossible without an extension | 3 | 5 | 15 | Weak Linux story on the default desktops | Support tiers (AR-15); OD-13 | E-05 |
 | R-12 | Mobile live references are transient, so D-005 semantics collide with share-sheet reality | 3 | 5 | 15 | User confusion; policy drift | AR-16; OD-03 | E-12 |
-| R-03 | Native paste leaves a truncated destination or reports success after a failure | 4 | 3 | 12 | Violates "never false success" | Consistency trailer; E-02 acceptance criteria; managed-download routing | E-02 |
+| R-03 | Native paste leaves a truncated destination or reports success after a failure | 4 | 3 | 12 | Violates "never false success" | E-02 measurement of partial-file outcomes; managed-download routing; the consistency trailer covers only OneCopy's own end-of-stream signal | E-02 |
 | R-04 | Finder `Command-V` impossible without File Provider | 3 | 4 | 12 | macOS UX below Windows | Test promises, then File Provider; OD-05 | E-03 |
 | R-06 | macOS pasteboard privacy enforced, so auto-capture is prompted or denied | 4 | 3 | 12 | Degraded macOS capture | Onboarding; detection APIs; test on 26 and 27 | E-03 |
 | R-08 | Stale roster or unclear revocation authority on LAN | 4 | 3 | 12 | A revoked device is still served | AR-10; property tests | E-11 |
@@ -408,7 +423,7 @@ Each item states the current design, the proposed change, advantages, disadvanta
 **Proposed.** Two delivery modes:
 
 - **Managed download.** OneCopy writes the destination: full journal, resume, verify, then atomic rename.
-- **Native paste** (Explorer `IStream`, File Provider, Android provider): integrity, plus no false success through the consistency trailer that gates the final bytes. Resume is best-effort.
+- **Native paste** (Explorer `IStream`, File Provider, Android provider): OneCopy never signals a clean end of stream for inconsistent data. Partial-file handling and resume depend on the consuming application and are claimed only where E-02/E-03 demonstrate them. *(Corrected per Errata 2.)*
 
 Items above a size threshold, or folders that exceed `MAX_PATH` or descriptor limits, default to managed download or show a choice.
 
@@ -506,7 +521,7 @@ Items above a size threshold, or folders that exceed `MAX_PATH` or descriptor li
 - Any trusted device may revoke another device.
 - A recovery key can re-establish trust.
 - A revoked or self-revoked key cannot sign.
-- A transfer is authorized only if the server and peer roster versions agree, or the local roster was refreshed within a bound (for example 24 h, to be tuned).
+- A transfer is authorized only if the server and peer roster versions agree, or the local roster was refreshed within a bound chosen only after a documented security/usability trade-off. *(Corrected per Errata 3.)*
 
 **Advantages.** Closes the lockout and stale-roster gaps.
 

@@ -31,7 +31,7 @@ Phase 0 must prove which relay network components (discovery, NAT information, t
 - `RelayMode::Disabled` is supported but removes relay fallback, peer introduction and hole-punch coordination. iroh estimates roughly one connection in ten stops working without a relay.
 - By default iroh uses four public relays operated by number 0. They are rate-limited and described as free for development and testing. Relays see endpoint IP addresses, which endpoints communicate, and relayed volume, but not content. The relay software is open source and self-hostable.
 
-An independent measurement of libp2p DCUtR hole punching (4.4M+ attempts) reports 70% ± 7.1% success, statistically indistinguishable between TCP and QUIC, and independent of relay characteristics [V, arXiv:2510.27500]. Implications and options are proposals in `docs/reviews/ENGINEERING_REVIEW_2026-11-12.md` §3.7 and §5 (AR-01, AR-02); they require owner decisions.
+An independent measurement of libp2p DCUtR in the IPFS network (4.4M+ attempts) reports a *conditional* hole-punch success rate of 70% ± 7.1% [V, arXiv:2510.27500]. The rate counts only attempts that reached the hole-punching stage. TCP and QUIC were statistically indistinguishable, and success was independent of relay characteristics. This is not an end-to-end connection success rate and not a prediction of OneCopy's success rate (corrected 2026-11-12). Implications and options are proposals in `docs/reviews/ENGINEERING_REVIEW_2026-11-12.md` §3.7 and §5 (AR-01, AR-02); they require owner decisions.
 
 ## Direct path candidate process (PROPOSED)
 
