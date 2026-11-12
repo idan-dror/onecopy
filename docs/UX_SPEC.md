@@ -55,6 +55,8 @@ Do not render executable HTML from clipboard or automatically resolve/open a cop
 | Staged/Ready | Valid temporary encrypted copy | "Offline copy created [date/time]" |
 | Expired | Staging object expired/deleted | "Offline copy expired" |
 | *Kept on device (PROPOSED)* | Mobile local staging of a transient source | "Kept on this phone until [time]" |
+| *Origin app not running* | A large item's bytes live on a mobile origin whose OneCopy app is suspended or not running (D-030 correction) | "Open OneCopy on [device] to get this item" |
+| *Preview only* | Item above the inline cap; only metadata or a preview is synced, and full content needs the origin | "Full [image/text] is on [device]" with size |
 | *Excluded (PROPOSED)* | Capture skipped because of a sensitivity marker | "Not saved: marked private by the app that copied it" |
 | *Manual capture mode (PROPOSED)* | Support tier B (for example GNOME Wayland, or macOS with clipboard access denied) | "Press [shortcut] or open OneCopy to add your clipboard" |
 | *Direct connection unavailable (PROPOSED)* | Free direct path failed on this network | "Couldn't connect directly to [device] on this network" (no paid option shown before Premium exists) |
@@ -71,6 +73,10 @@ Status must not conflate **source availability** with **offline staging availabi
 **Mobile → desktop:** from a mobile share action, OneCopy receives a user-authorized content URI/security-scoped item. If access is transient, warn that the source may become unavailable; do not silently materialize a giant permanent snapshot. *(Proposed, D-025: offer an explicit, bounded, expiring "Keep on this device until sent".)*
 
 **Desktop → mobile:** user opens OneCopy, chooses an item, then copies locally or shares/saves via native mobile APIs. Respect mobile lifecycle limits.
+
+**Large mobile-origin items (correction, 2026-11-12):** an image or text above the inline cap, copied or shared on a phone, is listed on other devices with size and origin. When the phone's OneCopy app is suspended or not running, the item shows "Open OneCopy on [phone] to get this item". It becomes fetchable when the app runs again. The UI never implies the content is stored elsewhere, and never uploads it automatically.
+
+**Remote file delivery modes (correction, 2026-11-12):** "Save with OneCopy" (managed download) guarantees resume and controlled finalization on supported destinations. Native paste shows only the guarantees demonstrated for that target. If a large native paste is interrupted, the UI offers to restart through managed download.
 
 **Blocked P2P Free:** describe direct connection failure and a Premium relay option. Do not silently turn the option on. *(Proposed clarification: until Premium exists, describe the failure and its likely cause only.)*
 

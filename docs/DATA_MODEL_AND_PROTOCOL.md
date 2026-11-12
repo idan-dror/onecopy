@@ -76,6 +76,26 @@ SourceRef (additions)
 - The origin serves `content_ref` bytes from its local encrypted store of *captured clipboard data*. That store is the clipboard content itself, not a snapshot of a file. Its retention follows history eviction.
 - Receivers fetch the bytes over the authenticated direct path when the user selects or promotes the item.
 
+**Availability of `content_ref` items (correction, 2026-11-12).** A `content_ref` can be served only while the origin's OneCopy core is running and reachable.
+
+- **iOS/iPadOS:** the app is normally suspended in the background, and remote wakeups are unreliable.
+- **Android:** the app process may not be running.
+
+So large items copied on a mobile device are frequently **unavailable** to other devices until the user opens OneCopy on the origin. The receiver must show an explicit state:
+
+```text
+content_ref availability:
+  AVAILABLE           origin reachable and serving
+  ORIGIN_OFFLINE      origin device not connected
+  ORIGIN_NOT_RUNNING  mobile origin app suspended/terminated; "open OneCopy on <device>"
+  EVICTED             origin no longer holds the captured data (history eviction)
+  UNAVAILABLE         other or permission failure (reason code)
+```
+
+No automatic upload, cloud staging or background prefetch is used to work around this. Premium "Keep Available Offline" remains an explicit, separate user action (D-009).
+
+**Explicit mobile local staging (D-025)** is an intentional, user-authorized exception for transient sources only. It never permits automatic source duplication.
+
 **Free control-plane quotas (D-031).**
 
 - Server-enforced: items per minute, inline bytes per day, retained envelopes per account (bounded by the history window plus tombstones), signaling messages per minute, address-discovery requests per minute.

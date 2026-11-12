@@ -26,6 +26,8 @@ For such sources a durable "live reference" usually cannot exist (review DA-05).
 3. It is **distinct from Premium cloud staging** (D-009): nothing leaves the device until a normal transfer to a trusted device is requested. The two are never presented as the same feature.
 4. Without local staging, a transient-source item shows "available while the share is open" and later "source no longer available".
 
+5. **Scope of the exception (correction, 2026-11-12).** Mobile local staging is an **intentional, user-authorized exception** to the "no file duplication" rule (README invariant #4, D-005), limited to transient sources. It must not be read as permission for automatic source duplication on any platform. It does not apply to durable sources (desktop paths, persistable grants, security-scoped bookmarks). It is not a precedent for caching, prefetching or snapshotting elsewhere.
+
 ## Alternatives considered
 
 - **Always copy on share.** Violates the "never automatic" direction.

@@ -66,14 +66,19 @@ These requirements reflect owner directions recorded on 2026-11-12. They are **n
 - PR-014: met in Phase 1 by measured direct-path selection. Complex scoring is deferred (D-035).
 - PR-023: refined by PR-030.
 - PR-024: extended by PR-034.
-- UJ-02: "passes integrity checks" applies to managed download; for native paste, see PR-029.
+- UJ-02: corrected in place (delivery-mode distinction).
+- PR-031: explicit mobile local staging is an intentional, user-authorized exception for transient sources only. It never permits automatic source duplication. README invariant #4 and PR-008/PR-010 are otherwise unchanged.
+- PR-032: large items whose origin is a mobile device may be **unavailable while the OneCopy app on that device is suspended or not running**. The receiver shows this explicitly (`UX_SPEC.md` state "Origin app not running"). Nothing is uploaded automatically to work around it.
 - UJ-06: until Premium exists (Phase 4), the UX explains the blocked direct connection without offering a paid option.
 
 ## Example user journeys and acceptance outcomes
 
 **UJ-01 Desktop text:** On supported desktop clients with capture permission, copying simple text produces an encrypted entry on another online trusted device. The receiving active OS clipboard remains unchanged until local user action. Selecting that entry allows paste to a normal app.
 
-**UJ-02 Remote file:** Copying a multi-GB file does not transfer/upload its data at copy time. The destination sees the reference. When requested, its source opens and streams with progress, cancel/resume; the completed artifact passes integrity checks. An unavailable source is explained.
+**UJ-02 Remote file:** Copying a multi-GB file does not transfer/upload its data at copy time. The destination sees the reference. When requested, its source opens and streams with progress and cancel. An unavailable source is explained. The outcome depends on the delivery mode (corrected 2026-11-12, D-024):
+
+- **OneCopy-managed download** (supported destinations): resume after interruption, end-to-end integrity verification and controlled finalization are **guaranteed**.
+- **Native paste** (for example Explorer): only the guarantees demonstrated for that specific target and condition in E-02/E-03 are claimed (PR-029). OneCopy never signals successful completion for data that failed validation, but resume and finalization belong to the target application.
 
 **UJ-03 Simultaneous copying:** Device A and B copy independently within seconds. Both appear once in history in a deterministic order; no recursive copy feedback or automatic takeover of OS clipboards.
 

@@ -78,7 +78,9 @@ These terms support the owner-directed proposals D-021 to D-042. Their definitio
 
 **Transient source:** A source whose access grant is limited in time or by process lifetime, such as an Android share-intent URI grant or an iOS share-extension item. (D-025)
 
-**Mobile local staging:** An explicit, user-requested, bounded and expiring copy of a transient mobile source, kept in OneCopy's app container until sent. Not Premium cloud staging. (D-025)
+**Mobile local staging:** An explicit, user-requested, bounded and expiring copy of a transient mobile source, kept in OneCopy's app container until sent. Not Premium cloud staging. An intentional, user-authorized exception for transient sources only; it never permits automatic source duplication. (D-025)
+
+**Origin app not running (mobile):** The availability state of an item whose bytes must be fetched from a mobile origin while the OneCopy app there is suspended or terminated. The item is listed but cannot be fetched until the app runs again. (D-030 correction)
 
 **Inline content cap:** The maximum ciphertext size of representation content carried inside a history envelope. (D-030)
 

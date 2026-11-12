@@ -123,7 +123,7 @@ These refinements reflect owner-directed proposals. They do not change the CONFI
    - Free configuration has no relay transport.
    - Address discovery is a control-plane service that never forwards inter-device packets.
    - The Premium relay is a separate, entitlement-gated component.
-3. **Content references (D-030, ADR-0006).** Representations above the inline cap become on-demand `content_ref`s. The origin core serves them through source capabilities, from its local encrypted store of captured clipboard data.
+3. **Content references (D-030, ADR-0006).** Representations above the inline cap become on-demand `content_ref`s. The origin core serves them through source capabilities, from its local encrypted store of captured clipboard data. Mobile origins can serve only while their app is running, so availability states are explicit (`DATA_MODEL_AND_PROTOCOL.md`).
 4. **Process model and local IPC (D-038, D-039, ADR-0009).** Recommended: one per-user agent process per desktop owns the core, the OS adapter and the tray. A separate UI process is allowed only behind authenticated IPC. Exactly one process per device mutates cryptographic state; mobile extensions enqueue work for the main app. A process-model ADR precedes Phase 1.
 5. **Mobile local staging store (D-025, ADR-0004).** A bounded, expiring, encrypted area in the app container for explicitly kept transient sources. It is separate from the Premium staging client.
 6. **OneCopy-owned OS integrations (D-027, ADR-0005).** Share extensions, File Provider–like providers, an IME or desktop-shell integrations are separate components, each with its own ADR and threat-model entry. Provider-style integrations expose only authorized history items.

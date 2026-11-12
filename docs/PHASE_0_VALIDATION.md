@@ -98,7 +98,7 @@ Targets are hypotheses, not contractual release SLOs. Candidate direct-success g
 
 **Gate C — Direct path:** QUIC authentication, strict no-Free-managed-relay payload, representative NAT performance and clear failed-path UX. Transport dependency decision recorded.
 
-**Gate D — Transfer:** 100 GB without file-size-proportional memory growth, safe resume, path safety, no falsely successful mixed/corrupt destination in fault suite.
+**Gate D — Transfer:** 100 GB without file-size-proportional memory growth, safe resume, path safety, no falsely successful mixed/corrupt destination in fault suite. *(Correction 2026-11-12, D-024: safe resume and controlled finalization are gated on OneCopy-managed download. Native-paste targets are gated by Gate B and E-02 outcome classes.)*
 
 **Gate E — Security:** threat model reviewed; high-risk protocol and filesystem invariants tested; no public beta without independent protocol/security assessment.
 

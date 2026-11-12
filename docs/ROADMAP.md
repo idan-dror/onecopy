@@ -21,11 +21,11 @@
 
 **Goal:** Usable trusted-device clipboard/history with direct P2P transfer.
 
-**Includes:** local Rust core on Windows and one Linux target first, then macOS; local trusted device roster, E2EE sync, ~10 item history, normal copy/paste bridge as allowed, text/image/file/folder representations, on-demand transfers and bounded resume, user-visible errors.
+**Includes:** local Rust core on Windows and one Linux target first, then macOS; local trusted device roster, E2EE sync, ~10 item history, normal copy/paste bridge as allowed, text/image/file/folder representations, on-demand transfers, OneCopy-managed download with bounded resume and controlled finalization, native paste where E-02 evidence supports it, user-visible errors.
 
 **Excludes:** managed Premium relay/staging, per-application add-ons, full mobile background integration and automatic snapshots.
 
-**Exit:** core user journeys UJ-01–UJ-06 pass on supported desktop configurations; code is maintainable and testable; outstanding limitations are documented.
+**Exit:** core user journeys UJ-01–UJ-06 pass on supported desktop configurations; code is maintainable and testable; outstanding limitations are documented. For UJ-02, resume and controlled finalization are verified on **OneCopy-managed downloads**. Native paste is verified only against the target-specific claims that E-02 demonstrated, and each unsupported guarantee is documented (D-024, corrected 2026-11-12).
 
 ## Phase 2 — Desktop production hardening
 

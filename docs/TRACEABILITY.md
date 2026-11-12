@@ -9,7 +9,7 @@
 | PR-005, PR-025, PR-027 | PRD, DATA_MODEL_AND_PROTOCOL, UX_SPEC | E-01, E-11 | Representation handling, deterministic dedup/retention |
 | PR-007, PR-021, PR-026, NFR-001 | SECURITY_AND_PRIVACY, DATA_MODEL_AND_PROTOCOL | E-11 | Device trust, key review, revocation |
 | PR-008, PR-009, PR-010, PR-011 | TRANSFER_AND_ROUTING, DATA_MODEL_AND_PROTOCOL | E-08, E-09 | Live source, no silent mixed results |
-| PR-012, PR-013, NFR-003 | TRANSFER_AND_ROUTING | E-09, E-10 | 100 GB bounded/resumable verified transfer |
+| PR-012, PR-013, NFR-003 | TRANSFER_AND_ROUTING | E-09, E-10 (managed download); E-02 (native paste claims) | 100 GB bounded/resumable verified **managed download**; native paste only to demonstrated claims (D-024) |
 | PR-014, PR-015, PR-016 | TRANSFER_AND_ROUTING, PREMIUM_GATEWAY | E-06, E-07, E-13 | No Free managed relay payload |
 | PR-017, PR-018 | PREMIUM_GATEWAY, UX_SPEC, DATA_MODEL_AND_PROTOCOL | E-13 (early economics only) | Explicit, verified, expiring Premium copy |
 | PR-020 | ARCHITECTURE, PRODUCT_VISION | Document review | No per-third-party-app add-ons |

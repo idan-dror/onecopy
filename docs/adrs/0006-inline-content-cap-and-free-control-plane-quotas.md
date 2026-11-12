@@ -41,6 +41,7 @@ The baseline promises Free users "small encrypted-history sync" without defining
 ## User/product effects
 
 - A large text or image copied on an offline device is listed but not retrievable until that device is online again. This must be shown explicitly.
+- **Mobile origins (correction, 2026-11-12):** a large item copied on a phone is usually unretrievable while the OneCopy app there is suspended or not running (iOS suspension; Android process lifecycle). Receivers show the `ORIGIN_NOT_RUNNING` state ("Open OneCopy on [device]"). No automatic upload or prefetch works around it.
 
 ## Consequences and follow-up tests
 
