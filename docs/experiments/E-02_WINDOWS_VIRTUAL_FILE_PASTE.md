@@ -1,9 +1,43 @@
 # E-02 — Windows clipboard virtual-file paste: experiment specification
 
-**Status:** PROPOSED. Implementation-ready once the owner approves the documentation baseline **and** this specification. **Not implemented.**
+**Status:** **APPROVED** by the product owner on 2026-11-12 with the Phase 0 baseline. Implemented in two independently reviewed stages (§0). The implementation PR is not merged without owner approval.
 **Experiment class:** Phase 0 feasibility spike. This is throwaway code, not a product foundation.
-**Related:** PR-019, PR-023 (CONFIRMED/PROPOSED); PR-028–PR-030, PR-035 (PROPOSED); D-024, D-033 (PROPOSED); ADR-0002, ADR-0007; Gate B (Windows).
-**Stage:** 0. Runs on the existing Windows development machine; no purchases and no network services.
+**Related:** PR-019 (CONFIRMED), PR-023 (PROPOSED); PR-028–PR-030, PR-035 (CONFIRMED); D-024, D-033, D-041, D-042 (CONFIRMED); ADR-0002, ADR-0007; Gate B (Windows).
+**Equipment stage:** 0. Runs on the existing Windows development machine; no purchases and no network services.
+
+## 0. Authorization and staging (owner decision, 2026-11-12)
+
+**Objective.** Produce evidence about native Windows file paste. Do not assume it is feasible.
+
+**Stage A — minimal feasibility.**
+
+- Isolated Rust experiment workspace; synthetic local byte provider.
+- Windows clipboard `IDataObject` and `IStream` with `CFSTR_FILEDESCRIPTORW` and `CFSTR_FILECONTENTS`.
+- Explorer paste of **small** synthetic files: manual (D1), plus an automated driver pending D1 calibration.
+- Basic lifecycle, correctness and memory evidence.
+- Cases: §7.0. After Stage A, **stop and report the outcome**. Do not proceed into the Stage B matrix without the owner's review.
+
+**Stage B — robustness and compatibility.** Starts only after Stage A passes review. Covers:
+
+- delayed and faulting streams, cancellation, provider termination;
+- 1, 10 and 100 GiB transfers;
+- partial-file and false-success classification;
+- clipboard privacy-marker and provenance observations;
+- additional targets;
+- the sanitized evidence and acceptance report.
+
+These are the cases in §7.1–§7.11 not marked *blocked*.
+
+**Safety permissions:**
+
+| Item | Permission |
+|---|---|
+| Process Monitor | Optional diagnostic. Install only from the official Microsoft Sysinternals source; no silent installation; raw traces stay local and are never committed. |
+| Elevated VHD creation (DEST-01 to DEST-04) | **Deferred.** Safe instructions are prepared (Appendix A), but no disk-management command runs without separate operator approval. Cases stay **blocked / not run**. |
+| SEC-04 hostile-filename tests | **Only in a disposable VM**, never on the main Windows installation. **Blocked / not run** until a VM is available. Security requirements are not weakened because of this. |
+| Keystroke or input automation | Permitted inside this experiment only, for reproducible testing (D-041). It must never become a product dependency. |
+| Inputs | Synthetic data only; never actual user files. |
+| Scope | No production OneCopy components, networking, encryption, cloud services or GUI. |
 
 Evidence labels: **[V]** verified against Microsoft documentation on 2026-11-12; **[K]** known but not re-verified, so confirm during implementation; **[I]** inference.
 
@@ -161,9 +195,9 @@ Environment checked on 2026-11-12 (read-only inspection):
 | Disk | NTFS destination with ≥ 250 GiB free (a 100 GiB destination plus headroom; the source is synthetic, so no source file) | Secondary NTFS volume with > 1 TB free: OK |
 | PowerShell | 5.1 (built in) for scripts; `Get-Counter`, `Get-Item -Stream`, `Get-MpComputerStatus` (read-only) | Present |
 | Screen recording | Snipping Tool screen recording (built in) for D1 runs | Present (verify) |
-| Process Monitor (Sysinternals) | **Optional.** File-system trace of the target's create, write, rename and delete on the destination. Needs elevation. | **Not installed.** Installation needs owner approval. Fallback: `e02-verify` 100 ms directory polling. |
-| Elevated `diskpart` (VHD creation) | **Optional.** Small NTFS, FAT32 and exFAT VHDs for disk-full and filesystem cases | Available on Home with elevation. **The operator runs these steps; elevation is not automated.** |
-| Hypervisor | Not needed, except to run Q9 hostile-name cases in a disposable VM (preferred) | Optional (Stage 0b) |
+| Process Monitor (Sysinternals) | **Optional.** File-system trace of the target's create, write, rename and delete on the destination. Needs elevation. | **Not installed.** Allowed only from the official Microsoft Sysinternals source, with no silent installation. Raw traces stay local. Fallback: `e02-verify` 100 ms directory polling. |
+| Elevated `diskpart` (VHD creation) | Small NTFS, FAT32 and exFAT VHDs for disk-full and filesystem cases | **Deferred.** Instructions in Appendix A; runs only after separate operator approval. DEST-01 to DEST-04 are blocked until then. |
+| Disposable VM | **Required** for SEC-04 (hostile names) | Not available yet. SEC-04 is blocked. |
 
 ## 5. Variants (combinable flags per case)
 
@@ -182,7 +216,7 @@ Environment checked on 2026-11-12 (read-only inspection):
 
 | ID | Target | Driver | Notes |
 |---|---|---|---|
-| G-01 | Explorer folder window | **D1** manual Ctrl+V (ground truth); **D2** scripted: `open-target.ps1` opens the folder, focuses the window, sends Ctrl+V | D2 is valid only after the calibration subset matches D1 (§9.4) |
+| G-01 | Explorer folder window | **D1** manual Ctrl+V (ground truth). **D2** scripted: `open-target.ps1` opens the folder. Preferred automation **D2c** posts Explorer's folder-view *Paste* command (`WM_COMMAND`, `FCIDM_SHVIEW_PASTE`; undocumented ID [K]) to that specific window, so no global keystrokes can land in another application. A global Ctrl+V keystroke is used only if D2c fails, and only after checking that the target window is in the foreground. | D2/D2c is valid only after the calibration subset matches D1 (§9.4). Automation is experiment-only (D-041). |
 | G-02 | Desktop | D1 | Destination is the Desktop. Synthetic names only; files are removed after the run. |
 | G-03 | Common Item Dialog hosted by another process (Notepad *Save As* or *Open* dialog file list, Ctrl+V into the list) | D1 | **Required second target.** Shell copy hosted in a non-Explorer process. |
 | G-04 | `IFileOperation::CopyItems(IDataObject, destination)` + `PerformOperations` | D3 (`e02-driver`) | `CopyItems` accepts an `IDataObject` [V]. Whether it consumes virtual-only formats is itself a result. |
@@ -194,6 +228,28 @@ Environment checked on 2026-11-12 (read-only inspection):
 Priority: **P0** mandatory for the Gate B decision · **P1** should run · **P2** optional.
 Repeats: P0 cases run **3×** (each 100 GiB case runs **2×**); P1 cases run 2×; P2 cases run 1×.
 Default destination: `<test-root>\dest\<run-id>\` on the NTFS volume. Default target and driver: G-01/D1 for calibration, then D2.
+
+### 7.0 Stage A cases (small files; T1, FS set, PUI on; target G-01)
+
+| ID | Setup | Measure / record |
+|---|---|---|
+| A-01 | 1 file, 1 MiB | Call sequence; result; digest |
+| A-02 | 1 file, 0 bytes (`FD_FILESIZE` = 0) | Created with size 0 |
+| A-03 | 1 file, 4 KiB | Digest |
+| A-04 | 1 file, 64 MiB | Digest; provider peak private bytes compared with A-01 (no size-proportional buffering) |
+| A-05 | 3 files (1 KiB, 1 MiB, 8 MiB) in one data object | Per-`lindex` contents calls; all digests |
+| A-06 | A-01 data object pasted twice into two folders | A new stream per `GetData`; both digests (LIFE-01, small) |
+| A-07 | Graceful provider exit (`clear`) after A-01 | Clipboard no longer offers OneCopy formats; no memory spike (PROC-04, small) |
+| A-08 | Log audit after all Stage A runs | No content markers, user names or profile paths (SEC-06) |
+
+**Stage A acceptance:**
+
+- **SA-1:** `cargo build --locked` and `cargo test --locked` pass for the experiment workspace.
+- **SA-2:** every case A-01 to A-06 produces the advertised names and sizes, with BLAKE3 digests equal to the expected ones. Driver: D1, or the automated driver, which stays pending D1 calibration.
+- **SA-3:** the lifecycle is visible in the event log (set clipboard → descriptor `GetData` → contents `GetData` per file → reads → stream release), and A-07 leaves no OneCopy formats on the clipboard.
+- **SA-4:** A-04 peak private bytes exceed A-01's by less than 16 MiB.
+- **SA-5:** A-08 is clean.
+- **SA-6:** a Stage A report with exact commands, environment and results classified as pass, fail, inconclusive or not run.
 
 ### 7.1 Baseline (BASE)
 
@@ -278,14 +334,14 @@ Default destination: `<test-root>\dest\<run-id>\` on the NTFS volume. Default ta
 | LIFE-06 | P2 | Lock the workstation during a throttled copy | Copy continues? |
 | LIFE-07 | P2 | Sleep and resume during a throttled copy | Outcome |
 
-### 7.8 Destination conditions (DEST) — optional elevated VHD steps run by the operator
+### 7.8 Destination conditions (DEST) — DEST-01 to DEST-04 BLOCKED until separate operator approval for VHD creation (Appendix A)
 
 | ID | Pri | Setup | Measure / record |
 |---|---|---|---|
-| DEST-01 | P1 | 1 GiB NTFS VHD, 2 GiB file, FS set | Early refusal versus mid-copy failure; partial state |
-| DEST-02 | P1 | DEST-01 with FS absent | Same as DEST-01 |
-| DEST-03 | P1 | FAT32 VHD, 5 GiB file | Early "file too large" check? Partial? |
-| DEST-04 | P1 | exFAT VHD, 1 GiB file | `Zone.Identifier` (alternate data streams) absent as expected |
+| DEST-01 | P1 (blocked) | 1 GiB NTFS VHD, 2 GiB file, FS set | Early refusal versus mid-copy failure; partial state |
+| DEST-02 | P1 (blocked) | DEST-01 with FS absent | Same as DEST-01 |
+| DEST-03 | P1 (blocked) | FAT32 VHD, 5 GiB file | Early "file too large" check? Partial? |
+| DEST-04 | P1 (blocked) | exFAT VHD, 1 GiB file | `Zone.Identifier` (alternate data streams) absent as expected |
 | DEST-05 | P0 | Name collision → *Keep both* / *Skip* | Naming behavior |
 | DEST-06 | P2 | Read-only destination folder (synthetic test folder) | Error path |
 
@@ -299,14 +355,14 @@ Default destination: `<test-root>\dest\<run-id>\` on the NTFS volume. Default ta
 | FOLD-04 | P1 | Unicode names: NFC versus NFD pair, RTL, emoji; case-collision pair (`a.bin`/`A.bin`); trailing dot or space | Created names; collisions handled? |
 | FOLD-05 | P2 | 100,000 entries | Descriptor ~tens of MB [K]; feasibility only |
 
-### 7.10 Security and provenance (SEC) — hostile-name cases preferably in a disposable VM
+### 7.10 Security and provenance (SEC) — SEC-04 runs only in a disposable VM (BLOCKED until available)
 
 | ID | Pri | Setup | Measure / record |
 |---|---|---|---|
 | SEC-01 | P0 | After BASE-02 and DEST-05 on each target: read `Get-Item -Stream *` and the `Zone.Identifier` content | Mark-of-the-Web applied: yes/no, zone, per target |
 | SEC-02 | P1 | UD on (`CFSTR_UNTRUSTEDDRAGDROP` DWORD) | Any change in prompts or Mark-of-the-Web. Informational, because the format is documented for IE drag-and-drop. |
 | SEC-03 | P1 | Paste a benign synthetic `.cmd` that only echoes text, then open it | Any SmartScreen or attachment prompt? |
-| SEC-04 | P0 | Hostile `cFileName` values: `..\x.bin`, `sub\..\..\x.bin`, an absolute path *inside the test root's sentinel directory*, `x.bin:ads`, `CON`, `NUL.bin`, `COM1` | **No write outside the destination folder.** Record each outcome. Sentinel directories are checked before and after. Run in a disposable VM if Stage 0b is approved; otherwise only inside the nested test root. |
+| SEC-04 | P0 (blocked: disposable VM only) | Hostile `cFileName` values: `..\x.bin`, `sub\..\..\x.bin`, an absolute path *inside the test root's sentinel directory*, `x.bin:ads`, `CON`, `NUL.bin`, `COM1` | **No write outside the destination folder.** Record each outcome. Sentinel directories are checked before and after. **Disposable VM only (owner decision 2026-11-12); never on the main Windows installation.** Until a VM exists, record as blocked/not run. |
 | SEC-05 | P1 | Microsoft Defender protection history after the runs (read-only) | Were pasted files scanned or flagged? |
 | SEC-06 | P0 | Log audit: search the logs for known synthetic plaintext markers and for user-profile paths | Logs contain none |
 
@@ -392,7 +448,7 @@ Before D2 or D3 results are used:
 3. **Close** other clipboard managers. Record anything that cannot be closed.
 4. **Settings.** Clipboard History is toggled **manually by the operator** for LIFE-04/05 and restored afterwards. The experiment code changes no settings.
 5. **Disk space.** Delete destination files after each verified run. The 100 GiB cases write about 100 GiB per run to the SSD; record the total bytes written.
-6. **Optional elevation.** Elevated steps (VHD creation, Process Monitor) are run by the operator and listed in the run record.
+6. **Elevation.** VHD creation is deferred (Appendix A); it needs separate operator approval and is run by the operator, never automated. Process Monitor, if used, comes from the official Sysinternals source, installed visibly by the operator. Elevated steps are listed in the run record.
 7. **Abort.** A kill switch (`run-case.ps1 -Abort`) stops the provider, clears the clipboard and stops the samplers.
 
 ## 11. Fallback options (decision tree)
@@ -468,10 +524,44 @@ Before D2 or D3 results are used:
 
 ## 15. Readiness
 
-This specification is **implementation-ready** once:
+**Resolved 2026-11-12.** The owner approved the baseline and this specification:
 
-1. the owner approves the documentation baseline and this specification;
-2. the owner states whether optional Process Monitor installation and operator-run elevated VHD steps are permitted (the experiment is still valid without them, using the polling observer and skipping DEST-01 to DEST-04);
-3. the owner states whether SEC-04 must wait for a disposable VM (Stage 0b) or may run inside the nested test root.
+1. Process Monitor is optional, from the official Sysinternals source only, with no silent installation; traces stay local.
+2. Elevated VHD steps are deferred; DEST-01 to DEST-04 are blocked until separate operator approval.
+3. SEC-04 runs only in a disposable VM and is blocked until one exists.
 
-No other dependency is missing on the current development machine.
+Stage A may start once the documentation baseline is merged. No other dependency is missing on the current development machine.
+
+## Appendix A — VHD preparation instructions (deferred; do not run without separate operator approval)
+
+These steps are for the **operator** only. They run in an elevated `diskpart` session, **after** separate approval. Claude does not run them. Status: [K], verify on first use.
+
+**Safety rules:**
+
+- Use **only** `select vdisk file="…"`. **Never** `select disk N`, which can select a real disk.
+- Before `format`, run `detail vdisk` and `list volume`, and confirm that the selected object is the new VHD file under `<test-root>\vhd\`.
+- Use a drive letter that is confirmed unused.
+- One VHD per session; detach it when done; delete the VHD file afterwards.
+
+**Example** (1 GiB NTFS; for FAT32 use `fs=fat32`, for exFAT `fs=exfat`):
+
+```text
+create vdisk file="<test-root>\vhd\e02-ntfs-1g.vhdx" maximum=1024 type=expandable
+select vdisk file="<test-root>\vhd\e02-ntfs-1g.vhdx"
+attach vdisk
+detail vdisk
+convert mbr
+create partition primary
+format fs=ntfs quick label=E02NTFS
+assign letter=<unused letter>
+list volume
+```
+
+**Teardown:**
+
+```text
+select vdisk file="<test-root>\vhd\e02-ntfs-1g.vhdx"
+detach vdisk
+```
+
+Then delete the `.vhdx` file. Record every command and its output in the run record.
