@@ -67,7 +67,7 @@ If a technology is marked PROPOSED, do not silently promote it to CONFIRMED. A p
 **Accepted clarifications (2026-11-12, Phase 0 baseline — read together with the invariants above):**
 
 - **#3** — third-party application plugins stay out of scope; OneCopy-owned OS integrations are evaluated individually by ADR (D-027, ADR-0005).
-- **#4** — "change monitoring" means idle or background monitoring; consistency checks on the opened source *during an active transfer* are required (D-026, ADR-0003). For **transient mobile sources only**, an explicit, user-authorized, bounded and expiring local copy is an **intentional exception** (D-025, ADR-0004). It does **not** permit automatic source duplication of any kind.
+- **#4** — "change monitoring" means idle or background monitoring; consistency checks on the opened source *during an active transfer* are required (D-026, ADR-0003). For **transient mobile sources only**, an explicit, user-authorized, bounded and expiring local copy is an **intentional exception** (D-025, ADR-0004). It does **not** permit automatic source duplication of any kind. Sources are not locked by default, and no copy-on-write clones or hidden snapshots are made (D-042).
 - **#5** — Free connections may use signaling and STUN-style address discovery; no OneCopy-managed or third-party application relay, including library defaults, forwards Free inter-device packets; direct peer-to-peer is the only Free data path (D-021, D-022, ADR-0001).
 
 ## Evidence and provenance
