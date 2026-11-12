@@ -1,9 +1,9 @@
 # ADR 0006: Inline content cap, on-demand content references and Free control-plane quotas
 
-Status: Proposed
+Status: Accepted (Phase 0 baseline, 2026-11-12)
 Date: 2026-11-12
 Owner: Product owner
-Decision IDs: D-030, D-031 (PROPOSED). Related: PR-005, PR-007, PR-013 (CONFIRMED); README invariant #5
+Decision IDs: D-030, D-031 (CONFIRMED). Related: PR-005, PR-007, PR-013 (CONFIRMED); README invariant #5
 
 ## Context and evidence
 
@@ -12,7 +12,7 @@ The baseline promises Free users "small encrypted-history sync" without defining
 - the control plane stores and forwards arbitrarily large Free content;
 - the history channel can be used as a covert free relay (review DA-23).
 
-## Decision (proposed)
+## Decision
 
 1. **Inline cap (D-030).**
    - Each history envelope carries at most **256 KiB of representation ciphertext per item**. This is an **experimental starting point** to be tuned in E-11 with measured size distributions, not a final value.
@@ -50,4 +50,4 @@ The baseline promises Free users "small encrypted-history sync" without defining
 
 ## Acceptance record (who/when)
 
-Pending. No acceptance recorded.
+Accepted by the product owner, with an engineering teammate, on 2026-11-12 (PR #1), as part of the Phase 0 baseline. Scope: product direction and Phase 0 feasibility experiments. This acceptance does not approve unverified production architectures, future security-protocol choices or Premium infrastructure. Items this ADR leaves unspecified or OPEN remain open.

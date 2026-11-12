@@ -1,9 +1,9 @@
 # ADR 0003: Source consistency boundary — transfer-time validation versus monitoring and snapshots
 
-Status: Proposed
+Status: Accepted (Phase 0 baseline, 2026-11-12)
 Date: 2026-11-12
 Owner: Product owner
-Decision IDs: D-026 (PROPOSED), D-042 (OPEN). Related: README invariant #4, D-005, D-006, PR-011 (all CONFIRMED)
+Decision IDs: D-026, D-042 (CONFIRMED). Related: README invariant #4, D-005, D-006, PR-011 (all CONFIRMED)
 
 ## Context and evidence
 
@@ -18,7 +18,7 @@ No portable filesystem primitive gives an immutable view of a file that another 
 - client caching on network filesystems;
 - cloud placeholders that hydrate on open.
 
-## Decision (proposed)
+## Decision
 
 **Prohibited** (unchanged intent of the CONFIRMED rules):
 
@@ -42,10 +42,11 @@ No portable filesystem primitive gives an immutable view of a file that another 
 - Residual races are documented per filesystem.
 - Chunk digests prove transmission fidelity, not source immutability.
 
-**OPEN (D-042), requires a separate owner decision:**
+**D-042 (owner decision, 2026-11-12):**
 
-- (a) opening Windows sources without write sharing, which prevents concurrent writers during a transfer but makes other applications report "file in use";
-- (b) transfer-scoped copy-on-write clones (APFS `clonefile`, Linux reflink, ReFS block cloning). These are snapshot-like and create hidden temporary files on the source volume.
+- **Do not lock source files against concurrent modification by default.** For example, Windows sources are opened with write sharing allowed. Any non-default locking option would need a separate decision.
+- **Do not introduce transfer-scoped copy-on-write clones or hidden source snapshots** (APFS `clonefile`, Linux reflink, ReFS block cloning or similar).
+- Use scoped transfer-time source-consistency checks and report detectable incompatible modifications. Document residual races rather than claiming universal detection.
 
 ## Alternatives considered
 
@@ -64,8 +65,8 @@ No portable filesystem primitive gives an immutable view of a file that another 
 ## Consequences and follow-up tests
 
 - E-08 mutation corpus across NTFS, ext4, exFAT and SMB (APFS when hardware is available) records detection latency and residual races.
-- README invariant #4 wording is clarified only after this ADR is accepted.
+- README invariant #4 wording is clarified to match this ADR (accepted 2026-11-12).
 
 ## Acceptance record (who/when)
 
-Pending. No acceptance recorded.
+Accepted by the product owner, with an engineering teammate, on 2026-11-12 (PR #1), as part of the Phase 0 baseline. Scope: product direction and Phase 0 feasibility experiments. This acceptance does not approve unverified production architectures, future security-protocol choices or Premium infrastructure. Items this ADR leaves unspecified or OPEN remain open.

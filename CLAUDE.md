@@ -1,6 +1,6 @@
 # CLAUDE.md — OneCopy implementation contract
 
-**Status:** Proposed governance policy; operative once approved by the product owner.
+**Status:** Governance policy accepted with the Phase 0 baseline on 2026-11-12; operative.
 
 ## Roles and authority
 
@@ -52,7 +52,7 @@
 - **Architecture decisions requested**
 - **Rollback/compatibility notes**
 
-## Workflow clarifications (PROPOSED, 2026-11-12 — operative only after owner acceptance)
+## Workflow clarifications (accepted 2026-11-12 with the Phase 0 baseline)
 
 These clarify how the rules above are applied. They do not relax any engineering invariant.
 
@@ -61,14 +61,16 @@ These clarify how the rules above are applied. They do not relax any engineering
 - **Evidence handling.** Raw evidence (traces, dumps, recordings) stays under the experiment's git-ignored `evidence/` directory. Only sanitized summaries and reports are committed. Synthetic data only.
 - **Commit separation.** Keep factual corrections, proposed decisions, experiment plans and experiment code in separate commits, and preferably separate PRs.
 - **Equipment and spending.** Use available hardware and free local environments first. Do not purchase hardware, create accounts or paid services, or assume a budget without explicit owner approval (D-028). Report experiments blocked by missing equipment as *not run*.
-- **Free networking.** For Free users, OneCopy infrastructure must not forward any inter-device packet: payload, handshake or traversal (D-021). Library default relays must be disabled. Third-party relays are OPEN (D-022).
+- **Free networking.** For Free users, OneCopy infrastructure must not forward any inter-device packet: payload, handshake or traversal (D-021). Third-party application relays, including library defaults, are prohibited as well; direct peer-to-peer is the only Free data path (D-022).
 - **Extensions.** Third-party application plugins are out of scope. A OneCopy-owned OS integration (share extension, File Provider–like provider, IME, desktop-shell integration) requires its own ADR and is limited to authorized history items (D-027).
+- **Keystroke automation.** Allowed only inside approved experiments, for reproducible testing. Never a product feature or dependency without a separate decision (D-041).
+- **Source files.** Never lock sources against concurrent modification by default, and never introduce copy-on-write clones or hidden source snapshots (D-042).
 - **Claims.** Do not claim native-paste guarantees, universal change detection or universal connectivity rates without experimental evidence (D-024, D-026, D-034).
 
 ## Initial work order
 
 1. Documentation baseline acceptance (no code).
-2. Phase 0 risk spikes: Windows Explorer virtual-file paste; Finder Command-V feasibility; Wayland capability matrix; strict direct-only iroh/QUIC experiment. *(Proposed refinement, D-023 and D-028: E-02 first; the transport experiment runs two independent tracks; hardware-dependent spikes wait for approved equipment.)*
+2. Phase 0 risk spikes: Windows Explorer virtual-file paste; Finder Command-V feasibility; Wayland capability matrix; strict direct-only iroh/QUIC experiment. *(Accepted refinement, D-023 and D-028: E-02 first; the transport experiment runs two independent tracks; hardware-dependent spikes wait for approved equipment.)*
 3. Minimal headless Rust foundation and encrypted history only within explicitly approved Phase 0 scope.
 4. On-demand 100 GB streaming/resume/source-change experiments and independent security review preparation.
 

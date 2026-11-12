@@ -1,9 +1,9 @@
 # ADR 0007: Clipboard sensitivity markers and received-file provenance
 
-Status: Proposed
+Status: Accepted (Phase 0 baseline, 2026-11-12)
 Date: 2026-11-12
 Owner: Product owner
-Decision IDs: D-032, D-033 (PROPOSED). Related: PR-024, D-019 (OPEN), NFR-002
+Decision IDs: D-032, D-033 (CONFIRMED). Related: PR-024, D-019 (OPEN), NFR-002
 
 ## Context and evidence
 
@@ -25,7 +25,7 @@ Promoting a OneCopy item to the OS clipboard can expose it to OS and keyboard-ap
 - **Linux.** No OS-enforced equivalent; freedesktop `user.xdg.origin.*` extended attributes are informational only [K].
 - **Android and iOS.** No direct equivalent [K].
 
-## Decision (proposed)
+## Decision
 
 1. **Capture (D-032).**
    - Treat content carrying an exclusion or concealed marker as **excluded** from capture and sync by default.
@@ -74,4 +74,4 @@ Promoting a OneCopy item to the OS clipboard can expose it to OS and keyboard-ap
 
 ## Acceptance record (who/when)
 
-Pending. No acceptance recorded.
+Accepted by the product owner, with an engineering teammate, on 2026-11-12 (PR #1), as part of the Phase 0 baseline. Scope: product direction and Phase 0 feasibility experiments. This acceptance does not approve unverified production architectures, future security-protocol choices or Premium infrastructure. Items this ADR leaves unspecified or OPEN remain open.

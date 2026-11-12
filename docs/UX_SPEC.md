@@ -33,8 +33,8 @@ Do not render executable HTML from clipboard or automatically resolve/open a cop
 - **Keep Available Offline:** Premium-only explicit staging, not automatic.
 - **Refresh Offline Copy:** replace the one temporary staged copy with a newly uploaded snapshot, only upon user action.
 - **Remove from history:** delete local/shared logical history entry according to the chosen retention semantics; do not delete source files.
-- *(PROPOSED, D-024)* **Paste** (native) versus **Save with OneCopy** (managed download). When native paste is unavailable, unverified or over its limits, offer Save with OneCopy and explain the difference in one sentence. Example, if E-02 confirms it: "Large transfers pasted into Explorer can't resume after an interruption."
-- *(PROPOSED, D-025)* **Keep on this device until sent** (mobile, transient sources only): an explicit choice that shows size and expiry. It is never automatic and is never labeled as an offline or cloud copy.
+- *(D-024)* **Paste** (native) versus **Save with OneCopy** (managed download). When native paste is unavailable, unverified or over its limits, offer Save with OneCopy and explain the difference in one sentence. Example, if E-02 confirms it: "Large transfers pasted into Explorer can't resume after an interruption."
+- *(D-025)* **Keep on this device until sent** (mobile, transient sources only): an explicit choice that shows size and expiry. It is never automatic and is never labeled as an offline or cloud copy.
 - **Pause synchronization/exclude app:** privacy control, behavior to be finalized.
 
 ## State vocabulary
@@ -54,13 +54,13 @@ Do not render executable HTML from clipboard or automatically resolve/open a cop
 | Verifying | Staging upload exists but not yet ready | "Verifying offline copy…" |
 | Staged/Ready | Valid temporary encrypted copy | "Offline copy created [date/time]" |
 | Expired | Staging object expired/deleted | "Offline copy expired" |
-| *Kept on device (PROPOSED)* | Mobile local staging of a transient source | "Kept on this phone until [time]" |
+| *Kept on device* | Mobile local staging of a transient source | "Kept on this phone until [time]" |
 | *Origin app not running* | A large item's bytes live on a mobile origin whose OneCopy app is suspended or not running (D-030 correction) | "Open OneCopy on [device] to get this item" |
 | *Preview only* | Item above the inline cap; only metadata or a preview is synced, and full content needs the origin | "Full [image/text] is on [device]" with size |
-| *Excluded (PROPOSED)* | Capture skipped because of a sensitivity marker | "Not saved: marked private by the app that copied it" |
-| *Manual capture mode (PROPOSED)* | Support tier B (for example GNOME Wayland, or macOS with clipboard access denied) | "Press [shortcut] or open OneCopy to add your clipboard" |
-| *Direct connection unavailable (PROPOSED)* | Free direct path failed on this network | "Couldn't connect directly to [device] on this network" (no paid option shown before Premium exists) |
-| *Permission needed (PROPOSED)* | OS permission blocks capture or LAN access (for example macOS Local Network) | Names the permission and where to grant it, with no dark patterns |
+| *Excluded* | Capture skipped because of a sensitivity marker | "Not saved: marked private by the app that copied it" |
+| *Manual capture mode* | Support tier B (for example GNOME Wayland, or macOS with clipboard access denied) | "Press [shortcut] or open OneCopy to add your clipboard" |
+| *Direct connection unavailable* | Free direct path failed on this network | "Couldn't connect directly to [device] on this network" (no paid option shown before Premium exists) |
+| *Permission needed* | OS permission blocks capture or LAN access (for example macOS Local Network) | Names the permission and where to grant it, with no dark patterns |
 
 Status must not conflate **source availability** with **offline staging availability**. When source is online and a staged copy exists, normal live transfer uses the current source unless the user explicitly requests the staged copy or an approved fallback policy says otherwise.
 
@@ -70,7 +70,7 @@ Status must not conflate **source availability** with **offline staging availabi
 
 **Desktop → desktop file:** copy 100 GB source on A (metadata only). B selects an item. Windows may present a native delayed virtual file, while another OS may present Save to Folder. The source must remain accessible until request reads it.
 
-**Mobile → desktop:** from a mobile share action, OneCopy receives a user-authorized content URI/security-scoped item. If access is transient, warn that the source may become unavailable; do not silently materialize a giant permanent snapshot. *(Proposed, D-025: offer an explicit, bounded, expiring "Keep on this device until sent".)*
+**Mobile → desktop:** from a mobile share action, OneCopy receives a user-authorized content URI/security-scoped item. If access is transient, warn that the source may become unavailable; do not silently materialize a giant permanent snapshot. *(D-025: offer an explicit, bounded, expiring "Keep on this device until sent".)*
 
 **Desktop → mobile:** user opens OneCopy, chooses an item, then copies locally or shares/saves via native mobile APIs. Respect mobile lifecycle limits.
 
@@ -78,9 +78,9 @@ Status must not conflate **source availability** with **offline staging availabi
 
 **Remote file delivery modes (correction, 2026-11-12):** "Save with OneCopy" (managed download) guarantees resume and controlled finalization on supported destinations. Native paste shows only the guarantees demonstrated for that target. If a large native paste is interrupted, the UI offers to restart through managed download.
 
-**Blocked P2P Free:** describe direct connection failure and a Premium relay option. Do not silently turn the option on. *(Proposed clarification: until Premium exists, describe the failure and its likely cause only.)*
+**Blocked P2P Free:** describe direct connection failure and a Premium relay option. Do not silently turn the option on. *(Clarification, 2026-11-12: until Premium exists, describe the failure and its likely cause only.)*
 
-**GNOME Wayland (PROPOSED, D-036):** automatic capture is unavailable. The user adds the current clipboard explicitly through a focused OneCopy window or a shortcut. Promotion works normally. The limitation is stated once during onboarding.
+**GNOME Wayland (D-036):** automatic capture is unavailable. The user adds the current clipboard explicitly through a focused OneCopy window or a shortcut. Promotion works normally. The limitation is stated once during onboarding.
 
 **Offline Premium:** create an encrypted temporary stage on request, show timestamp/expiry and storage/quota usage. Download as a separate explicit action. No source-change watcher and no automatic refresh.
 

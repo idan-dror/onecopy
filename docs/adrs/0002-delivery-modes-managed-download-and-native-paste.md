@@ -1,9 +1,9 @@
 # ADR 0002: Delivery modes — managed download and native paste
 
-Status: Proposed
+Status: Accepted (Phase 0 baseline, 2026-11-12)
 Date: 2026-11-12
 Owner: Product owner
-Decision IDs: D-024 (PROPOSED). Related: PR-012 (CONFIRMED), PR-023, NFR-003, E-02, E-03
+Decision IDs: D-024 (CONFIRMED). Related: PR-012 (CONFIRMED), PR-023, NFR-003, E-02, E-03
 
 ## Context and evidence
 
@@ -18,7 +18,7 @@ With Windows Shell virtual files (`CFSTR_FILEDESCRIPTOR` / `CFSTR_FILECONTENTS` 
 
 Similar limits apply to File Provider, Cloud Files and Android provider paths. What each target actually does on error, cancellation or source-process termination is unknown until measured.
 
-## Decision (proposed)
+## Decision
 
 1. **Managed download.** OneCopy writes the destination file itself, in a location the user chose or approved. It provides:
    - partial-file isolation;
@@ -55,8 +55,8 @@ Similar limits apply to File Provider, Cloud Files and Android provider paths. W
 
 - E-02 measures partial-file outcomes per fault class.
 - `TRANSFER_AND_ROUTING.md` and `UX_SPEC.md` describe both modes.
-- PRD PR-028, PR-029 and PR-030 (PROPOSED) map here.
+- PRD PR-028, PR-029 and PR-030 (CONFIRMED) map here.
 
 ## Acceptance record (who/when)
 
-Pending. No acceptance recorded.
+Accepted by the product owner, with an engineering teammate, on 2026-11-12 (PR #1), as part of the Phase 0 baseline. Scope: product direction and Phase 0 feasibility experiments. This acceptance does not approve unverified production architectures, future security-protocol choices or Premium infrastructure. Items this ADR leaves unspecified or OPEN remain open.

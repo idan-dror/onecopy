@@ -21,22 +21,22 @@
 | NFR-008 | SECURITY_AND_PRIVACY, ROADMAP | Security review and CI evidence | Signed release and audit before beta |
 | NFR-009 | PHASE_0_VALIDATION | E-06, E-07, E-09 | Measured SLOs, not assumed |
 
-## Proposed requirements from the PR #1 review (PROPOSED, 2026-11-12)
+## Requirements accepted with the Phase 0 baseline (2026-11-12)
 
-These rows map **proposed** requirements and are not accepted. Status must be updated when the owner accepts, amends or rejects them.
+Rows below were accepted on 2026-11-12 unless their status says otherwise.
 
 | Requirement IDs | Status | Decision / ADR | Primary design docs | Phase 0 evidence | Future acceptance |
 |---|---|---|---|---|---|
-| PR-028, PR-029, PR-030 | PROPOSED | D-024 / ADR-0002 | TRANSFER_AND_ROUTING, UX_SPEC | E-02, E-03, E-09 | Per-mode guarantees demonstrated; no unproven native-paste claim |
-| PR-031 | PROPOSED | D-025 / ADR-0004 | DATA_MODEL_AND_PROTOCOL, UX_SPEC | E-12 | Explicit, bounded, expiring mobile local staging |
-| PR-032 | PROPOSED | D-030 / ADR-0006 | DATA_MODEL_AND_PROTOCOL | E-11 | Inline cap enforced; `content_ref` fetch works |
-| PR-033 | PROPOSED | D-031 / ADR-0006 | DATA_MODEL_AND_PROTOCOL, PREMIUM_GATEWAY | E-11 | Free quotas enforced; no P2P size cap |
-| PR-034 | PROPOSED | D-032 / ADR-0007 | PLATFORM_CAPABILITIES, SECURITY_AND_PRIVACY | E-01, E-03, E-04 | Markers honored and set; limitations shown |
-| PR-035 | PROPOSED | D-033 / ADR-0007 | SECURITY_AND_PRIVACY, PLATFORM_CAPABILITIES | E-02, E-09 | Provenance applied (managed) or observed (native) |
-| PR-036 | PROPOSED | D-036 | PLATFORM_CAPABILITIES | E-04, E-05 | Published support tiers |
-| NFR-010, NFR-011, NFR-012 | PROPOSED | D-038–D-040 / ADR-0009 | SECURITY_AND_PRIVACY, ARCHITECTURE | E-11 | IPC authorization, single writer, dump hygiene |
-| NFR-013 | PROPOSED | D-021 / ADR-0001 | TRANSFER_AND_ROUTING | E-06a, E-06b | Zero Free inter-device packets through relays |
-| NFR-014 | PROPOSED | D-034 | PHASE_0_VALIDATION | E-06a, E-07 | Per-class connectivity reporting |
+| PR-028, PR-029, PR-030 | CONFIRMED | D-024 / ADR-0002 | TRANSFER_AND_ROUTING, UX_SPEC | E-02, E-03, E-09 | Per-mode guarantees demonstrated; no unproven native-paste claim |
+| PR-031 | CONFIRMED | D-025 / ADR-0004 | DATA_MODEL_AND_PROTOCOL, UX_SPEC | E-12 | Explicit, bounded, expiring mobile local staging |
+| PR-032 | CONFIRMED | D-030 / ADR-0006 | DATA_MODEL_AND_PROTOCOL | E-11 | Inline cap enforced; `content_ref` fetch works |
+| PR-033 | CONFIRMED | D-031 / ADR-0006 | DATA_MODEL_AND_PROTOCOL, PREMIUM_GATEWAY | E-11 | Free quotas enforced; no P2P size cap |
+| PR-034 | CONFIRMED | D-032 / ADR-0007 | PLATFORM_CAPABILITIES, SECURITY_AND_PRIVACY | E-01, E-03, E-04 | Markers honored and set; limitations shown |
+| PR-035 | CONFIRMED | D-033 / ADR-0007 | SECURITY_AND_PRIVACY, PLATFORM_CAPABILITIES | E-02, E-09 | Provenance applied (managed) or observed (native) |
+| PR-036 | CONFIRMED | D-036 | PLATFORM_CAPABILITIES | E-04, E-05 | Published support tiers |
+| NFR-010, NFR-011, NFR-012 | CONFIRMED | D-038–D-040 / ADR-0009 | SECURITY_AND_PRIVACY, ARCHITECTURE | E-11 | IPC authorization, single writer, dump hygiene |
+| NFR-013 | CONFIRMED | D-021, D-022 / ADR-0001 | TRANSFER_AND_ROUTING | E-06a, E-06b | Zero Free inter-device packets through relays |
+| NFR-014 | CONFIRMED | D-034 | PHASE_0_VALIDATION | E-06a, E-07 | Per-class connectivity reporting |
 | NFR-015 | PROPOSED | review DA-25 | PRD | E-01 (agent footprint) | Measured idle footprint budget |
 | NFR-016 | OPEN | review DA-24 / B-12 | DATA_MODEL_AND_PROTOCOL | E-11 (version tests) | Compatibility window |
 | (security review) | OPEN | D-037 / ADR-0008 | SECURITY_AND_PRIVACY | E-11 | Revocation, freshness, recovery policy |

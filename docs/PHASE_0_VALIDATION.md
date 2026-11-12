@@ -35,12 +35,12 @@ Phase 0 determines whether the OneCopy product contract can be implemented truth
 | E-12 | Mobile feasibility only | Android Share/content URI jobs and iOS Share/background HTTPS architecture/prototype as resources allow |
 | E-13 | Gateway baseline research | Storage and relay pricing/throughput experiments without introducing paid infrastructure into Free path |
 
-### Proposed register refinements (PROPOSED, 2026-11-12 — pending owner acceptance)
+### Register refinements (accepted 2026-11-12)
 
 | ID | Refinement | Basis |
 |---|---|---|
 | E-02 | **First implementation-ready experiment.** The full specification is in [`docs/experiments/E-02_WINDOWS_VIRTUAL_FILE_PASTE.md`](experiments/E-02_WINDOWS_VIRTUAL_FILE_PASTE.md). It measures target-side partial-file, cancellation, termination and provenance behavior; it does not assume them. | D-024, D-033 |
-| E-06a | Emulated NAT lab, local only. **Two independent tracks:** iroh configured for D-021, and standalone QUIC plus ICE-style traversal. Per NAT class: success, setup p50/p95, and packet-capture plus byte-counter evidence of **zero** Free inter-device packets through any relay. | D-021, D-023 |
+| E-06a | Emulated NAT lab, local only. **Two independent tracks:** iroh configured for D-021/D-022, and standalone QUIC plus ICE-style traversal. Per NAT class: success, setup p50/p95, and packet-capture plus byte-counter evidence of **zero** Free inter-device packets through any relay. | D-021, D-023 |
 | E-06b / E-07 | Field validation and network-class survey. Needs an owner-approved public host (D-028). Results are reported **per network class with confidence intervals**. No universal rate. | D-028, D-034 |
 | E-12 | Mobile feasibility, including `BGContinuedProcessingTask` as an experiment and transient-source lifetimes. Blocked until devices are approved. | D-025, D-028 |
 | E-13 | **Desk research only** during Phase 0. Measurements move to Premium development. | D-029 |
@@ -81,7 +81,7 @@ Fault injection: kill either process, restart control plane, sleep/wake endpoint
 
 Targets are hypotheses, not contractual release SLOs. Candidate direct-success goal of ≥90% on non-enterprise consumer networks needs a statistically meaningful real-world trial (research suggests at least 1,000 connection attempts); do not infer from a few local tests.
 
-**Connectivity targets per network class (PROPOSED, D-034 — pending owner acceptance):**
+**Connectivity targets per network class (D-034, accepted 2026-11-12):**
 
 - The universal ≥90% direct-success goal is **withdrawn as unsupported**.
 - Connectivity is measured and reported per NAT and network class, with confidence intervals: LAN; home NAT; double NAT; CGNAT; IPv6; enterprise; hotel or captive; hotspot; cellular.
@@ -102,14 +102,14 @@ Targets are hypotheses, not contractual release SLOs. Candidate direct-success g
 
 **Gate E — Security:** threat model reviewed; high-risk protocol and filesystem invariants tested; no public beta without independent protocol/security assessment.
 
-**Proposed gate refinements (PROPOSED, 2026-11-12):**
+**Gate refinements (accepted 2026-11-12):**
 
 - **Gate B (Windows).** "Go" for native paste of a size or condition class requires E-02 evidence that no false-success outcome occurred for it (outcome classes O3/O4 in the E-02 spec). Partial-file outcomes (O2) are documented and need an owner decision on UX wording. Otherwise that class falls back to managed download.
 - **Gate B (macOS).** Finder `Command-V` remains unverified until E-03 runs on approved hardware.
 - **Gate C.** Per-class connectivity (D-034) plus binary zero-Free-relay evidence (NFR-013). The transport track decision is recorded in an ADR.
 - **Gate E.** Includes the pre-implementation security review items in `SECURITY_AND_PRIVACY.md` (D-037 to D-040).
 
-## Staged equipment and environment plan (PROPOSED, D-028 — pending owner acceptance)
+## Staged equipment and environment plan (D-028, accepted 2026-11-12)
 
 | Stage | Environment | Approval | Experiments enabled |
 |---|---|---|---|
@@ -134,7 +134,7 @@ For each run: `experiment_id`, repo commit, OS/version/compositor, hardware, sel
 
 Scheduling is flexible; a fixed six-week calendar is **not** a release commitment.
 
-**Proposed revised order (PROPOSED, 2026-11-12):**
+**Revised order (accepted 2026-11-12):**
 
 1. Baseline acceptance.
 2. **E-02** (Stage 0).

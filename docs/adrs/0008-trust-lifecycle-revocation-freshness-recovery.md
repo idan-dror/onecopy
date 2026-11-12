@@ -46,7 +46,13 @@ Inputs needed before choosing *T*:
 
 ## Decision
 
-None. Remains OPEN until the pre-implementation security review. E-11 prototypes the mechanics (signed roster log, version pinning, revocation propagation) behind interfaces so that any option can be evaluated.
+None. Remains OPEN until the pre-implementation security review.
+
+**Owner direction (2026-11-12):**
+
+- **E-11 must investigate** revocation authority, roster freshness, offline LAN access and recovery.
+- No production policy may be chosen without an explicit security review.
+- This ADR does not block E-02. E-11 prototypes the mechanics (signed roster log, version pinning, revocation propagation) behind interfaces so that any option can be evaluated.
 
 ## Security/privacy and interoperability effects
 

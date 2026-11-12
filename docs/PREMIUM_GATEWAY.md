@@ -68,15 +68,15 @@ A relay's outbound byte charges, infrastructure throughput and connection overhe
 - Rate-limit account/device operations and monitor abnormal file churn, malformed requests and unauthorized access attempts.
 - Confirm deletion semantics, lifecycle policy and regional data processing; avoid overpromising secure erasure on storage-provider internals.
 
-## Relationship to Free connectivity and mobile local staging (PROPOSED, 2026-11-12)
+## Relationship to Free connectivity and mobile local staging (accepted 2026-11-12)
 
-- **Free (D-021).** Free connections use signaling, presence, candidate exchange and STUN-style address discovery. The Premium relay is the only planned OneCopy service that forwards inter-device packets. It must be unreachable by Free sessions by construction, not merely by policy check.
+- **Free (D-021, D-022).** Free connections use signaling, presence, candidate exchange and STUN-style address discovery. No OneCopy-managed or third-party relay carries Free inter-device packets. The Premium relay is the only planned OneCopy service that forwards inter-device packets. It must be unreachable by Free sessions by construction, not merely by policy check.
 - **Free quotas (D-031).** Free history and control traffic have published rate and storage quotas. Free P2P file size is not limited.
 - **Mobile local staging (D-025).** The explicit, on-device copy of a transient mobile source is a different feature from Premium "Keep Available Offline". It never leaves the device except through a normal transfer to a trusted device, and the two must never share UI labels.
 
 ## Go/no-go experiment
 
-*Phase 0 scope (PROPOSED, D-029):* during Phase 0, E-13 is desk research only (pricing, limits, terms). The measurements below are performed in Premium development (Phase 4 preparation), after explicit owner approval of any paid resources.
+*Phase 0 scope (D-029, accepted):* during Phase 0, E-13 is desk research only (pricing, limits, terms). The measurements below are performed in Premium development (Phase 4 preparation), after explicit owner approval of any paid resources.
 
 Measure R2 and at least one alternative across target regions using 1/10/100 GB encrypted payloads, concurrent clients, failure/retry and rapid expiry, actual item request counts and effective costs. Separately benchmark live relay hosts for throughput, cost/TB, packet loss, 95th percentile latency, concurrency and abuse resilience. Premium cannot be priced responsibly until these results exist.
 

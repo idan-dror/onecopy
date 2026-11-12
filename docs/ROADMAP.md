@@ -10,7 +10,7 @@
 
 **Exit:** `PHASE_0_VALIDATION.md` gates A–E documented and owner accepts resolved choices/fallbacks. No requirement that every platform achieves identical UX.
 
-*Proposed refinements (2026-11-12, pending acceptance):*
+*Refinements accepted with the Phase 0 baseline (2026-11-12):*
 
 - **Equipment (D-028).** Phase 0 follows a staged equipment plan: available hardware and free local environments first. Experiments needing unapproved equipment remain blocked.
 - **E-13 (D-029).** E-13 is desk research only. Gateway measurements move to Phase 4.
@@ -49,7 +49,7 @@
 
 **Goal:** Reliable connectivity where direct is blocked and explicit temporary offline availability, with healthy unit economics.
 
-**Includes:** encrypted managed live relay, quota/entitlement service, expiring client-encrypted object staging, readiness verification, manual refresh, pricing/abuse governance, regional benchmarks and operational SLIs. *(Proposed, D-029: includes the gateway storage and relay measurements moved out of Phase 0.)*
+**Includes:** encrypted managed live relay, quota/entitlement service, expiring client-encrypted object staging, readiness verification, manual refresh, pricing/abuse governance, regional benchmarks and operational SLIs. *(D-029: includes the gateway storage and relay measurements moved out of Phase 0.)*
 
 **Exit:** paid gateway reliability/cost/security evidence, no unexpected Free payload routing through managed relays, staging retention controls operational.
 

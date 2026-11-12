@@ -37,7 +37,7 @@
 
 **Phase 0:** separately record GNOME/Mutter, KDE/KWin and wlroots-family environment/version/protocol availability; test capture, writing, clipboard availability after owner closes, permission prompts and native file-paste behavior. Support wording must be **per compositor and version**, not generic "Wayland works."
 
-**GNOME Wayland limitation (RESEARCHED 2026-11-12; tier PROPOSED by D-036):** Mutter implements neither data-control protocol, so automatic background capture is not available through supported protocols. The proposed tier is B (manual capture). Every alternative needs a separate decision:
+**GNOME Wayland limitation (RESEARCHED 2026-11-12; tier per D-036):** Mutter implements neither data-control protocol, so automatic background capture is not available through supported protocols. The proposed tier is B (manual capture). Every alternative needs a separate decision:
 
 - XWayland bridge (unverified);
 - portal Clipboard (only inside RemoteDesktop or InputCapture sessions, which would present misleading consent);
@@ -59,7 +59,7 @@
 
 Matrix cells updated 2026-11-12 with RESEARCHED facts from the review addendum below. No support claim was added.
 
-## Clipboard support tiers (PROPOSED, D-036 — pending owner acceptance)
+## Clipboard support tiers (D-036, accepted 2026-11-12; tier assignments per version are confirmed only by E-03/E-04/E-05/E-12 evidence)
 
 | Tier | Meaning |
 |---|---|
@@ -67,7 +67,7 @@ Matrix cells updated 2026-11-12 with RESEARCHED facts from the review addendum b
 | **B — manual capture** | The user captures explicitly: focused OneCopy window, global shortcut where available, share action. Promotion works. |
 | **C — share/promote only** | Content enters through OS share flows; promotion within app lifecycle limits |
 
-| Environment | Proposed tier | Basis |
+| Environment | Initial tier | Basis |
 |---|---|---|
 | Windows (interactive session) | A | Clipboard format listener |
 | macOS, pasteboard access allowed | A | Polling plus allowed reads; behavior with "ask" or "deny" is to be measured in E-03 |
@@ -81,7 +81,7 @@ Matrix cells updated 2026-11-12 with RESEARCHED facts from the review addendum b
 
 Tiers are published per tested OS or compositor version (E-04, E-05, E-03, E-12). Never claim "Wayland works" generically.
 
-## Sensitivity and exclusion markers (PROPOSED handling, D-032 / ADR-0007)
+## Sensitivity and exclusion markers (accepted handling, D-032 / ADR-0007)
 
 | Platform | Honor on capture | Set on promotion of sensitive items | Evidence |
 |---|---|---|---|
@@ -99,7 +99,7 @@ Tiers are published per tested OS or compositor version (E-04, E-05, E-03, E-12)
 - Apps can misuse markers to hide content.
 - Setting markers on promotion only helps where the OS or the recording app honors them.
 
-## Received-file provenance (RESEARCH for D-033 / ADR-0007)
+## Received-file provenance (D-033 / ADR-0007 accepted; mechanism details fixed after measurement)
 
 | Platform | Mechanism | Notes |
 |---|---|---|

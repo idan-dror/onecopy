@@ -58,15 +58,15 @@
 
 **Go/no-go gate:** Measurable requirement that determines whether a feature or claim proceeds, is narrowed or receives a fallback.
 
-## Proposed terms (PROPOSED, 2026-11-12 — pending owner acceptance)
+## Terms added with the Phase 0 baseline (accepted 2026-11-12)
 
-These terms support the owner-directed proposals D-021 to D-042. Their definitions become binding only when the related decisions are accepted.
+These terms support decisions D-021 to D-042. Terms tied to an OPEN decision (roster freshness, D-037) describe a concept, not a decided policy.
 
 **Signaling:** Control-plane messages carrying authentication, roster, presence, connection candidates and connection-attempt timing between devices. Signaling is not inter-device packet forwarding. (D-021)
 
 **Address discovery:** A STUN-style request and response through which a device learns its public address and port mapping from a server. The server never forwards packets between devices. (D-021)
 
-**Inter-device packet forwarding (relay):** A server receiving packets from one device and sending them to another, whatever they contain: payload, handshake or NAT-traversal frames. Prohibited on OneCopy infrastructure for Free users (D-021). Third-party relays are OPEN (D-022). The Premium relay is the only planned OneCopy forwarding service.
+**Inter-device packet forwarding (relay):** A server receiving packets from one device and sending them to another, whatever they contain: payload, handshake or NAT-traversal frames. Prohibited on OneCopy infrastructure for Free users (D-021). Third-party application relays, including library defaults, are also prohibited for Free (D-022). The Premium relay is the only planned OneCopy forwarding service.
 
 **Delivery mode:** How a requested file is materialized at the destination: *managed download* or *native paste*. (D-024)
 

@@ -42,27 +42,27 @@
 | PR-026 | Enrollment and E2EE recovery cannot be achieved solely by an email password reset. | PROPOSED | MVP |
 | PR-027 | History size/eviction and retention policy shall be visible, configurable later. | PROPOSED | MVP |
 
-### Proposed requirements from the PR #1 review (PROPOSED, pending owner acceptance)
+### Requirements accepted with the Phase 0 baseline (2026-11-12)
 
-These requirements reflect owner directions recorded on 2026-11-12. They are **not** CONFIRMED. They do not change the CONFIRMED rows above; where they refine one, the clarification is noted below the table.
+These requirements were accepted with the Phase 0 baseline. Where one refines a row above, the clarification is noted below the table. Values described as experimental (for example the inline cap) are not final.
 
 | ID | Requirement | Status | Decision / ADR | Target |
 |---|---|---|---|---|
-| PR-028 | **Managed download:** when OneCopy writes the destination itself, it provides partial-file isolation, journaled resume of verified ranges, end-to-end verification and controlled finalization (atomic rename where supported). | PROPOSED | D-024 / ADR-0002 | MVP |
-| PR-029 | **Native paste:** when an OS component or application writes the destination, OneCopy claims no managed-download guarantee for that target unless an experiment demonstrated it, and never signals a clean end of stream for data that failed source-consistency validation. | PROPOSED | D-024 / ADR-0002 | MVP |
-| PR-030 | Offer managed download when native paste is unavailable, unverified for the condition, or beyond evidence-based limits (size, entry count, path length). | PROPOSED | D-024 / ADR-0002 | MVP |
-| PR-031 | **Mobile local staging:** for transient mobile sources, the user may explicitly keep a bounded, expiring local copy until it is sent. Never automatic; distinct from Premium cloud staging. | PROPOSED | D-025 / ADR-0004 | Mobile |
-| PR-032 | Inline encrypted content per history item is bounded (256 KiB of ciphertext as an experimental starting point). Larger text and images become on-demand content references fetched from the origin. | PROPOSED | D-030 / ADR-0006 | MVP |
-| PR-033 | Free control-plane traffic is subject to published rate and storage quotas. There is no product-imposed P2P file-size limit. | PROPOSED | D-031 / ADR-0006 | MVP |
-| PR-034 | Honor platform and application sensitivity or exclusion markers on capture. Set them when promoting sensitive items. Document their limitations to users. | PROPOSED | D-032 / ADR-0007 | MVP |
-| PR-035 | Preserve the security provenance of received files using per-OS mechanisms where they exist. Native-paste provenance is observed, not assumed. | PROPOSED | D-033 / ADR-0007 | MVP |
-| PR-036 | Publish per-OS and per-desktop clipboard support tiers, including the GNOME Wayland limitation. | PROPOSED | D-036 | Platform |
+| PR-028 | **Managed download:** when OneCopy writes the destination itself, it provides partial-file isolation, journaled resume of verified ranges, end-to-end verification and controlled finalization (atomic rename where supported). | CONFIRMED | D-024 / ADR-0002 | MVP |
+| PR-029 | **Native paste:** when an OS component or application writes the destination, OneCopy claims no managed-download guarantee for that target unless an experiment demonstrated it, and never signals a clean end of stream for data that failed source-consistency validation. | CONFIRMED | D-024 / ADR-0002 | MVP |
+| PR-030 | Offer managed download when native paste is unavailable, unverified for the condition, or beyond evidence-based limits (size, entry count, path length). | CONFIRMED | D-024 / ADR-0002 | MVP |
+| PR-031 | **Mobile local staging:** for transient mobile sources, the user may explicitly keep a bounded, expiring local copy until it is sent. Never automatic; distinct from Premium cloud staging. | CONFIRMED | D-025 / ADR-0004 | Mobile |
+| PR-032 | Inline encrypted content per history item is bounded (256 KiB of ciphertext as an experimental starting point). Larger text and images become on-demand content references fetched from the origin. | CONFIRMED | D-030 / ADR-0006 | MVP |
+| PR-033 | Free control-plane traffic is subject to published rate and storage quotas. There is no product-imposed P2P file-size limit. | CONFIRMED | D-031 / ADR-0006 | MVP |
+| PR-034 | Honor platform and application sensitivity or exclusion markers on capture. Set them when promoting sensitive items. Document their limitations to users. | CONFIRMED | D-032 / ADR-0007 | MVP |
+| PR-035 | Preserve the security provenance of received files using per-OS mechanisms where they exist. Native-paste provenance is observed, not assumed. | CONFIRMED | D-033 / ADR-0007 | MVP |
+| PR-036 | Publish per-OS and per-desktop clipboard support tiers, including the GNOME Wayland limitation. | CONFIRMED | D-036 | Platform |
 
-**Clarification notes (PROPOSED, no change to CONFIRMED text until accepted):**
+**Accepted clarification notes (2026-11-12):**
 
 - PR-008 and PR-010: for transient mobile sources, see PR-031.
 - PR-012: the stated guarantees apply in full to managed download (PR-028). Native-paste claims are limited by PR-029.
-- PR-015: defined at the packet level by NFR-013 and D-021. Third-party relays are OPEN (D-022).
+- PR-015: defined at the packet level by NFR-013 and D-021. Third-party application relays, including library defaults, are prohibited too (D-022); direct P2P is the only Free data path.
 - PR-014: met in Phase 1 by measured direct-path selection. Complex scoring is deferred (D-035).
 - PR-023: refined by PR-030.
 - PR-024: extended by PR-034.
@@ -105,11 +105,11 @@ These requirements reflect owner directions recorded on 2026-11-12. They are **n
 | NFR-007 | Per-platform consent/permissions must be respected, not bypassed. | CONFIRMED |
 | NFR-008 | Code signing, reproducible CI where feasible, dependency/security checks before public beta. | PROPOSED |
 | NFR-009 | SLOs from research are experiment targets, not contractual performance promises. | RESEARCHED |
-| NFR-010 | Local IPC endpoints authenticate and authorize callers. No unauthenticated local endpoint exposes history or commands. | PROPOSED (D-038 / ADR-0009) |
-| NFR-011 | Exactly one process per device mutates cryptographic state (single-writer rule). | PROPOSED (D-039 / ADR-0009) |
-| NFR-012 | Crash dumps and diagnostics never capture clipboard bodies, keys, filenames or source paths: no full-memory dumps, scrubbed minidumps, opt-in reporting. | PROPOSED (D-040 / ADR-0009) |
-| NFR-013 | For Free users, no OneCopy-managed server forwards any inter-device packet (payload, handshake or traversal), verified by packet capture and server counters. | PROPOSED (D-021 / ADR-0001) |
-| NFR-014 | Direct-connectivity results are measured, targeted and reported per NAT and network class. No universal success-rate claim. | PROPOSED (D-034) |
+| NFR-010 | Local IPC endpoints authenticate and authorize callers. No unauthenticated local endpoint exposes history or commands. | CONFIRMED (D-038 / ADR-0009) |
+| NFR-011 | Exactly one process per device mutates cryptographic state (single-writer rule). | CONFIRMED (D-039 / ADR-0009) |
+| NFR-012 | Crash dumps and diagnostics never capture clipboard bodies, keys, filenames or source paths: no full-memory dumps, scrubbed minidumps, opt-in reporting. | CONFIRMED (D-040 / ADR-0009) |
+| NFR-013 | For Free users, no OneCopy-managed or third-party application relay (including library defaults) forwards any inter-device packet (payload, handshake or traversal), verified by packet capture and server counters. | CONFIRMED (D-021, D-022 / ADR-0001) |
+| NFR-014 | Direct-connectivity results are measured, targeted and reported per NAT and network class. No universal success-rate claim. | CONFIRMED (D-034) |
 | NFR-015 | The always-on desktop agent has a measured idle CPU, memory and wakeup budget (values set from E-01 measurements). | PROPOSED (review DA-25) |
 | NFR-016 | A defined cross-version compatibility window. | OPEN (B-12) |
 

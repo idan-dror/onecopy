@@ -1,9 +1,9 @@
 # ADR 0009: Local process security — IPC authorization, single-writer cryptographic state, crash dumps
 
-Status: Proposed
+Status: Accepted (Phase 0 baseline, 2026-11-12)
 Date: 2026-11-12
 Owner: Product owner
-Decision IDs: D-038, D-039, D-040 (PROPOSED). Related: NFR-002; `ARCHITECTURE.md` §Client processes
+Decision IDs: D-038, D-039, D-040 (CONFIRMED). Related: NFR-002; `ARCHITECTURE.md` §Client processes
 
 ## Context and evidence
 
@@ -11,7 +11,7 @@ Decision IDs: D-038, D-039, D-040 (PROPOSED). Related: NFR-002; `ARCHITECTURE.md
 - **Shared cryptographic state.** Some state must never be advanced by two writers at once: per-sender sequence counters, nonce derivation inputs, MLS secret-tree ratchets (if MLS is chosen), epoch state. A desktop agent plus UI process, or an iOS/Android app plus its extensions, could otherwise reuse nonces or fork state (review §3.5).
 - **Crash dumps** (Windows Error Reporting full dumps, custom minidumps, Android tombstones) can contain heap memory holding clipboard bodies and keys [K]. NFR-002 covers only logs and telemetry.
 
-## Decision (proposed)
+## Decision
 
 1. **IPC authorization (D-038).** Every local endpoint authenticates and authorizes its caller:
    - Windows: a named pipe whose ACL allows only the current user SID, plus verification of the client process image where feasible;
@@ -48,4 +48,4 @@ Decision IDs: D-038, D-039, D-040 (PROPOSED). Related: NFR-002; `ARCHITECTURE.md
 
 ## Acceptance record (who/when)
 
-Pending. No acceptance recorded.
+Accepted by the product owner, with an engineering teammate, on 2026-11-12 (PR #1), as part of the Phase 0 baseline. Scope: product direction and Phase 0 feasibility experiments. This acceptance does not approve unverified production architectures, future security-protocol choices or Premium infrastructure. Items this ADR leaves unspecified or OPEN remain open.

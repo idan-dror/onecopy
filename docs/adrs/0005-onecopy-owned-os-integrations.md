@@ -1,9 +1,9 @@
 # ADR 0005: OneCopy-owned OS integrations versus third-party application plugins
 
-Status: Proposed
+Status: Accepted (Phase 0 baseline, 2026-11-12)
 Date: 2026-11-12
 Owner: Product owner
-Decision IDs: D-027 (PROPOSED). Related: D-003, PR-020 (CONFIRMED); PRODUCT_VISION "not a universal remote filesystem mount"; D-016, D-017, D-018
+Decision IDs: D-027 (CONFIRMED). Related: D-003, PR-020 (CONFIRMED); PRODUCT_VISION "not a universal remote filesystem mount"; D-016, D-017, D-018
 
 ## Context and evidence
 
@@ -18,7 +18,7 @@ Several native capabilities need an OS-sanctioned extension point that OneCopy i
 
 None of these is a plugin for a third-party application. D-003 is nonetheless sometimes read as forbidding them.
 
-## Decision (proposed)
+## Decision
 
 1. Third-party application plugins remain out of scope. This covers browser extensions, IDE or editor extensions, and per-application add-ons (D-003 is unchanged).
 2. OneCopy-owned OS integrations are a separate category. Each one may be evaluated through its **own ADR**, which states:
@@ -56,4 +56,4 @@ None of these is a plugin for a third-party application. D-003 is nonetheless so
 
 ## Acceptance record (who/when)
 
-Pending. No acceptance recorded.
+Accepted by the product owner, with an engineering teammate, on 2026-11-12 (PR #1), as part of the Phase 0 baseline. Scope: product direction and Phase 0 feasibility experiments. This acceptance does not approve unverified production architectures, future security-protocol choices or Premium infrastructure. Items this ADR leaves unspecified or OPEN remain open.

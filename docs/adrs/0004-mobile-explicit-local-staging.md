@@ -1,9 +1,9 @@
 # ADR 0004: Explicit, bounded mobile local staging for transient sources
 
-Status: Proposed
+Status: Accepted (Phase 0 baseline, 2026-11-12)
 Date: 2026-11-12
 Owner: Product owner
-Decision IDs: D-025 (PROPOSED). Related: D-005, PR-008, PR-010 (CONFIRMED); D-009, PR-017 (Premium staging, CONFIRMED)
+Decision IDs: D-025 (CONFIRMED). Related: D-005, PR-008, PR-010 (CONFIRMED); D-009, PR-017 (Premium staging, CONFIRMED)
 
 ## Context and evidence
 
@@ -14,7 +14,7 @@ Some mobile sources are only temporarily accessible [K]:
 
 For such sources a durable "live reference" usually cannot exist (review DA-05). D-005 forbids automatic duplication for a normal Copy.
 
-## Decision (proposed)
+## Decision
 
 1. When the source permission is transient, the user may **explicitly** choose "Keep on this device until sent" (working label). OneCopy then copies the content into its own app container.
 2. This mobile local staging is:
@@ -51,4 +51,4 @@ For such sources a durable "live reference" usually cannot exist (review DA-05).
 
 ## Acceptance record (who/when)
 
-Pending. No acceptance recorded.
+Accepted by the product owner, with an engineering teammate, on 2026-11-12 (PR #1), as part of the Phase 0 baseline. Scope: product direction and Phase 0 feasibility experiments. This acceptance does not approve unverified production architectures, future security-protocol choices or Premium infrastructure. Items this ADR leaves unspecified or OPEN remain open.

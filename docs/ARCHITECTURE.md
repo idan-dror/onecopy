@@ -113,14 +113,14 @@ The above is a contract sketch, not compiled Rust API. Distinguish ephemeral sou
 
 Suppress re-ingestion loops using an OS-specific origin marker where supported and a conservative recent fingerprint cache where not. Suppression must be observable in tests and must avoid discarding genuine new copies of similar content.
 
-## Proposed refinements (PROPOSED, 2026-11-12 — pending owner acceptance)
+## Accepted refinements (Phase 0 baseline, 2026-11-12)
 
-These refinements reflect owner-directed proposals. They do not change the CONFIRMED hybrid local-core architecture.
+These refinements were accepted with the Phase 0 baseline. They refine, and do not change, the CONFIRMED hybrid local-core architecture. Per-OS mechanisms they leave open (for example the process-model ADR before Phase 1) still need their own decisions.
 
 1. **Delivery modes (D-024, ADR-0002).** The transfer engine owns *managed download*: destination writer, journal, verification, finalization. The native bridge exposes *native-paste providers* that pull bytes from the transfer engine's bounded stream API. On Windows that is `IDataObject`/`IStream`; other providers need their own ADRs (ADR-0005). The two modes carry different, documented guarantees.
 2. **Free connection path (D-021, D-023, ADR-0001).**
    - A transport abstraction with two candidate implementations, evaluated independently.
-   - Free configuration has no relay transport.
+   - Free configuration has no relay transport: neither OneCopy-managed nor third-party, including library defaults (D-022).
    - Address discovery is a control-plane service that never forwards inter-device packets.
    - The Premium relay is a separate, entitlement-gated component.
 3. **Content references (D-030, ADR-0006).** Representations above the inline cap become on-demand `content_ref`s. The origin core serves them through source capabilities, from its local encrypted store of captured clipboard data. Mobile origins can serve only while their app is running, so availability states are explicit (`DATA_MODEL_AND_PROTOCOL.md`).
@@ -133,7 +133,7 @@ These refinements reflect owner-directed proposals. They do not change the CONFI
 
 - Core: Rust workspace, asynchronous runtime to be selected, SQLite local persistence candidate.
 - Swift/Kotlin bindings: UniFFI experiment; Windows stable C ABI/C# bridge candidate. *Option added 2026-11-12: write the Windows clipboard/COM adapter in Rust (`windows-rs`), exercised inside E-02 only.*
-- Transport: standard QUIC, with `iroh` first Phase 0 candidate; strict direct-only behavior is a gate. *Proposed (D-023): evaluate iroh and a standalone QUIC plus ICE-style traversal as two independent tracks.*
+- Transport: standard QUIC, with `iroh` first Phase 0 candidate; strict direct-only behavior is a gate. *Accepted (D-023): evaluate iroh and a standalone QUIC plus ICE-style traversal as two independent tracks.*
 - Control: minimal test service during Phase 0; managed PostgreSQL, OIDC/passkeys later as evaluated.
 - Gateway object staging: Cloudflare R2 first regional cost/performance experiment, not selected provider.
 
@@ -147,8 +147,8 @@ Enrollment/recovery key architecture; whether MLS is warranted; concrete UI fram
 
 Added 2026-11-12:
 
-- revocation authority, roster freshness, offline LAN authorization and recovery (D-037, ADR-0008);
-- third-party relays for Free (D-022);
-- transfer-time write prevention and copy-on-write clones (D-042);
+- revocation authority, roster freshness, offline LAN authorization and recovery (D-037, ADR-0008; investigated in E-11);
 - the process-model ADR (AR-07 in the review);
 - native-paste target guarantees (E-02, E-03).
+
+Resolved on 2026-11-12: third-party relays for Free (D-022, prohibited); transfer-time write prevention and copy-on-write clones (D-042, not used).

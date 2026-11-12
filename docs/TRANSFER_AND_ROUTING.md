@@ -18,11 +18,11 @@ Premium staging: explicit temporary E2EE object copy, separate from relay
 
 The control plane may pay small costs for login, encrypted event sync and connection signaling for Free users. That does **not** authorize sending Free file payload bytes through a OneCopy-managed relay. A peer may be unreachable under restrictive NAT/UDP environments; tell the user rather than silently crossing a paywall boundary.
 
-**Free connection-establishment policy (PROPOSED, D-021 / ADR-0001; pending owner acceptance):**
+**Free connection-establishment policy (D-021, D-022 / ADR-0001, accepted 2026-11-12):**
 
 - **Allowed for Free:** control-plane signaling, presence, candidate exchange, connection-attempt timing, and STUN-style address discovery.
 - **Prohibited for Free:** OneCopy-managed infrastructure forwarding **any** inter-device packet. This covers payload, QUIC handshake and NAT-traversal frames.
-- Whether third-party relays (for example library default public relays) may carry Free packets is OPEN (D-022). The reviewer recommends prohibiting them.
+- **Third-party application relays, including library defaults, are also prohibited (D-022).** Direct peer-to-peer connectivity is the only Free data path.
 - **Evidence (NFR-013):** packet captures and server byte counters show zero forwarded Free inter-device packets.
 
 ## Transport experiment
@@ -31,12 +31,12 @@ The control plane may pay small costs for login, encrypted event sync and connec
 
 Phase 0 must prove which relay network components (discovery, NAT information, temporary coordination) iroh uses, when payload bytes cross a managed relay, whether the policy can disable it completely, and what direct reachability is lost. If it cannot meet requirements cleanly, evaluate a narrow STUN/candidate-exchange mechanism around a standard QUIC implementation. WebRTC/libp2p are secondary comparisons, not committed dependencies.
 
-**Two independent transport tracks (PROPOSED, D-023 / ADR-0001; pending owner acceptance):**
+**Two independent transport tracks (D-023 / ADR-0001, accepted 2026-11-12):**
 
-- **Track 1:** iroh, configured to satisfy D-021. Free sessions have no relay transport, and candidates arrive through OneCopy signaling.
+- **Track 1:** iroh, configured to satisfy D-021 and D-022. Free sessions have no relay transport, and candidates arrive through OneCopy signaling.
 - **Track 2:** a standalone QUIC implementation plus ICE-style candidate exchange and connectivity checks.
 - Both tracks are evaluated in E-06a against identical evidence: per-class success, setup time, zero Free relayed packets, code and API stability.
-- Neither is preferred in advance. If accepted, this supersedes the "evaluate iroh first" ordering above.
+- Neither is preferred in advance. This supersedes the "evaluate iroh first" ordering above.
 
 **Review addendum — RESEARCHED facts (2026-11-12), no decision change.** From iroh's own documentation [V]:
 
@@ -65,7 +65,7 @@ Use folder manifests rather than implicit ZIP creation. Entries are relative pat
 
 Proposed chunk size range **4–16 MiB**, with 4 MiB as initial benchmark. Do not prehash a 100 GB file at Copy time. Compute per-chunk digests while reading, carry an authenticated manifest/final digest, use QUIC flow control and bounded in-flight chunks. Multiple QUIC streams may separate control from payload, subject to measured benefits.
 
-## Delivery modes (PROPOSED, D-024 / ADR-0002 — pending owner acceptance)
+## Delivery modes (D-024 / ADR-0002, accepted 2026-11-12)
 
 | Aspect | Managed download (OneCopy writes destination) | Native paste (OS component or app writes destination) |
 |---|---|---|
@@ -84,7 +84,7 @@ Rules:
 
 ## Resume and durability
 
-*Scope note (PROPOSED, D-024): this section specifies **managed download**.*
+*Scope note (D-024): this section specifies **managed download**.*
 
 Destination uses a `.onecopy-partial` data file and a local checkpoint journal tracking manifest identity and verified chunk ranges. On restart, validate integrity and resubmit missing ranges. Checkpoint ordering must avoid acknowledging data not durably written; a crash simulator should exercise writes interrupted before and after journal commits. Never mark final filename complete before final manifest checks and atomic commit/rename where filesystem supports it.
 
@@ -103,7 +103,7 @@ There is no portable guarantee of an immutable filesystem view during arbitrary 
 
 A stronger snapshot-based semantic is explicitly out of scope for normal Copy.
 
-**Boundary between transfer-time validation and prohibited behavior (PROPOSED, D-026 / ADR-0003 — pending owner acceptance):**
+**Boundary between transfer-time validation and prohibited behavior (D-026, D-042 / ADR-0003, accepted 2026-11-12):**
 
 - **Prohibited:**
   - reading, hashing, copying or uploading source bytes at copy time;
@@ -116,9 +116,7 @@ A stronger snapshot-based semantic is explicitly out of scope for normal Copy.
   - fail and retry on incompatible change;
   - no stitching of ranges from different source states.
 - **Allowed, scoped to the opened file and ending with the transfer:** OS change notifications on that file. This is transfer-time validation, not monitoring.
-- **OPEN (D-042):**
-  - opening Windows sources without write sharing (prevents writers; other apps see "file in use");
-  - transfer-scoped copy-on-write clones (snapshot-like).
+- **Decided (D-042):** sources are **not** locked against concurrent modification by default (Windows sources are opened with write sharing allowed). No transfer-scoped copy-on-write clones or hidden source snapshots. Detectable incompatible modifications are reported, and residual races are documented.
 
 **Detection is not guaranteed.** Stat and identity checks can miss concurrent modifications [K]:
 
@@ -139,7 +137,7 @@ Reject absolute paths, `..`, embedded NULs, Windows device names/alternate data 
 
 Measure real RTT, throughput sample, loss/retransmission, network type, metered/battery state, failure rates and route cost. Proposed score combines predicted completion time, reliability, power and monetary cost; a suggested 25% hysteresis threshold is an experiment parameter, **not** a frozen algorithm.
 
-**Deferral (PROPOSED, D-035):**
+**Deferral (D-035, accepted):**
 
 - Phase 1 Free routing is measured direct-path selection: prefer the best measured direct path (for example via QUIC path validation and RTT), filtered by entitlement.
 - The scoring formula and hysteresis are deferred until a Premium relay exists and measurements show a benefit.
@@ -167,6 +165,6 @@ Durability calls are specified per OS, because `fsync` semantics differ (for exa
 - Direct LAN/WAN, double NAT/CGNAT, IPv6, UDP-blocked, variable latency/loss, network handoff.
 - Kill/restart both endpoints, disconnect/reconnect, sleep/wake, disk full, source modified/truncated/deleted/replaced, permission revoked.
 - Assert no unsupported managed payload relay in Free; zero silent corruption; bounded RSS; verified restore and resume; measurable throughput baseline.
-- *Proposed (D-021, D-034):* assert zero Free inter-device packets through any relay. Report connectivity per NAT and network class with confidence intervals, never as a single universal rate.
+- *(D-021, D-022, D-034):* assert zero Free inter-device packets through any relay. Report connectivity per NAT and network class with confidence intervals, never as a single universal rate.
 
 See `PHASE_0_VALIDATION.md`. Proposed 80% baseline LAN throughput, <256 MiB per active transfer, and <one chunk typical resume retransmission remain targets subject to test.

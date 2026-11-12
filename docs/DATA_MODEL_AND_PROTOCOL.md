@@ -54,7 +54,7 @@ SourceRef
   handle_expiration?
 ```
 
-### Proposed model additions (PROPOSED, 2026-11-12 — pending owner acceptance)
+### Model additions (accepted with the Phase 0 baseline, 2026-11-12; wire encoding per the protocol ADR)
 
 ```text
 Representation (additions)
@@ -175,8 +175,8 @@ Availability is dynamic: offline may become online again. Do not use an item cop
 | `TransferCheckpoint` / `ResumeRequest` | Resume from verified ranges only, bound to exact compatible manifest/source epoch |
 | `TransferComplete` / `TransferReceipt` | End-to-end integrity and destination commit acknowledgment |
 | `TransferError` | Structured reason: unavailable, denied, source_changed, network, expired, disk_full, invalid_path, revoked, incompatible_version |
-| `SourceConsistencyResult` *(PROPOSED, D-024/D-026)* | Sender's post-read re-validation result for a file. The receiver must not finalize a managed download, or release the final bytes to a native-paste target, without a passing result. Not a guarantee about how the target handles partial files. |
-| `ContentRequest` / `ContentData` *(PROPOSED, D-030)* | Fetch an on-demand `content_ref` representation through its source capability |
+| `SourceConsistencyResult` *(D-024/D-026; encoding per protocol ADR)* | Sender's post-read re-validation result for a file. The receiver must not finalize a managed download, or release the final bytes to a native-paste target, without a passing result. Not a guarantee about how the target handles partial files. |
+| `ContentRequest` / `ContentData` *(D-030; encoding per protocol ADR)* | Fetch an on-demand `content_ref` representation through its source capability |
 
 Manifest entries use normalized *relative* destination paths. Sender must not supply absolute destination targets. File type, size, source object identity and permission constraints need a well-defined cross-platform subset; special nodes should not be copied by default.
 
@@ -186,10 +186,11 @@ A transfer attempt gets an opaque `source_revision_token` derived from a combina
 
 Resume is legal only when the source's current verifiable representation remains compatible with the existing transfer manifest. Otherwise discard/restart the affected transfer, never stitch chunks from incompatible attempts.
 
-*Proposed clarifications (D-026, ADR-0003):*
+*Clarifications (D-026, D-042, ADR-0003, accepted):*
 
 - The token and checks are **transfer-time validation**, not monitoring. Nothing is recorded or watched before a transfer request.
 - The checks are not claimed to detect every concurrent modification. Known blind spots are listed in `TRANSFER_AND_ROUTING.md`.
+- No default source locking, no copy-on-write clones and no hidden source snapshots (D-042).
 
 ## Premium staging state machine
 
@@ -220,8 +221,8 @@ Staged metadata includes `staging_id`, copy `created_at`, `expires_at`, encrypte
 4. Invalid manifest paths, nested entries and oversize lengths rejected before file creation.
 5. Interrupted transfer resumes verified bytes, but refuses incompatible source revision.
 6. An arbitrary requested raw filesystem path cannot be opened through a remote endpoint.
-7. *(Proposed)* Representations above the inline cap become `content_ref`s. Fetching one requires a valid capability and current roster membership.
-8. *(Proposed)* Free quota breaches defer sync with an explicit status and never drop content silently.
-9. *(Proposed)* A missing or failed `SourceConsistencyResult` blocks managed-download finalization and blocks a clean end of stream for native paste.
+7. *(Phase 0 baseline)* Representations above the inline cap become `content_ref`s. Fetching one requires a valid capability and current roster membership.
+8. *(Phase 0 baseline)* Free quota breaches defer sync with an explicit status and never drop content silently.
+9. *(Phase 0 baseline)* A missing or failed `SourceConsistencyResult` blocks managed-download finalization and blocks a clean end of stream for native paste.
 
 See `TRACEABILITY.md` for test mapping, `TRANSFER_AND_ROUTING.md` for transport, and `SECURITY_AND_PRIVACY.md` for trust assumptions.
