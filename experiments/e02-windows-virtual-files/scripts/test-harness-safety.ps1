@@ -240,7 +240,7 @@ if ($IncludeDesktop) {
             Assert-True ($t.Owned.Process.WaitForExit(10000)) 'agent did not exit'
             Assert-True ((Get-Clipboard -Format Text -Raw).Trim() -eq $text) 'other application clipboard content was cleared or changed'
             $exit = Get-Content (Join-Path $t.RunDir 'events.jsonl') | ForEach-Object { $_ | ConvertFrom-Json } | Where-Object { $_.event -eq 'exit' }
-            Assert-True ($exit.still_current -eq $false -and $exit.cleared -eq $false) 'agent claimed or cleared a clipboard it no longer owned'
+            Assert-True ($exit.ours -eq $false -and $exit.cleared -eq $false) 'agent claimed or cleared a clipboard it no longer owned'
             $sum = Get-Content -Raw (Join-Path $t.RunDir 'summary.json') | ConvertFrom-Json
             Assert-True ($null -ne $sum.clipboard_lost_ms) 'loss of ownership not recorded'
         } finally { $null = Stop-OwnedProcess -Owned $t.Owned }

@@ -20,6 +20,8 @@ mod log;
 #[cfg(windows)]
 mod memory;
 #[cfg(windows)]
+mod ownership;
+#[cfg(windows)]
 mod stats;
 #[cfg(windows)]
 mod stream;
@@ -47,10 +49,11 @@ mod app {
     use windows::Win32::System::Threading::{CreateMutexW, OpenProcess, PROCESS_SYNCHRONIZE, WaitForSingleObject};
     use windows::Win32::System::Com::IDataObject;
     use windows::Win32::System::DataExchange::{
-        AddClipboardFormatListener, GetClipboardOwner, GetClipboardSequenceNumber, RemoveClipboardFormatListener,
+        AddClipboardFormatListener, GetClipboardSequenceNumber, RemoveClipboardFormatListener,
     };
     use windows::Win32::System::LibraryLoader::GetModuleHandleW;
-    use windows::Win32::System::Ole::{OleFlushClipboard, OleInitialize, OleIsCurrentClipboard, OleSetClipboard, OleUninitialize};
+    use windows::Win32::System::Ole::{OleFlushClipboard, OleInitialize, OleSetClipboard, OleUninitialize};
+    use crate::ownership;
     use windows::Win32::UI::WindowsAndMessaging::{
         CreateWindowExW, DefWindowProcW, DestroyWindow, DispatchMessageW, GetMessageW, HWND_MESSAGE, KillTimer, MSG,
         PostQuitMessage, RegisterClassW, SetTimer, TranslateMessage, WINDOW_EX_STYLE, WINDOW_STYLE, WM_CLIPBOARDUPDATE,
@@ -170,12 +173,24 @@ mod app {
             let _ = KillTimer(Some(hwnd), TIMER_ID);
         }
 
-        let still_current = unsafe { OleIsCurrentClipboard(&object) }.is_ok();
-        let mut cleared = false;
-        if matches!(args.exit_mode, ExitMode::Clear) && still_current {
-            cleared = unsafe { OleSetClipboard(None) }.is_ok();
+        // Never OleSetClipboard(NULL): it empties the clipboard whoever owns it.
+        let (ours, cleared, detail) = if matches!(args.exit_mode, ExitMode::Clear) {
+            let r = ownership::release_if_ours(&object, hwnd);
+            (r.before.ours(), r.cleared, json!({
+                "opened": r.opened, "ole_hresult_before": r.before.ole_hresult,
+                "owner_is_our_process_before": r.before.owner_is_our_process, "ole_hresult_after": r.after_ole_hresult,
+            }))
+        } else {
+            let o = ownership::check(&object);
+            (o.ours(), false, json!({ "ole_hresult_before": o.ole_hresult, "owner_is_our_process_before": o.owner_is_our_process }))
+        };
+        if !ours {
+            let now = log::now_ms();
+            stats::with(|s| {
+                s.clipboard_lost_ms.get_or_insert(now);
+            });
         }
-        log::event("exit", json!({ "mode": format!("{:?}", args.exit_mode), "still_current": still_current, "cleared": cleared }));
+        log::event("exit", json!({ "mode": format!("{:?}", args.exit_mode), "ours": ours, "cleared": cleared, "detail": detail }));
         CURRENT.with(|c| *c.borrow_mut() = None);
         drop(object);
 
@@ -247,10 +262,9 @@ mod app {
     extern "system" fn wnd_proc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
         match msg {
             WM_CLIPBOARDUPDATE => {
-                let owner_is_us = unsafe { GetClipboardOwner() }.map(|h| h == hwnd).unwrap_or(false);
                 // Another process replacing the clipboard ends the paste window for this run (interference).
-                let still_current = CURRENT.with(|c| c.borrow().as_ref().map(|o| unsafe { OleIsCurrentClipboard(o) }.is_ok()));
-                if still_current == Some(false) {
+                let own = CURRENT.with(|c| c.borrow().as_ref().map(ownership::check));
+                if own.is_some_and(|o| !o.ours()) {
                     let now = log::now_ms();
                     stats::with(|s| {
                         s.clipboard_lost_ms.get_or_insert(now);
@@ -259,8 +273,9 @@ mod app {
                 log::event(
                     "clipboard_update",
                     json!({
-                        "sequence": unsafe { GetClipboardSequenceNumber() }, "owner_is_listener_window": owner_is_us,
-                        "our_object_current": still_current,
+                        "sequence": unsafe { GetClipboardSequenceNumber() },
+                        "ole_hresult": own.map(|o| o.ole_hresult), "owner_is_our_process": own.map(|o| o.owner_is_our_process),
+                        "ours": own.map(|o| o.ours()),
                     }),
                 );
                 LRESULT(0)
