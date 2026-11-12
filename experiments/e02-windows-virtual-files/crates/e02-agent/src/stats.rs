@@ -25,6 +25,9 @@ pub struct Stats {
     pub peak_private_bytes: u64,
     pub peak_working_set_bytes: u64,
     pub memory_samples: u64,
+    /// Lifetime peak commit as tracked by Windows (PeakPagefileUsage).
+    pub os_peak_commit_bytes: u64,
+    pub os_peak_working_set_bytes: u64,
     pub per_stream: Vec<StreamSummary>,
 }
 

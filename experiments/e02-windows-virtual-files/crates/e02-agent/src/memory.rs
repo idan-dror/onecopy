@@ -13,6 +13,10 @@ use windows::Win32::System::Threading::GetCurrentProcess;
 pub struct Sample {
     pub private_bytes: u64,
     pub working_set_bytes: u64,
+    /// OS-tracked lifetime peak commit (PeakPagefileUsage): catches spikes between samples.
+    pub os_peak_commit_bytes: u64,
+    /// OS-tracked lifetime peak working set.
+    pub os_peak_working_set_bytes: u64,
 }
 
 pub fn sample() -> Option<Sample> {
@@ -28,7 +32,12 @@ pub fn sample() -> Option<Sample> {
         )
         .ok()?;
     }
-    Some(Sample { private_bytes: counters.PrivateUsage as u64, working_set_bytes: counters.WorkingSetSize as u64 })
+    Some(Sample {
+        private_bytes: counters.PrivateUsage as u64,
+        working_set_bytes: counters.WorkingSetSize as u64,
+        os_peak_commit_bytes: counters.PeakPagefileUsage as u64,
+        os_peak_working_set_bytes: counters.PeakWorkingSetSize as u64,
+    })
 }
 
 pub fn record(reason: &str) {
@@ -37,8 +46,13 @@ pub fn record(reason: &str) {
             st.peak_private_bytes = st.peak_private_bytes.max(s.private_bytes);
             st.peak_working_set_bytes = st.peak_working_set_bytes.max(s.working_set_bytes);
             st.memory_samples += 1;
+            st.os_peak_commit_bytes = st.os_peak_commit_bytes.max(s.os_peak_commit_bytes);
+            st.os_peak_working_set_bytes = st.os_peak_working_set_bytes.max(s.os_peak_working_set_bytes);
         });
-        log::event("memory", json!({ "reason": reason, "private_bytes": s.private_bytes, "working_set_bytes": s.working_set_bytes }));
+        log::event("memory", json!({
+            "reason": reason, "private_bytes": s.private_bytes, "working_set_bytes": s.working_set_bytes,
+            "os_peak_commit_bytes": s.os_peak_commit_bytes, "os_peak_working_set_bytes": s.os_peak_working_set_bytes,
+        }));
     }
 }
 
