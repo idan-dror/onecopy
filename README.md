@@ -22,6 +22,7 @@ This documentation is the initial repository baseline. It is **not** an assertio
 | [Transfers and routing](docs/TRANSFER_AND_ROUTING.md) | Live-source, resume, QUIC, direct-only Free |
 | [Premium gateway](docs/PREMIUM_GATEWAY.md) | Relay, explicit temporary staging, pricing and quotas |
 | [Phase 0 validation](docs/PHASE_0_VALIDATION.md) | Risk-first proof plan, test matrix and gates |
+| [Experiment specifications](docs/experiments/README.md) | Phase 0 experiment specs (E-02 first); **PROPOSED**, not implemented |
 | [Roadmap](docs/ROADMAP.md) | Phases, sequencing and exit criteria |
 | [Decisions](docs/DECISIONS.md) | Decision register and proposed ADR workflow |
 | [Proposed ADRs](docs/adrs/README.md) | ADR-0001–0009, all **Proposed**; none accepted |

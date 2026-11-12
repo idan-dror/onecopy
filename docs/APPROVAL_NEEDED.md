@@ -8,6 +8,7 @@
 - [ ] Confirm the decision-status convention, governance and Claude implementation instructions.
 - [ ] Accept Phase 0 as a *feasibility experiment*, not a promise of universal native paste support or a public beta.
 - [ ] Accept, amend or reject the owner-directed proposals D-021 to D-042 and ADR-0001 to ADR-0009 (see the section below). Until accepted they remain PROPOSED or OPEN.
+- [ ] Approve the E-02 specification (`docs/experiments/E-02_WINDOWS_VIRTUAL_FILE_PASTE.md`) as the first implementation-ready experiment, including its §15 readiness answers: optional Process Monitor, operator-run elevated VHD steps, and where SEC-04 runs.
 ## Recommended near-term decisions
 
 | ID | Decision requiring confirmation | Recommendation | Reason |
