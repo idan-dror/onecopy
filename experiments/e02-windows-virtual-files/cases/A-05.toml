@@ -1,0 +1,15 @@
+case_id = "A-05"
+description = "Stage A: three synthetic files in one data object"
+seed = 1005
+
+[[files]]
+name = "e02-A-05-f0.bin"
+size = 1024
+
+[[files]]
+name = "e02-A-05-f1.bin"
+size = 1048576
+
+[[files]]
+name = "e02-A-05-f2.bin"
+size = 8388608

@@ -1,0 +1,7 @@
+case_id = "A-06"
+description = "Stage A: one 1 MiB synthetic file pasted into two folders (new stream per GetData)"
+seed = 1006
+
+[[files]]
+name = "e02-A-06-f0.bin"
+size = 1048576

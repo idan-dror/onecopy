@@ -1,0 +1,7 @@
+case_id = "A-03"
+description = "Stage A: one 4 KiB synthetic file"
+seed = 1003
+
+[[files]]
+name = "e02-A-03-f0.bin"
+size = 4096
