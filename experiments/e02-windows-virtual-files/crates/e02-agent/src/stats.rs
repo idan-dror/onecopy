@@ -6,6 +6,10 @@ use std::sync::Mutex;
 
 #[derive(Default, Serialize, Clone)]
 pub struct Stats {
+    /// Thread that called OleInitialize/OleSetClipboard (the owner STA).
+    pub owner_thread_id: u32,
+    /// Thread id -> number of COM method calls dispatched on it.
+    pub com_call_threads: BTreeMap<u32, u64>,
     /// COM method name -> call count.
     pub calls: BTreeMap<String, u64>,
     pub first_descriptor_get_data_ms: Option<f64>,
@@ -50,7 +54,11 @@ pub fn with<R>(f: impl FnOnce(&mut Stats) -> R) -> R {
 }
 
 pub fn count(method: &str) {
-    with(|s| *s.calls.entry(method.to_owned()).or_default() += 1);
+    let tid = unsafe { windows::Win32::System::Threading::GetCurrentThreadId() };
+    with(|s| {
+        *s.calls.entry(method.to_owned()).or_default() += 1;
+        *s.com_call_threads.entry(tid).or_default() += 1;
+    });
 }
 
 pub fn snapshot() -> Stats {

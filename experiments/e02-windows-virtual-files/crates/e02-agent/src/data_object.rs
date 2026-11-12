@@ -81,7 +81,9 @@ impl Shared {
     }
 }
 
-#[implement(IDataObject)]
+// Agile = false: windows-rs objects are agile (IAgileObject + free-threaded IMarshal) by default,
+// which dispatches cross-process calls on RPC threads. Variant T1 requires STA-bound objects.
+#[implement(IDataObject, Agile = false)]
 pub struct VirtualFileDataObject {
     shared: Arc<Shared>,
 }

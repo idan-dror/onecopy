@@ -115,6 +115,9 @@ mod app {
         let sampler = memory::Sampler::start();
 
         unsafe { OleInitialize(None)? };
+        let owner = unsafe { windows::Win32::System::Threading::GetCurrentThreadId() };
+        stats::with(|s| s.owner_thread_id = owner);
+        log::event("apartment", json!({ "owner_thread_id": owner, "apartment": "STA (OleInitialize)", "objects_agile": false }));
         let hwnd = create_listener_window()?;
         let formats = Formats::register()?;
         log::event(

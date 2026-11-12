@@ -41,7 +41,8 @@ struct State {
     last_reads: VecDeque<ReadRecord>,
 }
 
-#[implement(IStream)]
+// Agile = false: see data_object.rs; T1 keeps every IStream call on the owner STA.
+#[implement(IStream, Agile = false)]
 pub struct VirtualFileStream {
     stream_id: u64,
     file_index: u32,
@@ -138,6 +139,7 @@ impl Drop for VirtualFileStream {
 
 impl ISequentialStream_Impl for VirtualFileStream_Impl {
     fn Read(&self, pv: *mut c_void, cb: u32, pcbread: *mut u32) -> HRESULT {
+        stats::count("IStream::Read");
         let now = log::now_ms();
         let mut st = self.state.lock().unwrap_or_else(|p| p.into_inner());
         let remaining = self.size.saturating_sub(st.position);
