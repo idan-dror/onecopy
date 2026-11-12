@@ -52,10 +52,23 @@
 - **Architecture decisions requested**
 - **Rollback/compatibility notes**
 
+## Workflow clarifications (PROPOSED, 2026-11-12 — operative only after owner acceptance)
+
+These clarify how the rules above are applied. They do not relax any engineering invariant.
+
+- **Status discipline.** Owner directions given in review are recorded as PROPOSED (or OPEN) until the owner explicitly accepts the baseline. Never mark them CONFIRMED on the owner's behalf.
+- **Experiments before code.** Each Phase 0 experiment needs an approved specification in `docs/experiments/` before any experiment code is written. Experiment code lives in an isolated `experiments/<id>-<slug>/` workspace. It shares no crates with future product code, and is not promoted to product code without review.
+- **Evidence handling.** Raw evidence (traces, dumps, recordings) stays under the experiment's git-ignored `evidence/` directory. Only sanitized summaries and reports are committed. Synthetic data only.
+- **Commit separation.** Keep factual corrections, proposed decisions, experiment plans and experiment code in separate commits, and preferably separate PRs.
+- **Equipment and spending.** Use available hardware and free local environments first. Do not purchase hardware, create accounts or paid services, or assume a budget without explicit owner approval (D-028). Report experiments blocked by missing equipment as *not run*.
+- **Free networking.** For Free users, OneCopy infrastructure must not forward any inter-device packet: payload, handshake or traversal (D-021). Library default relays must be disabled. Third-party relays are OPEN (D-022).
+- **Extensions.** Third-party application plugins are out of scope. A OneCopy-owned OS integration (share extension, File Provider–like provider, IME, desktop-shell integration) requires its own ADR and is limited to authorized history items (D-027).
+- **Claims.** Do not claim native-paste guarantees, universal change detection or universal connectivity rates without experimental evidence (D-024, D-026, D-034).
+
 ## Initial work order
 
 1. Documentation baseline acceptance (no code).
-2. Phase 0 risk spikes: Windows Explorer virtual-file paste; Finder Command-V feasibility; Wayland capability matrix; strict direct-only iroh/QUIC experiment.
+2. Phase 0 risk spikes: Windows Explorer virtual-file paste; Finder Command-V feasibility; Wayland capability matrix; strict direct-only iroh/QUIC experiment. *(Proposed refinement, D-023 and D-028: E-02 first; the transport experiment runs two independent tracks; hardware-dependent spikes wait for approved equipment.)*
 3. Minimal headless Rust foundation and encrypted history only within explicitly approved Phase 0 scope.
 4. On-demand 100 GB streaming/resume/source-change experiments and independent security review preparation.
 

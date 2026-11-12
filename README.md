@@ -24,6 +24,7 @@ This documentation is the initial repository baseline. It is **not** an assertio
 | [Phase 0 validation](docs/PHASE_0_VALIDATION.md) | Risk-first proof plan, test matrix and gates |
 | [Roadmap](docs/ROADMAP.md) | Phases, sequencing and exit criteria |
 | [Decisions](docs/DECISIONS.md) | Decision register and proposed ADR workflow |
+| [Proposed ADRs](docs/adrs/README.md) | ADR-0001–0009, all **Proposed**; none accepted |
 | [Approval needed](docs/APPROVAL_NEEDED.md) | Explicit owner choices before coding |
 | [Traceability](docs/TRACEABILITY.md) | Requirement → design → evidence linkage |
 | [Glossary](docs/GLOSSARY.md) | Consistent project vocabulary |
@@ -61,6 +62,12 @@ If a technology is marked PROPOSED, do not silently promote it to CONFIRMED. A p
 6. `Keep Available Offline` is an explicit Premium action creating an encrypted, temporary, frozen-at-upload staged copy; it has expiry, quotas and a manual refresh action.
 7. Never circumvent OS privacy restrictions or promise automatic mobile clipboard monitoring that the OS does not permit.
 8. Reliability, performance and security are assessed with reproducible tests; never substitute assertions for evidence.
+
+**Proposed clarifications (PROPOSED, 2026-11-12 — the invariant text above is unchanged until the owner accepts the baseline):**
+
+- **#3** — third-party application plugins stay out of scope; OneCopy-owned OS integrations are evaluated individually by ADR (D-027, ADR-0005).
+- **#4** — "change monitoring" means idle or background monitoring; consistency checks on the opened source *during an active transfer* are required (D-026, ADR-0003). For transient mobile sources, an explicit, bounded, expiring local copy is allowed (D-025, ADR-0004).
+- **#5** — Free connections may use signaling and STUN-style address discovery; OneCopy infrastructure never forwards Free inter-device packets (D-021, ADR-0001). Third-party relays are OPEN (D-022).
 
 ## Evidence and provenance
 
