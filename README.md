@@ -1,12 +1,12 @@
 # OneCopy — product and engineering documentation
 
-**Status:** Pre-implementation review draft · **Version:** 0.1 · **Prepared:** 2026-11-12  
-**Code status:** No product implementation authorized by this package.  
+**Status:** Phase 0 baseline **accepted** 2026-11-12 (scope: product direction and Phase 0 feasibility experiments) · **Version:** 0.2 · **Prepared:** 2026-11-12  
+**Code status:** Phase 0 experiments authorized only as specified and approved (E-02 first, staged). No product implementation authorized.  
 **Audience:** Product owner, ChatGPT (design/review partner), Claude (implementation engineer).
 
 OneCopy is a cross-platform, encrypted *device clipboard network*: it maintains an independent shared clipboard history on each trusted device, connects to the operating system's clipboard where permitted, and transfers copied files from their **current source only when requested**. Native integration should make copy/paste feel familiar, but not misrepresent mobile or Wayland limitations.
 
-This documentation is the initial repository baseline. It is **not** an assertion that every proposed design is approved. A review and decision pass must occur before Claude starts implementation.
+This documentation is the repository baseline. The Phase 0 baseline was accepted on 2026-11-12 (see `docs/APPROVAL_NEEDED.md`). Acceptance covers the product direction and Phase 0 experiments. It does not approve unverified production architectures, future security-protocol choices or Premium infrastructure, and PROPOSED and OPEN items keep their status.
 
 ## Documentation map
 
@@ -22,12 +22,15 @@ This documentation is the initial repository baseline. It is **not** an assertio
 | [Transfers and routing](docs/TRANSFER_AND_ROUTING.md) | Live-source, resume, QUIC, direct-only Free |
 | [Premium gateway](docs/PREMIUM_GATEWAY.md) | Relay, explicit temporary staging, pricing and quotas |
 | [Phase 0 validation](docs/PHASE_0_VALIDATION.md) | Risk-first proof plan, test matrix and gates |
+| [Experiment specifications](docs/experiments/README.md) | Phase 0 experiment specs; E-02 **approved** for staged implementation |
 | [Roadmap](docs/ROADMAP.md) | Phases, sequencing and exit criteria |
 | [Decisions](docs/DECISIONS.md) | Decision register and proposed ADR workflow |
+| [ADRs](docs/adrs/README.md) | ADR-0001–0007 and 0009 **accepted** (Phase 0 baseline); ADR-0008 Proposed (OPEN) |
 | [Approval needed](docs/APPROVAL_NEEDED.md) | Explicit owner choices before coding |
 | [Traceability](docs/TRACEABILITY.md) | Requirement → design → evidence linkage |
 | [Glossary](docs/GLOSSARY.md) | Consistent project vocabulary |
 | [Research sources](docs/RESEARCH_SOURCES.md) | Research provenance and authoritative references |
+| [Engineering review 2026-11-12](docs/reviews/ENGINEERING_REVIEW_2026-11-12.md) | Independent review findings and proposals — review input, **not approved** |
 | [Claude guidance](CLAUDE.md) | Implementation protocol and PR/review discipline |
 
 ## Decision markers
@@ -61,6 +64,12 @@ If a technology is marked PROPOSED, do not silently promote it to CONFIRMED. A p
 7. Never circumvent OS privacy restrictions or promise automatic mobile clipboard monitoring that the OS does not permit.
 8. Reliability, performance and security are assessed with reproducible tests; never substitute assertions for evidence.
 
+**Accepted clarifications (2026-11-12, Phase 0 baseline — read together with the invariants above):**
+
+- **#3** — third-party application plugins stay out of scope; OneCopy-owned OS integrations are evaluated individually by ADR (D-027, ADR-0005).
+- **#4** — "change monitoring" means idle or background monitoring; consistency checks on the opened source *during an active transfer* are required (D-026, ADR-0003). For **transient mobile sources only**, an explicit, user-authorized, bounded and expiring local copy is an **intentional exception** (D-025, ADR-0004). It does **not** permit automatic source duplication of any kind. Sources are not locked by default, and no copy-on-write clones or hidden snapshots are made (D-042).
+- **#5** — Free connections may use signaling and STUN-style address discovery; no OneCopy-managed or third-party application relay, including library defaults, forwards Free inter-device packets; direct peer-to-peer is the only Free data path (D-021, D-022, ADR-0001).
+
 ## Evidence and provenance
 
-This package is based on the supplied **OneCopy: Decision-Ready Architecture and Feasibility Research** (2026-11-12) and the product decisions discussed afterward. Research recommendations are clearly distinguished from confirmed product requirements; see `docs/RESEARCH_SOURCES.md` and `docs/DECISIONS.md`. The research report should also be retained in the repository under `docs/research/` when the owner supplies/commits it.
+This package is based on the supplied **OneCopy: Decision-Ready Architecture and Feasibility Research** (2026-11-12) and the product decisions discussed afterward. Research recommendations are clearly distinguished from confirmed product requirements; see `docs/RESEARCH_SOURCES.md` and `docs/DECISIONS.md`. The research report is retained in the repository at `docs/research/onecopy-deep-research-2026-11-12.md` (factual correction, 2026-11-12 review: the report is already committed).

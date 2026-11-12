@@ -57,3 +57,45 @@
 **ADR:** Architecture decision record with context, alternatives, owner decision and evidence.
 
 **Go/no-go gate:** Measurable requirement that determines whether a feature or claim proceeds, is narrowed or receives a fallback.
+
+## Terms added with the Phase 0 baseline (accepted 2026-11-12)
+
+These terms support decisions D-021 to D-042. Terms tied to an OPEN decision (roster freshness, D-037) describe a concept, not a decided policy.
+
+**Signaling:** Control-plane messages carrying authentication, roster, presence, connection candidates and connection-attempt timing between devices. Signaling is not inter-device packet forwarding. (D-021)
+
+**Address discovery:** A STUN-style request and response through which a device learns its public address and port mapping from a server. The server never forwards packets between devices. (D-021)
+
+**Inter-device packet forwarding (relay):** A server receiving packets from one device and sending them to another, whatever they contain: payload, handshake or NAT-traversal frames. Prohibited on OneCopy infrastructure for Free users (D-021). Third-party application relays, including library defaults, are also prohibited for Free (D-022). The Premium relay is the only planned OneCopy forwarding service.
+
+**Delivery mode:** How a requested file is materialized at the destination: *managed download* or *native paste*. (D-024)
+
+**Managed download:** OneCopy writes the destination file itself, with partial-file isolation, journaled resume, verification and controlled finalization. (PR-028)
+
+**Native paste:** An OS component or application (for example Explorer) writes the destination by pulling bytes from OneCopy through a native data-transfer interface. OneCopy controls only the bytes it supplies and its own end-of-stream and error signals. (PR-029)
+
+**Promotion:** User-initiated placement of a OneCopy history item onto the local active OS clipboard.
+
+**Transient source:** A source whose access grant is limited in time or by process lifetime, such as an Android share-intent URI grant or an iOS share-extension item. (D-025)
+
+**Mobile local staging:** An explicit, user-requested, bounded and expiring copy of a transient mobile source, kept in OneCopy's app container until sent. Not Premium cloud staging. An intentional, user-authorized exception for transient sources only; it never permits automatic source duplication. (D-025)
+
+**Origin app not running (mobile):** The availability state of an item whose bytes must be fetched from a mobile origin while the OneCopy app there is suspended or terminated. The item is listed but cannot be fetched until the app runs again. (D-030 correction)
+
+**Inline content cap:** The maximum ciphertext size of representation content carried inside a history envelope. (D-030)
+
+**On-demand content reference (`content_ref`):** A reference to a large text or image representation whose bytes are fetched from the origin on request through a source capability. (D-030)
+
+**Transfer-time source validation:** Checks on a source opened for an active transfer or staging operation, ending with that operation. Distinct from prohibited idle or background monitoring. (D-026)
+
+**Support tier:** The documented level of clipboard integration for an OS or desktop environment. (D-036)
+
+**Sensitivity marker:** A platform- or application-provided hint that clipboard content should not be recorded or synced. Markers are voluntary and their absence does not imply the content is not sensitive. (D-032)
+
+**Provenance marking:** OS metadata marking a file as originating from another machine, for example Windows Mark-of-the-Web or macOS quarantine. (D-033)
+
+**Roster freshness:** The age of the most recent verified roster state a device holds. Its policy is OPEN (D-037).
+
+**OneCopy-owned OS integration:** An OS-sanctioned extension point implemented by OneCopy itself (share extension, File Provider, IME, desktop-shell integration). Each is evaluated by its own ADR. Distinct from third-party application plugins, which remain out of scope. (D-027)
+
+**Single-writer state:** Cryptographic state (sequence counters, ratchets, epoch state) mutated by exactly one process per device. (D-039)

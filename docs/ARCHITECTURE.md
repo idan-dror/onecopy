@@ -113,11 +113,27 @@ The above is a contract sketch, not compiled Rust API. Distinguish ephemeral sou
 
 Suppress re-ingestion loops using an OS-specific origin marker where supported and a conservative recent fingerprint cache where not. Suppression must be observable in tests and must avoid discarding genuine new copies of similar content.
 
+## Accepted refinements (Phase 0 baseline, 2026-11-12)
+
+These refinements were accepted with the Phase 0 baseline. They refine, and do not change, the CONFIRMED hybrid local-core architecture. Per-OS mechanisms they leave open (for example the process-model ADR before Phase 1) still need their own decisions.
+
+1. **Delivery modes (D-024, ADR-0002).** The transfer engine owns *managed download*: destination writer, journal, verification, finalization. The native bridge exposes *native-paste providers* that pull bytes from the transfer engine's bounded stream API. On Windows that is `IDataObject`/`IStream`; other providers need their own ADRs (ADR-0005). The two modes carry different, documented guarantees.
+2. **Free connection path (D-021, D-023, ADR-0001).**
+   - A transport abstraction with two candidate implementations, evaluated independently.
+   - Free configuration has no relay transport: neither OneCopy-managed nor third-party, including library defaults (D-022).
+   - Address discovery is a control-plane service that never forwards inter-device packets.
+   - The Premium relay is a separate, entitlement-gated component.
+3. **Content references (D-030, ADR-0006).** Representations above the inline cap become on-demand `content_ref`s. The origin core serves them through source capabilities, from its local encrypted store of captured clipboard data. Mobile origins can serve only while their app is running, so availability states are explicit (`DATA_MODEL_AND_PROTOCOL.md`).
+4. **Process model and local IPC (D-038, D-039, ADR-0009).** Recommended: one per-user agent process per desktop owns the core, the OS adapter and the tray. A separate UI process is allowed only behind authenticated IPC. Exactly one process per device mutates cryptographic state; mobile extensions enqueue work for the main app. A process-model ADR precedes Phase 1.
+5. **Mobile local staging store (D-025, ADR-0004).** A bounded, expiring, encrypted area in the app container for explicitly kept transient sources. It is separate from the Premium staging client.
+6. **OneCopy-owned OS integrations (D-027, ADR-0005).** Share extensions, File Provider–like providers, an IME or desktop-shell integrations are separate components, each with its own ADR and threat-model entry. Provider-style integrations expose only authorized history items.
+7. **Routing (D-035).** Phase 1 uses measured direct-path selection. The scoring and hysteresis selector is deferred until a Premium relay exists and measurements show benefit.
+
 ## Technology candidates (not yet commitments)
 
 - Core: Rust workspace, asynchronous runtime to be selected, SQLite local persistence candidate.
-- Swift/Kotlin bindings: UniFFI experiment; Windows stable C ABI/C# bridge candidate.
-- Transport: standard QUIC, with `iroh` first Phase 0 candidate; strict direct-only behavior is a gate.
+- Swift/Kotlin bindings: UniFFI experiment; Windows stable C ABI/C# bridge candidate. *Option added 2026-11-12: write the Windows clipboard/COM adapter in Rust (`windows-rs`), exercised inside E-02 only.*
+- Transport: standard QUIC, with `iroh` first Phase 0 candidate; strict direct-only behavior is a gate. *Accepted (D-023): evaluate iroh and a standalone QUIC plus ICE-style traversal as two independent tracks.*
 - Control: minimal test service during Phase 0; managed PostgreSQL, OIDC/passkeys later as evaluated.
 - Gateway object staging: Cloudflare R2 first regional cost/performance experiment, not selected provider.
 
@@ -128,3 +144,11 @@ Correctness and authorization outrank raw throughput. Failure modes must be expl
 ## Open issues
 
 Enrollment/recovery key architecture; whether MLS is warranted; concrete UI framework per desktop; protocol/schema encoding; iroh compatibility; macOS Finder Command-V; Wayland compositor matrix; precise source consistency guarantee on each filesystem. See `APPROVAL_NEEDED.md` and `PHASE_0_VALIDATION.md`.
+
+Added 2026-11-12:
+
+- revocation authority, roster freshness, offline LAN authorization and recovery (D-037, ADR-0008; investigated in E-11);
+- the process-model ADR (AR-07 in the review);
+- native-paste target guarantees (E-02, E-03).
+
+Resolved on 2026-11-12: third-party relays for Free (D-022, prohibited); transfer-time write prevention and copy-on-write clones (D-042, not used).

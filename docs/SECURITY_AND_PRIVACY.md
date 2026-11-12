@@ -23,6 +23,14 @@
 | Untrusted app/clipboard writer | Plant malicious URLs, HTML, paths and deceptive filenames | Render as untrusted data, never auto-execute/open, sanitize UI |
 | Malicious network/NAT peer | Attempt spoofing, reflection, DoS | Mutual peer authentication, limits, anti-replay |
 | Malicious transfer manifest | Request out-of-root writes, symlink traversal, pathological tree | Strict path checks, manifests limits, no symlink following |
+| *Rows added with the Phase 0 baseline (2026-11-12):* | | |
+| Local process / other OS user / sandboxed app | Query the agent's local endpoint for cross-device history or issue commands | Authenticated, authorized IPC (D-038, ADR-0009) |
+| Crash or diagnostic capture | Heap contents (clipboard bodies, keys) in dumps or uploaded reports | No full-memory dumps, scrubbed minidumps, opt-in reporting (D-040) |
+| OS and keyboard-app clipboard history or cloud sync | Retains or uploads promoted items outside OneCopy's E2EE | Set exclusion markers on promotion of sensitive items; document limitations (D-032, ADR-0007) |
+| Revoked device on a LAN with stale peers | Requests transfers from peers that have not learned of the revocation | Roster freshness, authority and LAN policy (D-037, ADR-0008, OPEN) |
+| Concurrent writers of cryptographic state (app plus extension, agent plus UI) | Nonce reuse or forked ratchets | Single-writer rule (D-039, ADR-0009) |
+| Received file without provenance | Executables or documents bypass OS safety prompts | Provenance marking for managed downloads; native-paste behavior observed (D-033) |
+| Third-party relay operator (if ever permitted) | Observes Free connection metadata | Prohibited for Free, including library defaults (D-022) |
 
 ## Device trust and membership
 
@@ -70,6 +78,31 @@ Bound each allocation, frame, manifest depth, file count, path length, concurren
 
 **Telemetry forbidden:** clipboard bodies, secret keys, plaintext filenames, source paths, sensitive rich content, raw content hashes and unrestricted high-cardinality identifiers. Synthetic fixture data only in diagnostic logs/tests.
 
+## Pre-implementation security review scope (accepted 2026-11-12; D-037 remains OPEN)
+
+The owner directed that the following be resolved in a pre-implementation security review, before trust or key code is written for Phase 1. Items 1 to 3 are investigated in **E-11**, and no production policy is chosen without an explicit security review. They do not block E-02.
+
+1. **Revocation authority (D-037, ADR-0008, OPEN).** Who may revoke whom; how a stolen device is prevented from revoking every other device and locking the owner out; how a recovery key can override.
+2. **Roster freshness and offline LAN authorization (D-037, OPEN).** How old a device's roster may be before it serves or accepts a transfer, especially on a LAN while the control plane is unreachable.
+   - **No timeout is chosen without a documented trade-off.** A larger bound improves offline usability and lengthens the window in which a revoked device can still be served. A smaller bound shortens that window and causes more offline failures.
+   - Options are listed in ADR-0008: online confirmation, a bounded window, peer roster-version agreement, LAN gossip of revocations.
+3. **Account recovery (B-02, D-037).** A recovery key, approval by an existing device, or disclosed server-assisted escrow. Email-only recovery remains rejected (PR-026).
+4. **Local IPC authorization (D-038).** Per-OS caller authentication: a named pipe with a user-SID ACL plus client verification on Windows; XPC with a code-signing requirement on macOS; `SO_PEERCRED` on Linux. Alternatively the UI runs inside the agent process.
+5. **Single-writer cryptographic state (D-039).** Exactly one process per device mutates counters, ratchets or epoch state.
+6. **Crash dumps and diagnostics (D-040).** No full-memory dumps, scrubbed minidumps, opt-in reporting, zeroization where feasible.
+7. **Sensitive clipboard exposure (D-032).**
+   - Honor platform and application markers on capture and set them on promotion (see `PLATFORM_CAPABILITIES.md`).
+   - Limitations: markers are voluntary; their absence does not imply the content is not sensitive; OS behavior varies by version; apps can misuse markers.
+8. **Received-file provenance (D-033).**
+   - Managed downloads apply Windows Mark-of-the-Web (for example through `IAttachmentExecute`) and macOS quarantine.
+   - Native-paste provenance is observed in E-02/E-03.
+   - Linux and mobile have no enforced equivalent.
+   - Never preserve setuid or setgid bits.
+9. **Free connection metadata (D-021).** Signaling and address discovery reveal IP addresses and timing to the control plane. Direct connections reveal IP addresses to peers. Record both in the privacy inventory.
+10. **Encryption layering (review AR-09, not adopted).** Reliance on QUIC/TLS for live transfers, keyed BLAKE3 digests, and a standard streaming AEAD for staging are review proposals for the cryptography ADR only.
+11. **Keystroke injection (D-041, decided).** No automatic or simulated keystroke injection as a product feature. Experiment-only automation must not become a product dependency.
+12. **Source handling (D-042, decided).** No default source locking, no copy-on-write clones and no hidden source snapshots. Scoped transfer-time checks report detectable incompatible modifications, and residual races are documented.
+
 ## Security verification gates
 
 - Review formal threat model and key protocol externally before public beta.
@@ -82,3 +115,10 @@ Bound each allocation, frame, manifest depth, file count, path length, concurren
 ## Security-specific open decisions
 
 MLS vs epoch-secret group key; secure recovery and lost-all-devices behavior; clipboard sensitivity default; encrypted metadata granularity; local database encryption; update signing model. See `APPROVAL_NEEDED.md`.
+
+Added 2026-11-12:
+
+- revocation authority, roster freshness and offline LAN authorization (D-037);
+- provenance mechanism details (D-033).
+
+Decided on 2026-11-12: D-022 (third-party relays prohibited for Free), D-041 (no product keystroke injection) and D-042 (no default locking, clones or hidden snapshots).

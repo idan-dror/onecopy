@@ -48,6 +48,11 @@ Example from research: 500 GB uploaded over a month with average one-day retenti
 
 A relay's outbound byte charges, infrastructure throughput and connection overhead are distinct from object-storage billing. Benchmark real per-region throughput and effective billed cost before choosing topology.
 
+**Review addendum — RESEARCHED facts (2026-11-12), no decision change:**
+
+- [V] Cloudflare R2 Standard pricing was re-checked on 2026-11-12 and is unchanged: $0.015/GB-month storage, Class A $4.50/million, Class B $0.36/million, no egress charge. The free tier is 10 GB-month storage, 1M Class A and 10M Class B operations per month.
+- [S] The research report's Hetzner figure (20 TB included traffic) applies to EU cloud locations. Secondary sources report about 1–5 TB included in US locations (reduced December 2024), and about 0.5–8 TB in Singapore with roughly €7.40/TB overage, about seven times the EU/US overage rate. Verify on Hetzner's own pages before any relay-region costing.
+
 ## Subscription policy (PROPOSED)
 
 - Premium monthly relay allowance with sensible hard limits.
@@ -63,7 +68,15 @@ A relay's outbound byte charges, infrastructure throughput and connection overhe
 - Rate-limit account/device operations and monitor abnormal file churn, malformed requests and unauthorized access attempts.
 - Confirm deletion semantics, lifecycle policy and regional data processing; avoid overpromising secure erasure on storage-provider internals.
 
+## Relationship to Free connectivity and mobile local staging (accepted 2026-11-12)
+
+- **Free (D-021, D-022).** Free connections use signaling, presence, candidate exchange and STUN-style address discovery. No OneCopy-managed or third-party relay carries Free inter-device packets. The Premium relay is the only planned OneCopy service that forwards inter-device packets. It must be unreachable by Free sessions by construction, not merely by policy check.
+- **Free quotas (D-031).** Free history and control traffic have published rate and storage quotas. Free P2P file size is not limited.
+- **Mobile local staging (D-025).** The explicit, on-device copy of a transient mobile source is a different feature from Premium "Keep Available Offline". It never leaves the device except through a normal transfer to a trusted device, and the two must never share UI labels.
+
 ## Go/no-go experiment
+
+*Phase 0 scope (D-029, accepted):* during Phase 0, E-13 is desk research only (pricing, limits, terms). The measurements below are performed in Premium development (Phase 4 preparation), after explicit owner approval of any paid resources.
 
 Measure R2 and at least one alternative across target regions using 1/10/100 GB encrypted payloads, concurrent clients, failure/retry and rapid expiry, actual item request counts and effective costs. Separately benchmark live relay hosts for throughput, cost/TB, packet loss, 95th percentile latency, concurrency and abuse resilience. Premium cannot be priced responsibly until these results exist.
 
