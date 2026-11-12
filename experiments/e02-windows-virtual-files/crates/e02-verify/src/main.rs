@@ -430,12 +430,25 @@ mod win {
     }
 
     pub fn explorer_paste(dest: &Path, find_timeout_secs: u64) -> AnyResult<()> {
-        let w = wait_for_explorer(dest, find_timeout_secs)?;
-        // Give the view a moment to finish initial enumeration.
-        std::thread::sleep(Duration::from_millis(750));
-        unsafe { PostMessageW(Some(w.view), WM_COMMAND, WPARAM(DEFVIEW_PASTE_COMMAND), LPARAM(0))? };
-        println!("{}", json!({ "posted": "WM_COMMAND", "command_id": DEFVIEW_PASTE_COMMAND, "target": "folder_view" }));
-        Ok(())
+        wait_for_explorer(dest, find_timeout_secs)?;
+        // The folder view can be recreated while Explorer finishes navigating, which
+        // invalidates a handle found earlier. Let it settle, re-find, and retry.
+        let mut last_error = String::new();
+        for attempt in 1..=5 {
+            std::thread::sleep(Duration::from_millis(750));
+            let Some(w) = find_explorer(dest)? else {
+                last_error = "window disappeared".into();
+                continue;
+            };
+            match unsafe { PostMessageW(Some(w.view), WM_COMMAND, WPARAM(DEFVIEW_PASTE_COMMAND), LPARAM(0)) } {
+                Ok(()) => {
+                    println!("{}", json!({ "posted": "WM_COMMAND", "command_id": DEFVIEW_PASTE_COMMAND, "target": "folder_view", "attempt": attempt }));
+                    return Ok(());
+                }
+                Err(e) => last_error = e.to_string(),
+            }
+        }
+        Err(format!("could not post Paste after 5 attempts: {last_error}").into())
     }
 
     pub fn explorer_close(dest: &Path) -> AnyResult<()> {

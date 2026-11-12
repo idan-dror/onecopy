@@ -88,31 +88,45 @@ function Test-Complete([string] $dest) {
 }
 
 $completion = @()
-foreach ($d in $dests) {
-    $start = Get-Date
-    Start-Process -FilePath 'explorer.exe' -ArgumentList "`"$d`""
-    if ($Driver -eq 'ExplorerCommand') {
-        $driverOut = & $verifyExe explorer-paste --dest $d 2>&1 | Out-String
-        Write-Host "driver: $($driverOut.Trim())"
-    } else {
-        Write-Host "D1: press Ctrl+V in the Explorer window showing $d"
+$driverErrors = @()
+try {
+    foreach ($d in $dests) {
+        $start = Get-Date
+        $driverError = $null
+        Start-Process -FilePath 'explorer.exe' -ArgumentList "`"$d`""
+        if ($Driver -eq 'ExplorerCommand') {
+            # A driver failure is a harness error, not a paste outcome: record it and continue.
+            $prev = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+            $driverOut = & $verifyExe explorer-paste --dest $d 2>&1 | Out-String
+            $driverExit = $LASTEXITCODE
+            $ErrorActionPreference = $prev
+            Write-Host "driver: $($driverOut.Trim())"
+            if ($driverExit -ne 0) { $driverError = $driverOut.Trim(); $driverErrors += $driverError }
+        } else {
+            Write-Host "D1: press Ctrl+V in the Explorer window showing $d"
+        }
+        $done = $false
+        if (-not $driverError) {
+            $deadline = $start.AddSeconds($TimeoutSecs)
+            while ((Get-Date) -lt $deadline) {
+                if (Test-Complete $d) { $done = $true; break }
+                Start-Sleep -Milliseconds 200
+            }
+        }
+        $completion += [ordered]@{
+            destination  = "p$($completion.Count + 1)"
+            completed    = $done
+            seconds      = [math]::Round(((Get-Date) - $start).TotalSeconds, 2)
+            driver_error = $driverError
+        }
+        Start-Sleep -Seconds 3  # let the target finish and release its streams
     }
-    $done = $false
-    $deadline = $start.AddSeconds($TimeoutSecs)
-    while ((Get-Date) -lt $deadline) {
-        if (Test-Complete $d) { $done = $true; break }
-        Start-Sleep -Milliseconds 200
-    }
-    $completion += [ordered]@{
-        destination = "p$($completion.Count + 1)"
-        completed   = $done
-        seconds     = [math]::Round(((Get-Date) - $start).TotalSeconds, 2)
-    }
-    Start-Sleep -Seconds 3  # let the target finish and release its streams
+} finally {
+    # Always release the clipboard, even if the harness fails.
+    New-Item -ItemType File -Force -Path $stopFile | Out-Null
 }
 
 # --- Stop, inspect, verify ----------------------------------------------------------------
-New-Item -ItemType File -Force -Path $stopFile | Out-Null
 if (-not $agent.WaitForExit(30000)) { Stop-Process -Id $agent.Id -Force; throw 'agent did not exit' }
 foreach ($w in $watchers) { $null = $w.WaitForExit(10000) }
 $clipAfter = & $verifyExe clipboard-formats | Out-String | ConvertFrom-Json
@@ -143,7 +157,8 @@ $summary = Get-Content -Raw (Join-Path $runDir 'summary.json') | ConvertFrom-Jso
 $allMatch = -not ($verifications | Where-Object { -not $_.all_files_match })
 $allCompleted = -not ($completion | Where-Object { -not $_.completed })
 $clipClean = -not $clipAfter.has_onecopy_marker
-$result = if ($allMatch -and $allCompleted -and $clipClean -and $agent.ExitCode -eq 0) { 'pass' } else { 'fail' }
+# A harness (driver) error means the paste was never attempted: inconclusive, not fail.
+$result = if ($driverErrors.Count -gt 0) { 'inconclusive' } elseif ($allMatch -and $allCompleted -and $clipClean -and $agent.ExitCode -eq 0) { 'pass' } else { 'fail' }
 
 $record = [ordered]@{
     experiment_id        = 'E-02'
@@ -161,6 +176,7 @@ $record = [ordered]@{
     destinations         = $verifications
     observer             = $observers
     clipboard_after_exit = $clipAfter
+    harness_errors       = $driverErrors
     result               = $result
 }
 $reportDir = Join-Path $ws 'reports\stage-a'
