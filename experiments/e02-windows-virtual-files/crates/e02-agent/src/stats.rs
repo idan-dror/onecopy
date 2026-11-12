@@ -17,6 +17,8 @@ pub struct Stats {
     pub first_read_ms: Option<f64>,
     pub last_read_ms: Option<f64>,
     pub last_stream_release_ms: Option<f64>,
+    /// First time another process replaced our clipboard object (interference), if ever.
+    pub clipboard_lost_ms: Option<f64>,
     pub streams_created: u64,
     pub streams_released: u64,
     pub bytes_served: u64,

@@ -132,11 +132,15 @@ foreach ($w in $watchers) { $null = $w.WaitForExit(10000) }
 $clipAfter = & $verifyExe clipboard-formats | Out-String | ConvertFrom-Json
 
 $verifications = @()
+$windowsPresent = @()
 for ($i = 0; $i -lt $dests.Count; $i++) {
     $out = Join-Path $runDir "verify-p$($i + 1).json"
     & $verifyExe verify --case $caseFile --dest $dests[$i] --out $out | Out-Null
     $verifications += (Get-Content -Raw $out | ConvertFrom-Json)
+    $prev = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
     & $verifyExe explorer-close --dest $dests[$i] 2>&1 | Out-Null
+    $windowsPresent += ($LASTEXITCODE -eq 0)
+    $ErrorActionPreference = $prev
 }
 
 $observers = [ordered]@{}
@@ -157,8 +161,14 @@ $summary = Get-Content -Raw (Join-Path $runDir 'summary.json') | ConvertFrom-Jso
 $allMatch = -not ($verifications | Where-Object { -not $_.all_files_match })
 $allCompleted = -not ($completion | Where-Object { -not $_.completed })
 $clipClean = -not $clipAfter.has_onecopy_marker
-# A harness (driver) error means the paste was never attempted: inconclusive, not fail.
-$result = if ($driverErrors.Count -gt 0) { 'inconclusive' } elseif ($allMatch -and $allCompleted -and $clipClean -and $agent.ExitCode -eq 0) { 'pass' } else { 'fail' }
+# Harness errors and interference (test window closed, clipboard replaced by another process)
+# mean the paste outcome was not observed: inconclusive, not fail.
+$interference = @()
+if ($summary.clipboard_lost_ms) { $interference += "clipboard replaced by another process at $($summary.clipboard_lost_ms) ms" }
+for ($i = 0; $i -lt $completion.Count; $i++) {
+    if (-not $completion[$i].completed -and -not $windowsPresent[$i]) { $interference += "test window for p$($i + 1) closed before completion" }
+}
+$result = if ($driverErrors.Count -gt 0 -or $interference.Count -gt 0) { 'inconclusive' } elseif ($allMatch -and $allCompleted -and $clipClean -and $agent.ExitCode -eq 0) { 'pass' } else { 'fail' }
 
 $record = [ordered]@{
     experiment_id        = 'E-02'
@@ -177,6 +187,8 @@ $record = [ordered]@{
     observer             = $observers
     clipboard_after_exit = $clipAfter
     harness_errors       = $driverErrors
+    interference         = $interference
+    test_windows_present = $windowsPresent
     result               = $result
 }
 $reportDir = Join-Path $ws 'reports\stage-a'

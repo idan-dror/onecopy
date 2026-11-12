@@ -90,6 +90,11 @@ mod app {
     }
 
     static STOP: OnceLock<StopCondition> = OnceLock::new();
+
+    thread_local! {
+        /// Our clipboard object, visible to the window procedure on the owner STA thread.
+        static CURRENT: std::cell::RefCell<Option<IDataObject>> = const { std::cell::RefCell::new(None) };
+    }
     const TIMER_ID: usize = 1;
 
     pub fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -131,6 +136,7 @@ mod app {
         let object: IDataObject = VirtualFileDataObject::create(shared);
 
         set_clipboard_with_retry(&object)?;
+        CURRENT.with(|c| *c.borrow_mut() = Some(object.clone()));
         log::event("set_clipboard", json!({ "sequence": unsafe { GetClipboardSequenceNumber() } }));
         std::fs::write(args.run_dir.join("ready"), b"ready")?;
 
@@ -146,6 +152,7 @@ mod app {
             cleared = unsafe { OleSetClipboard(None) }.is_ok();
         }
         log::event("exit", json!({ "mode": format!("{:?}", args.exit_mode), "still_current": still_current, "cleared": cleared }));
+        CURRENT.with(|c| *c.borrow_mut() = None);
         drop(object);
 
         unsafe {
@@ -217,9 +224,20 @@ mod app {
         match msg {
             WM_CLIPBOARDUPDATE => {
                 let owner_is_us = unsafe { GetClipboardOwner() }.map(|h| h == hwnd).unwrap_or(false);
+                // Another process replacing the clipboard ends the paste window for this run (interference).
+                let still_current = CURRENT.with(|c| c.borrow().as_ref().map(|o| unsafe { OleIsCurrentClipboard(o) }.is_ok()));
+                if still_current == Some(false) {
+                    let now = log::now_ms();
+                    stats::with(|s| {
+                        s.clipboard_lost_ms.get_or_insert(now);
+                    });
+                }
                 log::event(
                     "clipboard_update",
-                    json!({ "sequence": unsafe { GetClipboardSequenceNumber() }, "owner_is_listener_window": owner_is_us }),
+                    json!({
+                        "sequence": unsafe { GetClipboardSequenceNumber() }, "owner_is_listener_window": owner_is_us,
+                        "our_object_current": still_current,
+                    }),
                 );
                 LRESULT(0)
             }
