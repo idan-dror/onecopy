@@ -246,7 +246,8 @@ try {
     $created = 0; $released = 0; $agentGone = $false; $agentGoneAt = $null; $errorAt = $null; $lastChange = $clock.Elapsed.TotalSeconds
     $triggerTimes = @{}; $done = @{}; $dialogFirstSeen = @{}
     $errorSignal = $false
-    $sequenceOrder = $(if ($h.concurrent) { @(,$pasteTargets) } else { @($pasteTargets | ForEach-Object { ,@($_) }) })
+    # Groups of target indexes pasted together. Built without $( ), which would unroll the nesting.
+    if ($h.concurrent) { $sequenceOrder = @(,@($pasteTargets)) } else { $sequenceOrder = @($pasteTargets | ForEach-Object { ,@($_) }) }
     $deadline = $clock.Elapsed.TotalSeconds + $timeout
     foreach ($group in $sequenceOrder) {
         foreach ($idx in $group) { Invoke-Paste $idx }
