@@ -21,6 +21,8 @@ param(
     [string] $ReportDir = ''
 )
 $ErrorActionPreference = 'Stop'
+# 'powershell -File' passes a comma-separated list as one string.
+$Cases = @($Cases | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim() } | Where-Object { $_ })
 $ws = Split-Path -Parent $PSScriptRoot
 if (-not $ReportDir) { $ReportDir = Join-Path $ws 'reports\stage-b1' }
 $abort = Join-Path $ws 'evidence\ABORT'
