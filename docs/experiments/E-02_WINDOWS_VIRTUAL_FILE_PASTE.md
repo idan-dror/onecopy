@@ -1,6 +1,7 @@
 # E-02 — Windows clipboard virtual-file paste: experiment specification
 
 **Status:** **APPROVED** by the product owner on 2026-11-12 with the Phase 0 baseline. Implemented in two independently reviewed stages (§0). The implementation PR is not merged without owner approval.
+**Progress (2026-11-13):** **Stage A is complete and accepted** (§0.1). Stage B is in progress. **E-02 as a whole is not complete**, and Gate B (Windows) is not decided.
 **Experiment class:** Phase 0 feasibility spike. This is throwaway code, not a product foundation.
 **Related:** PR-019 (CONFIRMED), PR-023 (PROPOSED); PR-028–PR-030, PR-035 (CONFIRMED); D-024, D-033, D-041, D-042 (CONFIRMED); ADR-0002, ADR-0007; Gate B (Windows).
 **Equipment stage:** 0. Runs on the existing Windows development machine; no purchases and no network services.
@@ -27,6 +28,18 @@
 - the sanitized evidence and acceptance report.
 
 These are the cases in §7.1–§7.11 not marked *blocked*.
+
+### 0.1 Stage A outcome (accepted 2026-11-13)
+
+- **Accepted** by the product owner on 2026-11-13, based on the reviewed code, 36 successful paste runs, the D1/D2c calibration and the safety regression results at `0dc3111`. Merged in PR #2 (merge commit `a4dcf2d`).
+- **Report and evidence:** `experiments/e02-windows-virtual-files/reports/E-02-stage-a-report.md` and `reports/stage-a/`. Superseded and preliminary runs, and the clipboard-ownership defect history (report §9.3), are preserved there.
+- **Limitation.** Stage A validates **only the tested behavior**:
+  - target G-01 (an Explorer folder window), on Windows 11 Home build 26200 (Explorer 10.0.26100.x), NTFS destination;
+  - small synthetic files (0 B to 64 MiB, up to 3 files), threading T1, no faults;
+  - drivers D1 and D2c, with D2c calibrated for these operations only.
+
+  It shows nothing about large files, faults, cancellation, provider termination, partial-file or false-success outcomes, provenance, other targets or T2. No native-paste guarantee may be claimed from it (D-024).
+- **Carried forward:** the `S_OK` versus `S_FALSE` finding is item W-01 of [`WINDOWS_ENGINEERING_CHECKLIST.md`](../WINDOWS_ENGINEERING_CHECKLIST.md).
 
 **Safety permissions:**
 

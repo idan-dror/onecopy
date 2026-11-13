@@ -22,7 +22,8 @@ This documentation is the repository baseline. The Phase 0 baseline was accepted
 | [Transfers and routing](docs/TRANSFER_AND_ROUTING.md) | Live-source, resume, QUIC, direct-only Free |
 | [Premium gateway](docs/PREMIUM_GATEWAY.md) | Relay, explicit temporary staging, pricing and quotas |
 | [Phase 0 validation](docs/PHASE_0_VALIDATION.md) | Risk-first proof plan, test matrix and gates |
-| [Experiment specifications](docs/experiments/README.md) | Phase 0 experiment specs; E-02 **approved** for staged implementation |
+| [Experiment specifications](docs/experiments/README.md) | Phase 0 experiment specs; E-02 **approved**, Stage A **complete and accepted** (2026-11-13) |
+| [Windows engineering checklist](docs/WINDOWS_ENGINEERING_CHECKLIST.md) | Windows adapter rules from experiment evidence (W-01 required) |
 | [Roadmap](docs/ROADMAP.md) | Phases, sequencing and exit criteria |
 | [Decisions](docs/DECISIONS.md) | Decision register and proposed ADR workflow |
 | [ADRs](docs/adrs/README.md) | ADR-0001–0007 and 0009 **accepted** (Phase 0 baseline); ADR-0008 Proposed (OPEN) |

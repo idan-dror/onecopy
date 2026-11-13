@@ -19,6 +19,8 @@
 
 **Phase 0 test:** capture text and file list; native virtual-file paste into Explorer with a lazy content stream; include cancellation, multiple files, delayed read and large-file behavior. Test destinations other than Explorer separately; cannot infer universal app compatibility from one success.
 
+**Adapter requirement (owner direction, 2026-11-13):** the Windows adapter follows [`WINDOWS_ENGINEERING_CHECKLIST.md`](WINDOWS_ENGINEERING_CHECKLIST.md). Item W-01 is required: predicate COM APIs are judged by comparing the raw `HRESULT` with `S_OK`, never by "succeeded". E-02 Stage A showed `S_FALSE` treated as success clearing another application's clipboard. The other items are PROPOSED.
+
 ## macOS
 
 **Research:** `NSPasteboard` supports clipboard items and provides detection APIs, but modern AppKit distinguishes user-intent paste from other programmatic access and can require user consent. `NSFilePromiseProvider` supports promises, particularly drag-and-drop; documentation alone does **not** establish reliable Finder `Command-V` using a remote promise written to the General pasteboard.
