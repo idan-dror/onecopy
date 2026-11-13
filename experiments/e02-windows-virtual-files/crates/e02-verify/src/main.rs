@@ -391,16 +391,20 @@ fn zone_identifier(path: &Path) -> Value {
     match std::fs::read_to_string(PathBuf::from(ads)) {
         Ok(text) => {
             let mut zone_id = None;
+            let mut zone_value_escaped = None;
             let mut keys = Vec::new();
             for line in text.lines() {
                 if let Some((k, v)) = line.split_once('=') {
                     keys.push(k.trim().to_owned());
                     if k.trim().eq_ignore_ascii_case("ZoneId") {
                         zone_id = v.trim().parse::<i64>().ok();
+                        // The ZoneId value only (never HostUrl/ReferrerUrl), escaped, at most 32 chars.
+                        zone_value_escaped = Some(v.chars().take(32).flat_map(|c| c.escape_default()).collect::<String>());
                     }
                 }
             }
-            json!({ "present": true, "zone_id": zone_id, "keys": keys })
+            json!({ "present": true, "zone_id": zone_id, "zone_value_escaped": zone_value_escaped, "keys": keys,
+                    "bytes": text.len() })
         }
         Err(_) => json!({ "present": false }),
     }
