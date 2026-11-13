@@ -8,10 +8,20 @@ const dir = process.argv[2] ?? 'reports/stage-b1';
 const commitPrefix = process.argv[3] ?? '';
 const read = (p) => JSON.parse(readFileSync(p, 'utf8').replace(/^﻿/, ''));
 const recs = readdirSync(dir)
-  .filter((f) => f.endsWith('.json') && !f.startsWith('stage-b1-') && statSync(join(dir, f)).isFile())
+  .filter((f) => f.endsWith('.json') && !f.startsWith('stage-b1-') && f !== 'corrections.json' && statSync(join(dir, f)).isFile())
   .map((f) => read(join(dir, f)))
   .filter((r) => r.stage === 'B1')
   .filter((r) => !commitPrefix || (r.env?.experiment_commit ?? '').startsWith(commitPrefix));
+// Documented corrections (corrections.json): raw records stay untouched.
+let corrections = {};
+try { corrections = read(join(dir, 'corrections.json')).corrections ?? {}; } catch { corrections = {}; }
+for (const r of recs) {
+  const c = corrections[r.run_id];
+  if (!c) continue;
+  r.correction = c.reason;
+  if (c.result) r.result = c.result;
+  if (c.class) r.classification = { ...r.classification, outcome_class: c.class, target_report: c.report ?? r.classification?.target_report };
+}
 
 const order = ['O5', 'O4', 'O3', 'O2', 'O1', 'C', 'S', 'N'];
 const worst = (a, b) => (order.indexOf(a) <= order.indexOf(b) ? a : b);
@@ -63,6 +73,7 @@ function runFacts(r) {
     zone_ids: files.map((f) => f.zone_identifier?.zone_id ?? (f.zone_identifier?.present ? 'present' : null)),
     observed_names: [...new Set(fsEvents)],
     interference: r.interference ?? [],
+    correction: r.correction ?? null,
   };
 }
 
