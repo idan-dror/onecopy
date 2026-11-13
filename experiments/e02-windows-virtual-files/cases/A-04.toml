@@ -1,0 +1,7 @@
+case_id = "A-04"
+description = "Stage A: one 64 MiB synthetic file (memory check against A-01)"
+seed = 1004
+
+[[files]]
+name = "e02-A-04-f0.bin"
+size = 67108864

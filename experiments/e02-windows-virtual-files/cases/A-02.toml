@@ -1,0 +1,7 @@
+case_id = "A-02"
+description = "Stage A: one zero-length synthetic file (FD_FILESIZE = 0)"
+seed = 1002
+
+[[files]]
+name = "e02-A-02-f0.bin"
+size = 0

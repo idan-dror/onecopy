@@ -1,0 +1,735 @@
+{
+  "summary": {
+    "generated": "2026-11-13T15:32:49.556Z",
+    "commit_filter": "9964dc9",
+    "runs": 9,
+    "comparisons": 6,
+    "all_equivalent": true,
+    "by_case": {
+      "A-01": {
+        "d1": 1,
+        "d2c": 2
+      },
+      "A-04": {
+        "d1": 1,
+        "d2c": 2
+      },
+      "A-05": {
+        "d1": 1,
+        "d2c": 2
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "case": "A-01",
+      "d1": "A-01-20261113T173143-b143b344",
+      "d2c": "A-01-20261112T220409-1015744e",
+      "equivalent": true,
+      "diffs": []
+    },
+    {
+      "case": "A-01",
+      "d1": "A-01-20261113T173143-b143b344",
+      "d2c": "A-01-20261112T220503-0bade5a4",
+      "equivalent": true,
+      "diffs": []
+    },
+    {
+      "case": "A-04",
+      "d1": "A-04-20261113T173215-4096de28",
+      "d2c": "A-04-20261112T220434-87a32a49",
+      "equivalent": true,
+      "diffs": []
+    },
+    {
+      "case": "A-04",
+      "d1": "A-04-20261113T173215-4096de28",
+      "d2c": "A-04-20261112T220511-d9fc6200",
+      "equivalent": true,
+      "diffs": []
+    },
+    {
+      "case": "A-05",
+      "d1": "A-05-20261113T173233-77e58232",
+      "d2c": "A-05-20261112T220442-ed1d8ba9",
+      "equivalent": true,
+      "diffs": []
+    },
+    {
+      "case": "A-05",
+      "d1": "A-05-20261113T173233-77e58232",
+      "d2c": "A-05-20261112T220519-9b74765f",
+      "equivalent": true,
+      "diffs": []
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "A-01-20261112T220409-1015744e",
+      "driver": "D2c",
+      "result": "pass",
+      "commit": "9964dc9",
+      "signature": [
+        "get_data:Shell IDList Array!",
+        "get_data:CF_HDROP!",
+        "get_data:Shell IDList Array!",
+        "get_data:CF_HDROP!",
+        "get_data:Shell IDList Array!",
+        "set_data:TargetCLSID",
+        "get_data:EnterpriseDataProtectionId!",
+        "get_data:AsyncFlag!",
+        "get_data:FileGroupDescriptorW",
+        "get_data:Shell Object Offsets!",
+        "get_data:ZoneIdentifier!",
+        "stream_create",
+        "get_data:FileContents#0",
+        "stream_seek(origin=1,move=0)",
+        "stream_seek(origin=0,move=0)",
+        "stream_release",
+        "set_data:Performed DropEffect",
+        "set_data:Logical Performed DropEffect",
+        "get_data:cf#0!"
+      ],
+      "threads": {
+        "all_on_owner_sta": true,
+        "distinct_com_threads": 1
+      },
+      "streams": {
+        "created": 1,
+        "released": 1,
+        "read_calls": 5,
+        "request_sizes": [
+          262144
+        ],
+        "short_reads": 1,
+        "stat_calls": 0,
+        "seek_pattern": "1:0,0:0,0:0",
+        "eof_read_all": true,
+        "lifetime_ms": 4
+      },
+      "outcome": {
+        "files": [
+          "e02-A-01-f0.bin:1048576:true"
+        ],
+        "clipboard_empty_after_exit": true,
+        "clipboard_lost": null,
+        "exit_code": 0,
+        "window": [
+          {
+            "top_preexisting": false,
+            "tabs_on_top": 1,
+            "close_decision": "close"
+          }
+        ]
+      },
+      "errors": [],
+      "ui_polling": {
+        "preferred_dropeffect_gets": 16,
+        "dropdescription_sets": 9,
+        "query_get_data": 3,
+        "enum_format_etc": 7
+      },
+      "harness": {
+        "interference": [],
+        "exception": null
+      }
+    },
+    {
+      "run_id": "A-01-20261112T220503-0bade5a4",
+      "driver": "D2c",
+      "result": "pass",
+      "commit": "9964dc9",
+      "signature": [
+        "get_data:Shell IDList Array!",
+        "get_data:CF_HDROP!",
+        "get_data:Shell IDList Array!",
+        "get_data:CF_HDROP!",
+        "get_data:Shell IDList Array!",
+        "set_data:TargetCLSID",
+        "get_data:EnterpriseDataProtectionId!",
+        "get_data:AsyncFlag!",
+        "get_data:FileGroupDescriptorW",
+        "get_data:Shell Object Offsets!",
+        "get_data:ZoneIdentifier!",
+        "stream_create",
+        "get_data:FileContents#0",
+        "stream_seek(origin=1,move=0)",
+        "stream_seek(origin=0,move=0)",
+        "stream_release",
+        "set_data:Performed DropEffect",
+        "set_data:Logical Performed DropEffect",
+        "get_data:cf#0!"
+      ],
+      "threads": {
+        "all_on_owner_sta": true,
+        "distinct_com_threads": 1
+      },
+      "streams": {
+        "created": 1,
+        "released": 1,
+        "read_calls": 5,
+        "request_sizes": [
+          262144
+        ],
+        "short_reads": 1,
+        "stat_calls": 0,
+        "seek_pattern": "1:0,0:0,0:0",
+        "eof_read_all": true,
+        "lifetime_ms": 4
+      },
+      "outcome": {
+        "files": [
+          "e02-A-01-f0.bin:1048576:true"
+        ],
+        "clipboard_empty_after_exit": true,
+        "clipboard_lost": null,
+        "exit_code": 0,
+        "window": [
+          {
+            "top_preexisting": false,
+            "tabs_on_top": 1,
+            "close_decision": "close"
+          }
+        ]
+      },
+      "errors": [],
+      "ui_polling": {
+        "preferred_dropeffect_gets": 16,
+        "dropdescription_sets": 9,
+        "query_get_data": 3,
+        "enum_format_etc": 7
+      },
+      "harness": {
+        "interference": [],
+        "exception": null
+      }
+    },
+    {
+      "run_id": "A-01-20261113T173143-b143b344",
+      "driver": "D1",
+      "result": "pass",
+      "commit": "9964dc9",
+      "signature": [
+        "get_data:Shell IDList Array!",
+        "get_data:CF_HDROP!",
+        "get_data:Shell IDList Array!",
+        "get_data:CF_HDROP!",
+        "get_data:Shell IDList Array!",
+        "set_data:TargetCLSID",
+        "get_data:EnterpriseDataProtectionId!",
+        "get_data:AsyncFlag!",
+        "get_data:FileGroupDescriptorW",
+        "get_data:Shell Object Offsets!",
+        "get_data:ZoneIdentifier!",
+        "stream_create",
+        "get_data:FileContents#0",
+        "stream_seek(origin=1,move=0)",
+        "stream_seek(origin=0,move=0)",
+        "stream_release",
+        "set_data:Performed DropEffect",
+        "set_data:Logical Performed DropEffect",
+        "get_data:cf#0!"
+      ],
+      "threads": {
+        "all_on_owner_sta": true,
+        "distinct_com_threads": 1
+      },
+      "streams": {
+        "created": 1,
+        "released": 1,
+        "read_calls": 5,
+        "request_sizes": [
+          262144
+        ],
+        "short_reads": 1,
+        "stat_calls": 0,
+        "seek_pattern": "1:0,0:0,0:0",
+        "eof_read_all": true,
+        "lifetime_ms": 4
+      },
+      "outcome": {
+        "files": [
+          "e02-A-01-f0.bin:1048576:true"
+        ],
+        "clipboard_empty_after_exit": true,
+        "clipboard_lost": null,
+        "exit_code": 0,
+        "window": [
+          {
+            "top_preexisting": false,
+            "tabs_on_top": 1,
+            "close_decision": "close"
+          }
+        ]
+      },
+      "errors": [],
+      "ui_polling": {
+        "preferred_dropeffect_gets": 16,
+        "dropdescription_sets": 9,
+        "query_get_data": 3,
+        "enum_format_etc": 7
+      },
+      "harness": {
+        "interference": [],
+        "exception": null
+      }
+    },
+    {
+      "run_id": "A-04-20261112T220434-87a32a49",
+      "driver": "D2c",
+      "result": "pass",
+      "commit": "9964dc9",
+      "signature": [
+        "get_data:Shell IDList Array!",
+        "get_data:CF_HDROP!",
+        "get_data:Shell IDList Array!",
+        "get_data:CF_HDROP!",
+        "get_data:Shell IDList Array!",
+        "set_data:TargetCLSID",
+        "get_data:EnterpriseDataProtectionId!",
+        "get_data:AsyncFlag!",
+        "get_data:FileGroupDescriptorW",
+        "get_data:Shell Object Offsets!",
+        "get_data:ZoneIdentifier!",
+        "stream_create",
+        "get_data:FileContents#0",
+        "stream_seek(origin=1,move=0)",
+        "stream_seek(origin=0,move=0)",
+        "stream_release",
+        "set_data:Performed DropEffect",
+        "set_data:Logical Performed DropEffect",
+        "get_data:cf#0!"
+      ],
+      "threads": {
+        "all_on_owner_sta": true,
+        "distinct_com_threads": 1
+      },
+      "streams": {
+        "created": 1,
+        "released": 1,
+        "read_calls": 257,
+        "request_sizes": [
+          262144
+        ],
+        "short_reads": 1,
+        "stat_calls": 0,
+        "seek_pattern": "1:0,0:0,0:0",
+        "eof_read_all": true,
+        "lifetime_ms": 139
+      },
+      "outcome": {
+        "files": [
+          "e02-A-04-f0.bin:67108864:true"
+        ],
+        "clipboard_empty_after_exit": true,
+        "clipboard_lost": null,
+        "exit_code": 0,
+        "window": [
+          {
+            "top_preexisting": false,
+            "tabs_on_top": 1,
+            "close_decision": "close"
+          }
+        ]
+      },
+      "errors": [],
+      "ui_polling": {
+        "preferred_dropeffect_gets": 16,
+        "dropdescription_sets": 9,
+        "query_get_data": 3,
+        "enum_format_etc": 7
+      },
+      "harness": {
+        "interference": [],
+        "exception": null
+      }
+    },
+    {
+      "run_id": "A-04-20261112T220511-d9fc6200",
+      "driver": "D2c",
+      "result": "pass",
+      "commit": "9964dc9",
+      "signature": [
+        "get_data:Shell IDList Array!",
+        "get_data:CF_HDROP!",
+        "get_data:Shell IDList Array!",
+        "get_data:CF_HDROP!",
+        "get_data:Shell IDList Array!",
+        "set_data:TargetCLSID",
+        "get_data:EnterpriseDataProtectionId!",
+        "get_data:AsyncFlag!",
+        "get_data:FileGroupDescriptorW",
+        "get_data:Shell Object Offsets!",
+        "get_data:ZoneIdentifier!",
+        "stream_create",
+        "get_data:FileContents#0",
+        "stream_seek(origin=1,move=0)",
+        "stream_seek(origin=0,move=0)",
+        "stream_release",
+        "set_data:Performed DropEffect",
+        "set_data:Logical Performed DropEffect",
+        "get_data:cf#0!"
+      ],
+      "threads": {
+        "all_on_owner_sta": true,
+        "distinct_com_threads": 1
+      },
+      "streams": {
+        "created": 1,
+        "released": 1,
+        "read_calls": 257,
+        "request_sizes": [
+          262144
+        ],
+        "short_reads": 1,
+        "stat_calls": 0,
+        "seek_pattern": "1:0,0:0,0:0",
+        "eof_read_all": true,
+        "lifetime_ms": 139
+      },
+      "outcome": {
+        "files": [
+          "e02-A-04-f0.bin:67108864:true"
+        ],
+        "clipboard_empty_after_exit": true,
+        "clipboard_lost": null,
+        "exit_code": 0,
+        "window": [
+          {
+            "top_preexisting": false,
+            "tabs_on_top": 1,
+            "close_decision": "close"
+          }
+        ]
+      },
+      "errors": [],
+      "ui_polling": {
+        "preferred_dropeffect_gets": 16,
+        "dropdescription_sets": 9,
+        "query_get_data": 3,
+        "enum_format_etc": 7
+      },
+      "harness": {
+        "interference": [],
+        "exception": null
+      }
+    },
+    {
+      "run_id": "A-04-20261113T173215-4096de28",
+      "driver": "D1",
+      "result": "pass",
+      "commit": "9964dc9",
+      "signature": [
+        "get_data:Shell IDList Array!",
+        "get_data:CF_HDROP!",
+        "get_data:Shell IDList Array!",
+        "get_data:CF_HDROP!",
+        "get_data:Shell IDList Array!",
+        "set_data:TargetCLSID",
+        "get_data:EnterpriseDataProtectionId!",
+        "get_data:AsyncFlag!",
+        "get_data:FileGroupDescriptorW",
+        "get_data:Shell Object Offsets!",
+        "get_data:ZoneIdentifier!",
+        "stream_create",
+        "get_data:FileContents#0",
+        "stream_seek(origin=1,move=0)",
+        "stream_seek(origin=0,move=0)",
+        "stream_release",
+        "set_data:Performed DropEffect",
+        "set_data:Logical Performed DropEffect",
+        "get_data:cf#0!"
+      ],
+      "threads": {
+        "all_on_owner_sta": true,
+        "distinct_com_threads": 1
+      },
+      "streams": {
+        "created": 1,
+        "released": 1,
+        "read_calls": 257,
+        "request_sizes": [
+          262144
+        ],
+        "short_reads": 1,
+        "stat_calls": 0,
+        "seek_pattern": "1:0,0:0,0:0",
+        "eof_read_all": true,
+        "lifetime_ms": 139
+      },
+      "outcome": {
+        "files": [
+          "e02-A-04-f0.bin:67108864:true"
+        ],
+        "clipboard_empty_after_exit": true,
+        "clipboard_lost": null,
+        "exit_code": 0,
+        "window": [
+          {
+            "top_preexisting": false,
+            "tabs_on_top": 1,
+            "close_decision": "close"
+          }
+        ]
+      },
+      "errors": [],
+      "ui_polling": {
+        "preferred_dropeffect_gets": 16,
+        "dropdescription_sets": 9,
+        "query_get_data": 3,
+        "enum_format_etc": 7
+      },
+      "harness": {
+        "interference": [],
+        "exception": null
+      }
+    },
+    {
+      "run_id": "A-05-20261112T220442-ed1d8ba9",
+      "driver": "D2c",
+      "result": "pass",
+      "commit": "9964dc9",
+      "signature": [
+        "get_data:Shell IDList Array!",
+        "get_data:CF_HDROP!",
+        "get_data:Shell IDList Array!",
+        "get_data:CF_HDROP!",
+        "get_data:Shell IDList Array!",
+        "set_data:TargetCLSID",
+        "get_data:EnterpriseDataProtectionId!",
+        "get_data:AsyncFlag!",
+        "get_data:FileGroupDescriptorW",
+        "get_data:Shell Object Offsets!",
+        "get_data:ZoneIdentifier!",
+        "stream_create",
+        "get_data:FileContents#0",
+        "stream_seek(origin=1,move=0)",
+        "stream_seek(origin=0,move=0)",
+        "stream_release",
+        "stream_create",
+        "get_data:FileContents#1",
+        "stream_seek(origin=1,move=0)",
+        "stream_seek(origin=0,move=0)",
+        "stream_release",
+        "stream_create",
+        "get_data:FileContents#2",
+        "stream_seek(origin=1,move=0)",
+        "stream_seek(origin=0,move=0)",
+        "stream_release",
+        "set_data:Performed DropEffect",
+        "set_data:Logical Performed DropEffect",
+        "get_data:cf#0!"
+      ],
+      "threads": {
+        "all_on_owner_sta": true,
+        "distinct_com_threads": 1
+      },
+      "streams": {
+        "created": 3,
+        "released": 3,
+        "read_calls": 40,
+        "request_sizes": [
+          262144
+        ],
+        "short_reads": 4,
+        "stat_calls": 0,
+        "seek_pattern": "1:0,0:0,0:0,1:0,0:0,0:0,1:0,0:0,0:0",
+        "eof_read_all": true,
+        "lifetime_ms": 769
+      },
+      "outcome": {
+        "files": [
+          "e02-A-05-f0.bin:1024:true",
+          "e02-A-05-f1.bin:1048576:true",
+          "e02-A-05-f2.bin:8388608:true"
+        ],
+        "clipboard_empty_after_exit": true,
+        "clipboard_lost": null,
+        "exit_code": 0,
+        "window": [
+          {
+            "top_preexisting": false,
+            "tabs_on_top": 1,
+            "close_decision": "close"
+          }
+        ]
+      },
+      "errors": [],
+      "ui_polling": {
+        "preferred_dropeffect_gets": 16,
+        "dropdescription_sets": 9,
+        "query_get_data": 3,
+        "enum_format_etc": 7
+      },
+      "harness": {
+        "interference": [],
+        "exception": null
+      }
+    },
+    {
+      "run_id": "A-05-20261112T220519-9b74765f",
+      "driver": "D2c",
+      "result": "pass",
+      "commit": "9964dc9",
+      "signature": [
+        "get_data:Shell IDList Array!",
+        "get_data:CF_HDROP!",
+        "get_data:Shell IDList Array!",
+        "get_data:CF_HDROP!",
+        "get_data:Shell IDList Array!",
+        "set_data:TargetCLSID",
+        "get_data:EnterpriseDataProtectionId!",
+        "get_data:AsyncFlag!",
+        "get_data:FileGroupDescriptorW",
+        "get_data:Shell Object Offsets!",
+        "get_data:ZoneIdentifier!",
+        "stream_create",
+        "get_data:FileContents#0",
+        "stream_seek(origin=1,move=0)",
+        "stream_seek(origin=0,move=0)",
+        "stream_release",
+        "stream_create",
+        "get_data:FileContents#1",
+        "stream_seek(origin=1,move=0)",
+        "stream_seek(origin=0,move=0)",
+        "stream_release",
+        "stream_create",
+        "get_data:FileContents#2",
+        "stream_seek(origin=1,move=0)",
+        "stream_seek(origin=0,move=0)",
+        "stream_release",
+        "set_data:Performed DropEffect",
+        "set_data:Logical Performed DropEffect",
+        "get_data:cf#0!"
+      ],
+      "threads": {
+        "all_on_owner_sta": true,
+        "distinct_com_threads": 1
+      },
+      "streams": {
+        "created": 3,
+        "released": 3,
+        "read_calls": 40,
+        "request_sizes": [
+          262144
+        ],
+        "short_reads": 4,
+        "stat_calls": 0,
+        "seek_pattern": "1:0,0:0,0:0,1:0,0:0,0:0,1:0,0:0,0:0",
+        "eof_read_all": true,
+        "lifetime_ms": 818
+      },
+      "outcome": {
+        "files": [
+          "e02-A-05-f0.bin:1024:true",
+          "e02-A-05-f1.bin:1048576:true",
+          "e02-A-05-f2.bin:8388608:true"
+        ],
+        "clipboard_empty_after_exit": true,
+        "clipboard_lost": null,
+        "exit_code": 0,
+        "window": [
+          {
+            "top_preexisting": false,
+            "tabs_on_top": 1,
+            "close_decision": "close"
+          }
+        ]
+      },
+      "errors": [],
+      "ui_polling": {
+        "preferred_dropeffect_gets": 16,
+        "dropdescription_sets": 9,
+        "query_get_data": 3,
+        "enum_format_etc": 7
+      },
+      "harness": {
+        "interference": [],
+        "exception": null
+      }
+    },
+    {
+      "run_id": "A-05-20261113T173233-77e58232",
+      "driver": "D1",
+      "result": "pass",
+      "commit": "9964dc9",
+      "signature": [
+        "get_data:Shell IDList Array!",
+        "get_data:CF_HDROP!",
+        "get_data:Shell IDList Array!",
+        "get_data:CF_HDROP!",
+        "get_data:Shell IDList Array!",
+        "set_data:TargetCLSID",
+        "get_data:EnterpriseDataProtectionId!",
+        "get_data:AsyncFlag!",
+        "get_data:FileGroupDescriptorW",
+        "get_data:Shell Object Offsets!",
+        "get_data:ZoneIdentifier!",
+        "stream_create",
+        "get_data:FileContents#0",
+        "stream_seek(origin=1,move=0)",
+        "stream_seek(origin=0,move=0)",
+        "stream_release",
+        "stream_create",
+        "get_data:FileContents#1",
+        "stream_seek(origin=1,move=0)",
+        "stream_seek(origin=0,move=0)",
+        "stream_release",
+        "stream_create",
+        "get_data:FileContents#2",
+        "stream_seek(origin=1,move=0)",
+        "stream_seek(origin=0,move=0)",
+        "stream_release",
+        "set_data:Performed DropEffect",
+        "set_data:Logical Performed DropEffect",
+        "get_data:cf#0!"
+      ],
+      "threads": {
+        "all_on_owner_sta": true,
+        "distinct_com_threads": 1
+      },
+      "streams": {
+        "created": 3,
+        "released": 3,
+        "read_calls": 40,
+        "request_sizes": [
+          262144
+        ],
+        "short_reads": 4,
+        "stat_calls": 0,
+        "seek_pattern": "1:0,0:0,0:0,1:0,0:0,0:0,1:0,0:0,0:0",
+        "eof_read_all": true,
+        "lifetime_ms": 1079
+      },
+      "outcome": {
+        "files": [
+          "e02-A-05-f0.bin:1024:true",
+          "e02-A-05-f1.bin:1048576:true",
+          "e02-A-05-f2.bin:8388608:true"
+        ],
+        "clipboard_empty_after_exit": true,
+        "clipboard_lost": null,
+        "exit_code": 0,
+        "window": [
+          {
+            "top_preexisting": false,
+            "tabs_on_top": 1,
+            "close_decision": "close"
+          }
+        ]
+      },
+      "errors": [],
+      "ui_polling": {
+        "preferred_dropeffect_gets": 19,
+        "dropdescription_sets": 11,
+        "query_get_data": 3,
+        "enum_format_etc": 7
+      },
+      "harness": {
+        "interference": [],
+        "exception": null
+      }
+    }
+  ]
+}

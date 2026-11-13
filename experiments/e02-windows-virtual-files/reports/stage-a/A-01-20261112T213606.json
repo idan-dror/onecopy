@@ -1,0 +1,136 @@
+﻿{
+    "experiment_id":  "E-02",
+    "stage":  "A",
+    "case_id":  "A-01",
+    "run_id":  "A-01-20261112T213606",
+    "driver":  "D2c",
+    "driver_calibrated":  false,
+    "target":  "G-01",
+    "pastes":  1,
+    "env":  {
+                "os_caption":  "Microsoft Windows 11 Home",
+                "os_version":  "10.0.26200",
+                "os_build":  "26200",
+                "os_ubr":  9711,
+                "os_display_version":  "25H2",
+                "explorer_version":  "10.0.26100.8875",
+                "explorer_separate_process":  0,
+                "clipboard_history_enabled":  null,
+                "cloud_clipboard_enabled":  null,
+                "defender_product_version":  "4.18.26100.4",
+                "defender_realtime_protection":  true,
+                "test_volume_filesystem":  "NTFS",
+                "test_volume_free_gib":  1311.2,
+                "cpu":  "AMD Ryzen 7 5700X3D 8-Core Processor",
+                "ram_gib":  31.9,
+                "experiment_commit":  "af648cca34e385e81140bf4328f771bcf889807f",
+                "experiment_tree_dirty":  false,
+                "rustc":  "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+                "cargo_lock_sha256":  "1674bd5110616f7acfe7922f10fa3a0377d25d108d3f1e476e0ea34a375aa02b"
+            },
+    "completion":  [
+                       {
+                           "destination":  "p1",
+                           "completed":  true,
+                           "seconds":  1.77,
+                           "driver_error":  null
+                       }
+                   ],
+    "agent_exit_code":  0,
+    "agent_summary":  {
+                          "owner_thread_id":  26676,
+                          "com_call_threads":  {
+                                                   "26676":  62
+                                               },
+                          "calls":  {
+                                        "IDataObject::EnumFormatEtc":  7,
+                                        "IDataObject::GetData":  31,
+                                        "IDataObject::QueryGetData":  3,
+                                        "IDataObject::SetData":  13,
+                                        "IStream::Read":  5,
+                                        "IStream::Seek":  3
+                                    },
+                          "first_descriptor_get_data_ms":  1677.1221999999998,
+                          "first_contents_get_data_ms":  1678.1588,
+                          "first_read_ms":  1679.2049,
+                          "last_read_ms":  1681.4386,
+                          "last_stream_release_ms":  1682.0572,
+                          "clipboard_lost_ms":  null,
+                          "streams_created":  1,
+                          "streams_released":  1,
+                          "bytes_served":  1048576,
+                          "read_calls":  5,
+                          "short_reads":  1,
+                          "peak_private_bytes":  2351104,
+                          "peak_working_set_bytes":  11968512,
+                          "memory_samples":  6,
+                          "os_peak_commit_bytes":  2351104,
+                          "os_peak_working_set_bytes":  12226560,
+                          "per_stream":  [
+                                             {
+                                                 "stream_id":  1,
+                                                 "file_index":  0,
+                                                 "advertised_size":  1048576,
+                                                 "bytes_served":  1048576,
+                                                 "final_position":  0,
+                                                 "max_position":  1048576,
+                                                 "read_calls":  5,
+                                                 "min_request":  262144,
+                                                 "max_request":  262144,
+                                                 "seeks":  3,
+                                                 "stats_calls":  0,
+                                                 "eof_read":  true
+                                             }
+                                         ]
+                      },
+    "destinations":  [
+                         {
+                             "all_files_match":  true,
+                             "case_id":  "A-01",
+                             "files":  [
+                                           {
+                                               "digest_match":  true,
+                                               "exists":  true,
+                                               "expected_size":  1048576,
+                                               "index":  0,
+                                               "name":  "e02-A-01-f0.bin",
+                                               "size":  1048576,
+                                               "zone_identifier":  {
+                                                                       "present":  false
+                                                                   }
+                                           }
+                                       ],
+                             "unexpected_entries":  [
+
+                                                    ]
+                         }
+                     ],
+    "observer":  {
+                     "p1":  {
+                                "events":  1,
+                                "names_seen":  [
+                                                   "e02-A-01-f0.bin"
+                                               ],
+                                "removals":  0
+                            }
+                 },
+    "clipboard_after_exit":  {
+                                 "formats":  [
+
+                                             ],
+                                 "has_file_contents":  false,
+                                 "has_file_descriptor":  false,
+                                 "has_onecopy_marker":  false,
+                                 "sequence":  820
+                             },
+    "harness_errors":  [
+
+                       ],
+    "interference":  [
+
+                     ],
+    "test_windows_present":  [
+                                 true
+                             ],
+    "result":  "pass"
+}

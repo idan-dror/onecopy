@@ -1,0 +1,175 @@
+﻿{
+    "experiment_id":  "E-02",
+    "stage":  "A",
+    "case_id":  "A-05",
+    "run_id":  "A-05-20261112T212739",
+    "driver":  "D2c",
+    "driver_calibrated":  false,
+    "target":  "G-01",
+    "pastes":  1,
+    "env":  {
+                "os_caption":  "Microsoft Windows 11 Home",
+                "os_version":  "10.0.26200",
+                "os_build":  "26200",
+                "os_ubr":  9711,
+                "os_display_version":  "25H2",
+                "explorer_version":  "10.0.26100.8875",
+                "explorer_separate_process":  0,
+                "clipboard_history_enabled":  null,
+                "cloud_clipboard_enabled":  null,
+                "defender_product_version":  "4.18.26100.4",
+                "defender_realtime_protection":  true,
+                "test_volume_filesystem":  "NTFS",
+                "test_volume_free_gib":  1311.2,
+                "cpu":  "AMD Ryzen 7 5700X3D 8-Core Processor",
+                "ram_gib":  31.9,
+                "experiment_commit":  "d85b1c50ff663169f45f6ae298ab16a7f042356d",
+                "experiment_tree_dirty":  false,
+                "rustc":  "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+                "cargo_lock_sha256":  "1674bd5110616f7acfe7922f10fa3a0377d25d108d3f1e476e0ea34a375aa02b"
+            },
+    "completion":  [
+                       {
+                           "destination":  "p1",
+                           "completed":  true,
+                           "seconds":  3.04
+                       }
+                   ],
+    "agent_exit_code":  0,
+    "agent_summary":  {
+                          "owner_thread_id":  16720,
+                          "com_call_threads":  {
+                                                   "16720":  113
+                                               },
+                          "calls":  {
+                                        "IDataObject::EnumFormatEtc":  9,
+                                        "IDataObject::GetData":  36,
+                                        "IDataObject::QueryGetData":  4,
+                                        "IDataObject::SetData":  15,
+                                        "IStream::Read":  40,
+                                        "IStream::Seek":  9
+                                    },
+                          "first_descriptor_get_data_ms":  1777.1153,
+                          "first_contents_get_data_ms":  1778.5264,
+                          "first_read_ms":  1840.2294000000002,
+                          "last_read_ms":  3023.2129,
+                          "last_stream_release_ms":  3023.9462000000003,
+                          "streams_created":  3,
+                          "streams_released":  3,
+                          "bytes_served":  9438208,
+                          "read_calls":  40,
+                          "short_reads":  4,
+                          "peak_private_bytes":  2347008,
+                          "peak_working_set_bytes":  12222464,
+                          "memory_samples":  8,
+                          "per_stream":  [
+                                             {
+                                                 "stream_id":  1,
+                                                 "file_index":  0,
+                                                 "advertised_size":  1024,
+                                                 "bytes_served":  1024,
+                                                 "final_position":  0,
+                                                 "max_position":  1024,
+                                                 "read_calls":  2,
+                                                 "min_request":  262144,
+                                                 "max_request":  262144,
+                                                 "seeks":  3,
+                                                 "stats_calls":  0,
+                                                 "eof_read":  true
+                                             },
+                                             {
+                                                 "stream_id":  2,
+                                                 "file_index":  1,
+                                                 "advertised_size":  1048576,
+                                                 "bytes_served":  1048576,
+                                                 "final_position":  0,
+                                                 "max_position":  1048576,
+                                                 "read_calls":  5,
+                                                 "min_request":  262144,
+                                                 "max_request":  262144,
+                                                 "seeks":  3,
+                                                 "stats_calls":  0,
+                                                 "eof_read":  true
+                                             },
+                                             {
+                                                 "stream_id":  3,
+                                                 "file_index":  2,
+                                                 "advertised_size":  8388608,
+                                                 "bytes_served":  8388608,
+                                                 "final_position":  0,
+                                                 "max_position":  8388608,
+                                                 "read_calls":  33,
+                                                 "min_request":  262144,
+                                                 "max_request":  262144,
+                                                 "seeks":  3,
+                                                 "stats_calls":  0,
+                                                 "eof_read":  true
+                                             }
+                                         ]
+                      },
+    "destinations":  [
+                         {
+                             "all_files_match":  true,
+                             "case_id":  "A-05",
+                             "files":  [
+                                           {
+                                               "digest_match":  true,
+                                               "exists":  true,
+                                               "expected_size":  1024,
+                                               "index":  0,
+                                               "name":  "e02-A-05-f0.bin",
+                                               "size":  1024,
+                                               "zone_identifier":  {
+                                                                       "present":  false
+                                                                   }
+                                           },
+                                           {
+                                               "digest_match":  true,
+                                               "exists":  true,
+                                               "expected_size":  1048576,
+                                               "index":  1,
+                                               "name":  "e02-A-05-f1.bin",
+                                               "size":  1048576,
+                                               "zone_identifier":  {
+                                                                       "present":  false
+                                                                   }
+                                           },
+                                           {
+                                               "digest_match":  true,
+                                               "exists":  true,
+                                               "expected_size":  8388608,
+                                               "index":  2,
+                                               "name":  "e02-A-05-f2.bin",
+                                               "size":  8388608,
+                                               "zone_identifier":  {
+                                                                       "present":  false
+                                                                   }
+                                           }
+                                       ],
+                             "unexpected_entries":  [
+
+                                                    ]
+                         }
+                     ],
+    "observer":  {
+                     "p1":  {
+                                "events":  4,
+                                "names_seen":  [
+                                                   "e02-A-05-f0.bin",
+                                                   "e02-A-05-f1.bin",
+                                                   "e02-A-05-f2.bin"
+                                               ],
+                                "removals":  0
+                            }
+                 },
+    "clipboard_after_exit":  {
+                                 "formats":  [
+
+                                             ],
+                                 "has_file_contents":  false,
+                                 "has_file_descriptor":  false,
+                                 "has_onecopy_marker":  false,
+                                 "sequence":  686
+                             },
+    "result":  "pass"
+}

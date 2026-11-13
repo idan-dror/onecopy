@@ -1,0 +1,163 @@
+﻿{
+    "experiment_id":  "E-02",
+    "stage":  "A",
+    "case_id":  "A-02",
+    "run_id":  "A-02-20261112T215918-5e693c07",
+    "driver":  "D2c",
+    "target":  "G-01",
+    "pastes":  1,
+    "injected_fault":  "none",
+    "env":  {
+                "os_caption":  "Microsoft Windows 11 Home",
+                "os_version":  "10.0.26200",
+                "os_build":  "26200",
+                "os_ubr":  9711,
+                "os_display_version":  "25H2",
+                "explorer_version":  "10.0.26100.8875",
+                "explorer_separate_process":  0,
+                "clipboard_history_enabled":  null,
+                "cloud_clipboard_enabled":  null,
+                "defender_product_version":  "4.18.26100.4",
+                "defender_realtime_protection":  true,
+                "test_volume_filesystem":  "NTFS",
+                "test_volume_free_gib":  1311,
+                "cpu":  "AMD Ryzen 7 5700X3D 8-Core Processor",
+                "ram_gib":  31.9,
+                "experiment_commit":  "897004c873a6c03341e6f49eafe082cf2f5feb55",
+                "experiment_tree_dirty":  true,
+                "rustc":  "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+                "cargo_lock_sha256":  "1674bd5110616f7acfe7922f10fa3a0377d25d108d3f1e476e0ea34a375aa02b"
+            },
+    "completion":  [
+                       {
+                           "destination":  "paste-target-1",
+                           "completed":  true,
+                           "seconds":  1.83,
+                           "driver_error":  null
+                       }
+                   ],
+    "explorer_windows":  [
+                             {
+                                 "destination":  "paste-target-1",
+                                 "found":  true,
+                                 "top_hwnd":  5638140,
+                                 "top_preexisting":  false,
+                                 "tabs_on_top":  1,
+                                 "close_decision":  "close"
+                             }
+                         ],
+    "agent_exit_code":  0,
+    "agent_summary":  {
+                          "owner_thread_id":  29384,
+                          "com_call_threads":  {
+                                                   "29384":  58
+                                               },
+                          "calls":  {
+                                        "IDataObject::EnumFormatEtc":  7,
+                                        "IDataObject::GetData":  31,
+                                        "IDataObject::QueryGetData":  3,
+                                        "IDataObject::SetData":  13,
+                                        "IStream::Seek":  3,
+                                        "IStream::Stat":  1
+                                    },
+                          "first_descriptor_get_data_ms":  1738.4538,
+                          "first_contents_get_data_ms":  1739.4799,
+                          "first_read_ms":  null,
+                          "last_read_ms":  null,
+                          "last_stream_release_ms":  1740.8866,
+                          "clipboard_lost_ms":  null,
+                          "streams_created":  1,
+                          "streams_released":  1,
+                          "bytes_served":  0,
+                          "read_calls":  0,
+                          "short_reads":  0,
+                          "peak_private_bytes":  2080768,
+                          "peak_working_set_bytes":  11771904,
+                          "memory_samples":  7,
+                          "os_peak_commit_bytes":  2080768,
+                          "os_peak_working_set_bytes":  11808768,
+                          "per_stream":  [
+                                             {
+                                                 "stream_id":  1,
+                                                 "file_index":  0,
+                                                 "advertised_size":  0,
+                                                 "bytes_served":  0,
+                                                 "final_position":  0,
+                                                 "max_position":  0,
+                                                 "read_calls":  0,
+                                                 "min_request":  null,
+                                                 "max_request":  null,
+                                                 "seeks":  3,
+                                                 "stats_calls":  1,
+                                                 "eof_read":  false
+                                             }
+                                         ]
+                      },
+    "destinations":  [
+                         {
+                             "all_files_match":  true,
+                             "case_id":  "A-02",
+                             "files":  [
+                                           {
+                                               "digest_match":  true,
+                                               "exists":  true,
+                                               "expected_size":  0,
+                                               "index":  0,
+                                               "name":  "e02-A-02-f0.bin",
+                                               "size":  0,
+                                               "zone_identifier":  {
+                                                                       "present":  false
+                                                                   }
+                                           }
+                                       ],
+                             "unexpected_entries":  [
+
+                                                    ]
+                         }
+                     ],
+    "observer":  {
+                     "paste-target-1":  {
+                                            "events":  1,
+                                            "names_seen":  [
+                                                               "e02-A-02-f0.bin"
+                                                           ],
+                                            "removals":  0,
+                                            "stopped_by_parent_exit":  false
+                                        }
+                 },
+    "clipboard_after_exit":  {
+                                 "formats":  [
+
+                                             ],
+                                 "has_file_contents":  false,
+                                 "has_file_descriptor":  false,
+                                 "has_onecopy_marker":  false,
+                                 "sequence":  985
+                             },
+    "harness":  {
+                    "failed_stage":  null,
+                    "exception":  null,
+                    "driver_errors":  [
+
+                                      ],
+                    "post":  {
+                                 "agent_stop":  "exited",
+                                 "watcher_stops":  [
+                                                       "exited"
+                                                   ]
+                             }
+                },
+    "interference":  [
+
+                     ],
+    "destination_cleanup":  {
+                                "deleted_files":  1,
+                                "removed_dirs":  2,
+                                "left_entries":  [
+
+                                                 ],
+                                "refused":  null
+                            },
+    "destination_kept":  false,
+    "result":  "pass"
+}

@@ -1,0 +1,6 @@
+# Build output
+/target/
+
+# Raw evidence stays local (event logs, observer traces, recordings).
+# Only sanitized summaries under reports/ are committed.
+/evidence/
