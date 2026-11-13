@@ -7,6 +7,8 @@ import { join } from 'node:path';
 const dir = process.argv[2] ?? 'reports/stage-b1';
 const commitPrefix = process.argv[3] ?? '';
 const read = (p) => JSON.parse(readFileSync(p, 'utf8').replace(/^﻿/, ''));
+const order = ['O5', 'O4', 'O3', 'O2', 'O1', 'C', 'S', 'N'];
+const worst = (a, b) => (order.indexOf(a) <= order.indexOf(b) ? a : b);
 const recs = readdirSync(dir)
   .filter((f) => f.endsWith('.json') && !f.startsWith('stage-b1-') && f !== 'corrections.json' && statSync(join(dir, f)).isFile())
   .map((f) => read(join(dir, f)))
@@ -15,6 +17,21 @@ const recs = readdirSync(dir)
 // Documented corrections (corrections.json): raw records stay untouched.
 let corrections = {};
 try { corrections = read(join(dir, 'corrections.json')).corrections ?? {}; } catch { corrections = {}; }
+// Per-destination verdict for multi-paste runs: a destination where Explorer created nothing,
+// while the run as a whole succeeded, is a silently dropped paste (N), not a false success.
+for (const r of recs) {
+  const targets = Object.keys(r.observer ?? {}).sort();
+  const nFiles = r.case?.files?.length ?? 1;
+  const perFile = r.classification?.per_file ?? [];
+  if (targets.length > 1 && r.classification?.target_report === 'success' && perFile.length === targets.length * nFiles) {
+    const inactive = targets.map((t) => (r.observer[t].names_seen ?? []).length === 0);
+    if (inactive.some(Boolean)) {
+      const classes = perFile.map((pf, i) => (inactive[Math.floor(i / nFiles)] ? 'N' : pf.class));
+      r.silent_no_op_targets = inactive.filter(Boolean).length;
+      r.classification = { ...r.classification, outcome_class: classes.reduce((w, c) => worst(w, c), 'N'), per_target_reclassified: true };
+    }
+  }
+}
 for (const r of recs) {
   const c = corrections[r.run_id];
   if (!c) continue;
@@ -23,8 +40,6 @@ for (const r of recs) {
   if (c.class) r.classification = { ...r.classification, outcome_class: c.class, target_report: c.report ?? r.classification?.target_report };
 }
 
-const order = ['O5', 'O4', 'O3', 'O2', 'O1', 'C', 'S', 'N'];
-const worst = (a, b) => (order.indexOf(a) <= order.indexOf(b) ? a : b);
 const tl = (r, ev) => r.timeline?.find((t) => t.event === ev)?.t_ms ?? null;
 
 function runFacts(r) {
@@ -74,6 +89,7 @@ function runFacts(r) {
     observed_names: [...new Set(fsEvents)],
     interference: r.interference ?? [],
     correction: r.correction ?? null,
+    silent_no_op_targets: r.silent_no_op_targets ?? 0,
   };
 }
 

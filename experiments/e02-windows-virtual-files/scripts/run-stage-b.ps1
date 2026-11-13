@@ -66,6 +66,11 @@ function Invoke-Native {
     try { $out = & $Exe @Arguments 2>&1 | Out-String; $code = $LASTEXITCODE } finally { $ErrorActionPreference = $prev }
     return [pscustomobject]@{ Output = $out.Trim(); ExitCode = $code }
 }
+# True if a dialog offering these automation ids has a button for the action ('id#n' compares by id).
+function Test-OffersAction($Ids, [string] $Action) {
+    $wanted = @($ActionIds[$Action] | ForEach-Object { ($_ -split '#')[0] })
+    return [bool](@($Ids | Where-Object { $wanted -contains $_ }).Count)
+}
 function Invoke-Fault([string] $Stage) { if ($InjectHarnessFault -eq $Stage) { throw "injected harness fault at $Stage" } }
 
 # Incremental reader for a JSONL file another process is appending to.
@@ -305,7 +310,7 @@ try {
                 # If an error/decision dialog of ours has been open for 5 s without offering the
                 # requested button, the target does not offer that choice: record it and move on.
                 $stuck = @($ours | Where-Object { -not $_.progress_bar -and ($now - $dialogFirstSeen[[string]$_.hwnd]) -ge 5 -and
-                    -not (@($_.button_ids) | Where-Object { $ActionIds[$next] -contains $_ }) })
+                    -not (Test-OffersAction @($_.button_ids) $next) })
                 if ($stuck.Count -gt 0 -and $next -ne 'cancel') {
                     [void]$actions.Add([ordered]@{ t_ms = [math]::Round($clock.Elapsed.TotalMilliseconds); action = $next; dialog_class = $stuck[0].class
                         dialog_progress = $false; result = [ordered]@{ invoked = $null; refused = 'not offered by the target dialog'; offered_ids = @($stuck[0].button_ids) }; raw_exit = $null })
@@ -321,7 +326,7 @@ try {
                     $allowed = $false
                     if ($next -eq 'cancel') { $allowed = ($h.expect -eq 'cancel') -or $isErrorDialog }
                     else { $allowed = $isErrorDialog }
-                    $hasButton = [bool](@($ids | Where-Object { $ActionIds[$next] -contains $_ }).Count)
+                    $hasButton = Test-OffersAction $ids $next
                     if ($allowed -and $hasButton) {
                         $r = Invoke-Native $verifyExe @('dialog-act', '--hwnd', [string]$dlg.hwnd, '--ids', ($ActionIds[$next] -join ','),
                             '--tokens', ($tokens -join ','), '--owners', ($ownerTops -join ','), '--test-root', $rootFull)
@@ -472,11 +477,17 @@ try {
     elseif ($DialogDriver -eq 'Manual' -and $caseInfo.harness.expect -eq 'cancel' -and $progressDialogs.Count -gt 0 -and -not $allEof) { $targetReport = 'cancelled' }
     elseif (-not $allEof -and $performedEffect.Count -eq 0) { $targetReport = 'silent_stop' }
     $severity = @{ 'O5' = 7; 'O4' = 6; 'O3' = 5; 'O2' = 4; 'O1' = 3; 'C' = 2; 'S' = 1; 'N' = 0 }
-    $perFile = @(); $worst = 'N'
+    $perFile = @(); $worst = 'N'; $vi = 0; $silentNoOp = 0
     foreach ($v in $verifications) {
+        $vi++
+        # A destination where Explorer created nothing while other pastes succeeded: silently dropped.
+        $leafKey = "paste-target-$vi"
+        $inactive = ($verifications.Count -gt 1) -and $observers.Contains($leafKey) -and (@($observers[$leafKey].names_seen).Count -eq 0)
+        if ($inactive) { $silentNoOp++ }
         foreach ($f in @($v.files)) {
             $cls = 'N'
-            if ($explorerLost.Count -gt 0 -or $targetReport -eq 'hang_or_timeout') { $cls = 'O5' }
+            if ($inactive -and $targetReport -eq 'success') { $cls = 'N' }
+            elseif ($explorerLost.Count -gt 0 -or $targetReport -eq 'hang_or_timeout') { $cls = 'O5' }
             elseif ($f.state -eq 'full_size_wrong_content') { $cls = 'O3' }
             elseif ($targetReport -eq 'success') { $cls = $(if ($f.state -eq 'complete_correct') { 'S' } else { 'O4' }) }
             elseif ($targetReport -eq 'no_operation') { $cls = $(if ($f.state -eq 'absent' -or $f.state -eq 'original_preserved') { 'N' } else { 'O4' }) }
@@ -493,7 +504,7 @@ try {
                 }
             }
             if ($f.mistakable_as_complete -and $f.state -ne 'complete_correct' -and $f.state -ne 'original_preserved' -and $cls -eq 'O2') { $cls = 'O3' }
-            $perFile += [ordered]@{ target = $v.case_id; name = $f.name; state = $f.state; size = $f.size; mistakable = $f.mistakable_as_complete; class = $cls }
+            $perFile += [ordered]@{ target = "paste-target-$vi"; name = $f.name; state = $f.state; size = $f.size; mistakable = $f.mistakable_as_complete; class = $cls }
             if ($severity[$cls] -gt $severity[$worst]) { $worst = $cls }
         }
     }
@@ -544,7 +555,7 @@ try {
         streams = [ordered]@{ created = $streamsCreated; released = $releases.Count; all_reached_eof = $allEof }
         destinations = $verifications; observer = $observers
         clipboard = [ordered]@{ set_sequence = $setSequence; before_release = $clipBefore; release = $clipRelease; after = $clipAfter; clean_after = $clipClean; replacement = $replace; probe = $probeStats }
-        classification = [ordered]@{ target_report = $targetReport; per_file = $perFile; outcome_class = $worst; expectation_met = $expectMet }
+        classification = [ordered]@{ target_report = $targetReport; per_file = $perFile; outcome_class = $worst; expectation_met = $expectMet; silent_no_op_targets = $silentNoOp }
         harness = [ordered]@{ failed_stage = $state.failed_stage; exception = $state.exception; driver_errors = $driverErrors; post = $post }
         interference = $interference
         destination_cleanup = $cleanup; destination_kept = [bool]($layout -and -not $cleanup)
