@@ -52,7 +52,7 @@ if (-not $ReportDir) { $ReportDir = Join-Path $ws 'reports\stage-b1' }
 # Observed on this build: the progress dialog's Cancel is "CancelButton"; the copy error box is
 # a task dialog whose OK is "CommandButton_1" (CommandButton_<Win32 id>).
 $ActionIds = @{
-    cancel    = @('CancelButton', 'CommandButton_2', '2', 'CommandButton_1', '1')
+    cancel    = @('CancelButton', 'CommandButton_2', '2', 'CommandButton_1', '1', 'Close')
     try_again = @('CommandButton_10', 'CommandButton_4', '10', '4')
     skip      = @('CommandButton_5', 'CommandButton_11', '5', '11')
     replace   = @('CommandButton_6', '6')
@@ -224,7 +224,7 @@ try {
     $pendingActions = New-Object System.Collections.ArrayList
     foreach ($a in @($h.dialog_actions)) { if ($a) { [void]$pendingActions.Add([string]$a) } }
     $created = 0; $released = 0; $agentGone = $false; $agentGoneAt = $null; $errorAt = $null; $lastChange = $clock.Elapsed.TotalSeconds
-    $triggerTimes = @{}; $done = @{}
+    $triggerTimes = @{}; $done = @{}; $dialogFirstSeen = @{}
     $errorSignal = $false
     $sequenceOrder = $(if ($h.concurrent) { @(,$pasteTargets) } else { @($pasteTargets | ForEach-Object { ,@($_) }) })
     $deadline = $clock.Elapsed.TotalSeconds + $timeout
@@ -278,8 +278,21 @@ try {
             $ds = Read-DialogState $dialogState
             $ours = @(); $openDialogs = @()
             if ($ds -and $ds.dialogs) { $openDialogs = @($ds.dialogs); $ours = @($ds.dialogs | Where-Object { $_.ours }) }
+            foreach ($dlg in $openDialogs) { if (-not $dialogFirstSeen.ContainsKey([string]$dlg.hwnd)) { $dialogFirstSeen[[string]$dlg.hwnd] = $now } }
             if ($DialogDriver -eq 'Uia' -and $pendingActions.Count -gt 0 -and $ours.Count -gt 0) {
                 $next = $pendingActions[0]
+                # If an error/decision dialog of ours has been open for 5 s without offering the
+                # requested button, the target does not offer that choice: record it and move on.
+                $stuck = @($ours | Where-Object { -not $_.progress_bar -and ($now - $dialogFirstSeen[[string]$_.hwnd]) -ge 5 -and
+                    -not (@($_.button_ids) | Where-Object { $ActionIds[$next] -contains $_ }) })
+                if ($stuck.Count -gt 0 -and $next -ne 'cancel') {
+                    [void]$actions.Add([ordered]@{ t_ms = [math]::Round($clock.Elapsed.TotalMilliseconds); action = $next; dialog_class = $stuck[0].class
+                        dialog_progress = $false; result = [ordered]@{ invoked = $null; refused = 'not offered by the target dialog'; offered_ids = @($stuck[0].button_ids) }; raw_exit = $null })
+                    Add-Timeline 'harness' "dialog_$($next)_not_offered" @{ offered_ids = @($stuck[0].button_ids) }
+                    $pendingActions.RemoveAt(0)
+                    if ($pendingActions.Count -eq 0) { [void]$pendingActions.Add('cancel') }
+                    $next = $pendingActions[0]
+                }
                 foreach ($dlg in $ours) {
                     $ids = @($dlg.button_ids)
                     # A dialog without a progress bar is an error or decision dialog.
@@ -336,6 +349,19 @@ try {
     $post.probe_stop = Stop-OwnedProcess -Owned $probe -GraceMs 10000
     $post.helper_stops = @($helpers | ForEach-Object { Stop-OwnedProcess -Owned $_ -GraceMs 30000 })
     $agentExit = $(if ($agent) { $agent.Process.ExitCode } else { $null })
+    # Leave no dialog of this run on the operator's screen. Only dialogs the watcher attributed to
+    # this run are touched, and dialog-act re-validates each one before invoking anything.
+    $cleanupDialogs = @()
+    if ($runDir -and (Test-Path -LiteralPath $dialogState) -and $DialogDriver -eq 'Uia') {
+        $ds = Read-DialogState $dialogState
+        foreach ($dlg in @($(if ($ds) { $ds.dialogs } else { @() }) | Where-Object { $_.ours })) {
+            $r = Invoke-Native $verifyExe @('dialog-act', '--hwnd', [string]$dlg.hwnd, '--ids', ($ActionIds['cancel'] -join ','),
+                '--tokens', ($tokens -join ','), '--owners', ($ownerTops -join ','), '--test-root', $rootFull)
+            $res = $null; try { $res = $r.Output | ConvertFrom-Json } catch { }
+            $cleanupDialogs += [ordered]@{ class = $dlg.class; progress_bar = $dlg.progress_bar; result = $res }
+        }
+    }
+    $post.cleanup_dialogs = $cleanupDialogs
     if ($runDir) {
         try { foreach ($e in (Read-NewJson $events)) { [void]$agentEvents.Add($e) } } catch { }
         try { foreach ($d in (Read-NewJson $dialogTail)) { [void]$dialogEvents.Add($d) } } catch { }
