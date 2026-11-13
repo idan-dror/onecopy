@@ -52,10 +52,11 @@ if (-not $ReportDir) { $ReportDir = Join-Path $ws 'reports\stage-b1' }
 # Observed on this build: the progress dialog's Cancel is "CancelButton"; the copy error box is
 # a task dialog whose OK is "CommandButton_1" (CommandButton_<Win32 id>).
 $ActionIds = @{
-    cancel    = @('CancelButton', 'CommandButton_2', '2', 'CommandButton_1', '1', 'Close')
+    cancel    = @('CancelButton', 'btnCancel', 'CommandButton_2', '2', 'CommandButton_1', '1', 'Close')
     try_again = @('CommandButton_10', 'CommandButton_4', '10', '4')
     skip      = @('CommandButton_5', 'CommandButton_11', '5', '11')
-    replace   = @('CommandButton_6', '6')
+    # Conflict dialog ("Copy File"): tile 1 = copy and replace, tile 2 = don't copy; both "tileMain".
+    replace   = @('tileMain#1', 'CommandButton_6', '6')
     keep_both = @('CommandButton_7', '7')
 }
 
@@ -94,9 +95,27 @@ function Read-NewJson($Reader) {
 function Read-DialogState([string] $Path) {
     try { return (Get-Content -Raw -LiteralPath $Path -ErrorAction Stop | ConvertFrom-Json) } catch { return $null }
 }
-# Only long-lived explorer.exe processes count for crash detection: launching a folder starts a
-# short-lived explorer.exe that exits on its own.
-function Get-ExplorerProcesses { @(Get-Process explorer -ErrorAction SilentlyContinue | Where-Object { $_.StartTime -lt (Get-Date).AddSeconds(-120) } | ForEach-Object { [ordered]@{ id = $_.Id; start = $_.StartTime.ToString('o') } }) }
+# Crash detection watches the processes that matter: the shell (owner of Shell_TrayWnd) and the
+# process hosting each of the run's own Explorer windows. Launching a folder also starts a
+# short-lived explorer.exe that exits on its own; it is not counted.
+Add-Type -Namespace E02 -Name Win -MemberDefinition @'
+[DllImport("user32.dll", CharSet = CharSet.Unicode)] public static extern IntPtr FindWindow(string cls, string title);
+[DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr hwnd, out uint pid);
+'@
+function Get-WindowProcess([int64] $Hwnd, [string] $Role) {
+    $procId = [uint32]0
+    $null = [E02.Win]::GetWindowThreadProcessId([IntPtr]$Hwnd, [ref]$procId)
+    $p = $null; if ($procId) { $p = Get-Process -Id $procId -ErrorAction SilentlyContinue }
+    if (-not $p) { return $null }
+    return [ordered]@{ role = $Role; id = $p.Id; name = $p.ProcessName; start = $p.StartTime.ToString('o') }
+}
+function Get-ExplorerProcesses([int64[]] $Hwnds = @()) {
+    $out = @()
+    $shell = Get-WindowProcess ([E02.Win]::FindWindow('Shell_TrayWnd', $null).ToInt64()) 'shell'
+    if ($shell) { $out += $shell }
+    foreach ($h in $Hwnds) { $w = Get-WindowProcess $h 'run_window_host'; if ($w) { $out += $w } }
+    return @($out)
+}
 
 $clock = [Diagnostics.Stopwatch]::StartNew()
 $timeline = New-Object System.Collections.ArrayList
@@ -105,7 +124,7 @@ function Add-Timeline([string] $Source, [string] $Event, $Detail = $null) {
 }
 
 $state = [ordered]@{ stage = 'init'; exception = $null; failed_stage = $null }
-$layout = $null; $runDir = $null; $agent = $null; $watchers = @(); $dialogWatch = $null; $probe = $null; $helpers = @()
+$layout = $null; $runDir = $null; $dialogState = $null; $ownerTops = @(); $tokens = @(); $rootFull = $null; $agent = $null; $watchers = @(); $dialogWatch = $null; $probe = $null; $helpers = @()
 $expected = @(); $caseInfo = $null; $runId = $null; $windows = @(); $preSnap = $null; $driverErrors = @()
 $agentEvents = New-Object System.Collections.ArrayList
 $dialogEvents = New-Object System.Collections.ArrayList
@@ -208,6 +227,7 @@ try {
     # The dialog watcher attributes dialogs whose owner chain leads to these windows to this run.
     $ownerTops = @($windows | Where-Object { $_.found } | ForEach-Object { [int64]$_.top_hwnd })
     Set-Content -LiteralPath $ownersFile -Value ('[' + ($ownerTops -join ',') + ']') -Encoding ASCII
+    $explorerBefore = Get-ExplorerProcesses $ownerTops
     function Invoke-Paste([int] $Index) {
         $t = $layout.Targets[$Index]
         if ($Driver -eq 'ExplorerCommand') {
@@ -352,7 +372,7 @@ try {
     # Leave no dialog of this run on the operator's screen. Only dialogs the watcher attributed to
     # this run are touched, and dialog-act re-validates each one before invoking anything.
     $cleanupDialogs = @()
-    if ($runDir -and (Test-Path -LiteralPath $dialogState) -and $DialogDriver -eq 'Uia') {
+    if ($runDir -and $dialogState -and (Test-Path -LiteralPath $dialogState) -and $DialogDriver -eq 'Uia') {
         $ds = Read-DialogState $dialogState
         foreach ($dlg in @($(if ($ds) { $ds.dialogs } else { @() }) | Where-Object { $_.ours })) {
             $r = Invoke-Native $verifyExe @('dialog-act', '--hwnd', [string]$dlg.hwnd, '--ids', ($ActionIds['cancel'] -join ','),
@@ -424,7 +444,7 @@ try {
         $summaryFile = Join-Path $runDir 'summary.json'
         if (Test-Path $summaryFile) { $summary = Get-Content -Raw $summaryFile | ConvertFrom-Json }
     }
-    $explorerAfter = Get-ExplorerProcesses
+    $explorerAfter = @(Get-Process -ErrorAction SilentlyContinue | ForEach-Object { try { [ordered]@{ id = $_.Id; start = $_.StartTime.ToString('o') } } catch { } })
     $explorerLost = @($explorerBefore | Where-Object { $b = $_; -not ($explorerAfter | Where-Object { $_.id -eq $b.id -and $_.start -eq $b.start }) })
 
     # --- Classification (spec §9.1) -------------------------------------------------------------
@@ -445,8 +465,8 @@ try {
     $performedEffect = @($setData | Where-Object { $_.format -eq 'Performed DropEffect' })
     $targetReport = 'success'
     if ($progress.timed_out) { $targetReport = 'hang_or_timeout' }
-    elseif ($errorDialogSeen) { $targetReport = 'failure' }
     elseif ($cancelInvoked) { $targetReport = 'cancelled' }
+    elseif ($errorDialogSeen) { $targetReport = 'failure' }
     elseif ($streamsCreated -eq 0) { $targetReport = 'no_operation' }
     elseif ($DialogDriver -eq 'Manual' -and $caseInfo.harness.expect -eq 'cancel' -and $progressDialogs.Count -gt 0 -and -not $allEof) { $targetReport = 'cancelled' }
     elseif (-not $allEof -and $performedEffect.Count -eq 0) { $targetReport = 'silent_stop' }
@@ -482,6 +502,8 @@ try {
     }
     $closedEarly = @($windows | Where-Object { $_.close_decision -eq 'not_found' })
     if ($closedEarly.Count -gt 0 -and -not ($caseInfo -and $caseInfo.harness.close_window_after_event)) { $interference += 'a test window was closed before the run ended' }
+    $unanswered = @($cleanupDialogs | Where-Object { -not $_.progress_bar -and -not ($_.result -and $_.result.invoked) })
+    if ($progress.timed_out -and $unanswered.Count -gt 0) { $interference += 'a dialog of this run offered no button the harness could answer; timeout is a harness limitation' }
     $result = 'completed'
     if ($state.exception -or $driverErrors.Count -gt 0 -or $interference.Count -gt 0) { $result = 'inconclusive' }
     $expectMet = $null
@@ -512,7 +534,7 @@ try {
         case = $caseInfo; env = $envRecord
         progress = $progress; timeline = $timeline
         explorer_windows = $windows
-        explorer_processes = [ordered]@{ before = $explorerBefore; after = $explorerAfter; lost = $explorerLost }
+        explorer_processes = [ordered]@{ watched = $explorerBefore; lost = $explorerLost }
         dialogs = [ordered]@{ appeared = $appeared.Count; attributed = $ourDialogs.Count; error_dialog_seen = $errorDialogSeen
             progress_dialog_seen = ($progressDialogs.Count -gt 0); error_texts = $errorTexts; events = @($dialogEvents | Where-Object { $_.event -ne 'start' }) }
         dialog_actions = $actions

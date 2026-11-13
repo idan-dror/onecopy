@@ -26,8 +26,6 @@ $Cases = @($Cases | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim(
 $ws = Split-Path -Parent $PSScriptRoot
 if (-not $ReportDir) { $ReportDir = Join-Path $ws 'reports\stage-b1' }
 $abort = Join-Path $ws 'evidence\ABORT'
-# Long-lived explorer.exe processes only (folder launches start short-lived ones).
-$explorerBefore = @(Get-Process explorer -ErrorAction SilentlyContinue | Where-Object { $_.StartTime -lt (Get-Date).AddSeconds(-120) } | ForEach-Object { "$($_.Id)@$($_.StartTime.ToString('o'))" })
 $rows = @()
 $stopReason = $null
 :outer for ($r = 1; $r -le $Repeats; $r++) {
@@ -46,8 +44,7 @@ $stopReason = $null
             expect_met = $(if ($rec) { $rec.classification.expectation_met } else { $null }); clipboard_clean = $(if ($rec) { $rec.clipboard.clean_after } else { $null })
         }
         $rows += [pscustomobject]$row
-        $explorerNow = @(Get-Process explorer -ErrorAction SilentlyContinue | ForEach-Object { "$($_.Id)@$($_.StartTime.ToString('o'))" })
-        if (@($explorerBefore | Where-Object { $explorerNow -notcontains $_ }).Count -gt 0) { $stopReason = 'an explorer.exe process disappeared'; break outer }
+        if ($rec -and @($rec.explorer_processes.lost).Count -gt 0) { $stopReason = "run $($rec.run_id): the shell or the run window's Explorer process disappeared"; break outer }
         if ($rec -and -not $rec.clipboard.clean_after) { $stopReason = "run $($rec.run_id) left OneCopy content on the clipboard"; break outer }
         if (@(Get-Process e02-agent -ErrorAction SilentlyContinue).Count -gt 0) { $stopReason = 'an e02-agent process is still running'; break outer }
     }

@@ -242,23 +242,30 @@ impl Uia {
     }
 
     /// Invokes the first enabled button whose automation id is in `ids` (in preference order).
-    /// Returns (id, name) of the invoked button.
+    /// `id#n` selects the n-th (1-based) button with that id, for dialogs whose choices share
+    /// one id (the conflict dialog's tiles). Returns (id, name) of the invoked button.
     pub fn invoke(&self, hwnd: isize, ids: &[String]) -> AnyResult<Option<(String, String)>> {
         let elements = self.elements(hwnd)?;
-        for wanted in ids {
+        for spec in ids {
+            let (wanted, nth) = parse_id_spec(spec);
+            let mut seen = 0usize;
             for e in &elements {
                 unsafe {
                     if !BUTTON_TYPES.contains(&e.CurrentControlType().unwrap_or_default()) {
                         continue;
                     }
                     let id = e.CurrentAutomationId().map(|b| b.to_string()).unwrap_or_default();
-                    if id != *wanted || !e.CurrentIsEnabled().map(|b| b.as_bool()).unwrap_or(false) {
+                    if id != wanted {
+                        continue;
+                    }
+                    seen += 1;
+                    if nth.is_some_and(|n| n != seen) || !e.CurrentIsEnabled().map(|b| b.as_bool()).unwrap_or(false) {
                         continue;
                     }
                     let name = e.CurrentName().map(|b| b.to_string()).unwrap_or_default();
                     let pattern: IUIAutomationInvokePattern = e.GetCurrentPatternAs(UIA_InvokePatternId)?;
                     pattern.Invoke()?;
-                    return Ok(Some((id, name)));
+                    return Ok(Some((spec.clone(), name)));
                 }
             }
         }
@@ -271,6 +278,17 @@ impl Drop for Uia {
         if self.owns_com {
             unsafe { CoUninitialize() };
         }
+    }
+}
+
+/// Splits "id#n" into (id, Some(n)); a plain id gives (id, None).
+pub fn parse_id_spec(spec: &str) -> (&str, Option<usize>) {
+    match spec.rsplit_once('#') {
+        Some((id, n)) => match n.parse::<usize>() {
+            Ok(n) if n >= 1 => (id, Some(n)),
+            _ => (spec, None),
+        },
+        None => (spec, None),
     }
 }
 
@@ -457,6 +475,14 @@ mod tests {
         let owner_text = vec!["Copying 'e02-ERR-01-f0.bin'".to_owned()];
         assert_eq!(ours_by(&win(3, 9), &t, &["e02-ERR-01-f0.bin".into()], &[7], &owner_text), Some("owner_text"));
         assert_eq!(ours_by(&win(3, 9), &t, &["e02-ERR-02-f0.bin".into()], &[7], &owner_text), None, "another run's file");
+    }
+
+    #[test]
+    fn id_specs_select_by_position() {
+        assert_eq!(parse_id_spec("tileMain#1"), ("tileMain", Some(1)));
+        assert_eq!(parse_id_spec("CancelButton"), ("CancelButton", None));
+        assert_eq!(parse_id_spec("x#0"), ("x#0", None));
+        assert_eq!(parse_id_spec("x#y"), ("x#y", None));
     }
 
     #[test]
