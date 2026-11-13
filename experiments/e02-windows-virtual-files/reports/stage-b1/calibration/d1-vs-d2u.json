@@ -1,0 +1,85 @@
+{
+  "generated": "2026-11-13T21:08:37.314Z",
+  "method": "spec §9.4: outcome class, target verdict, dialog kinds and destination behavior must match",
+  "cases": [
+    {
+      "case_id": "ERR-01",
+      "d1_runs": 1,
+      "d2u_runs": 3,
+      "pairs": [
+        {
+          "d1": "ERR-01-20261113T183708-921f013c",
+          "d2u": "ERR-01-20261113T184124-d96f5696",
+          "equivalent": true,
+          "differences": []
+        },
+        {
+          "d1": "ERR-01-20261113T183708-921f013c",
+          "d2u": "ERR-01-20261113T190507-11b08c87",
+          "equivalent": true,
+          "differences": []
+        },
+        {
+          "d1": "ERR-01-20261113T183708-921f013c",
+          "d2u": "ERR-01-20261113T205605-63e179fb",
+          "equivalent": true,
+          "differences": []
+        }
+      ],
+      "equivalent": true
+    },
+    {
+      "case_id": "CANCEL-01b",
+      "d1_runs": 1,
+      "d2u_runs": 3,
+      "pairs": [
+        {
+          "d1": "CANCEL-01b-20261113T183724-5a302339",
+          "d2u": "CANCEL-01b-20261113T184140-c3d9524c",
+          "equivalent": true,
+          "differences": []
+        },
+        {
+          "d1": "CANCEL-01b-20261113T183724-5a302339",
+          "d2u": "CANCEL-01b-20261113T191025-a7584166",
+          "equivalent": true,
+          "differences": []
+        },
+        {
+          "d1": "CANCEL-01b-20261113T183724-5a302339",
+          "d2u": "CANCEL-01b-20261113T205947-0d4b7648",
+          "equivalent": true,
+          "differences": []
+        }
+      ],
+      "equivalent": true
+    },
+    {
+      "case_id": "PROC-01",
+      "d1_runs": 1,
+      "d2u_runs": 3,
+      "pairs": [
+        {
+          "d1": "PROC-01-20261113T183736-4702c6c5",
+          "d2u": "PROC-01-20261113T184152-f0afb16c",
+          "equivalent": true,
+          "differences": []
+        },
+        {
+          "d1": "PROC-01-20261113T183736-4702c6c5",
+          "d2u": "PROC-01-20261113T191047-455ecc93",
+          "equivalent": true,
+          "differences": []
+        },
+        {
+          "d1": "PROC-01-20261113T183736-4702c6c5",
+          "d2u": "PROC-01-20261113T210010-c2f920e0",
+          "equivalent": true,
+          "differences": []
+        }
+      ],
+      "equivalent": true
+    }
+  ],
+  "equivalent": true
+}

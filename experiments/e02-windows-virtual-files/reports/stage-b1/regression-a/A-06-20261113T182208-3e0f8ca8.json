@@ -1,0 +1,233 @@
+﻿{
+    "experiment_id":  "E-02",
+    "stage":  "A",
+    "case_id":  "A-06",
+    "run_id":  "A-06-20261113T182208-3e0f8ca8",
+    "driver":  "D2c",
+    "target":  "G-01",
+    "pastes":  2,
+    "injected_fault":  "none",
+    "env":  {
+                "os_caption":  "Microsoft Windows 11 Home",
+                "os_version":  "10.0.26200",
+                "os_build":  "26200",
+                "os_ubr":  9711,
+                "os_display_version":  "25H2",
+                "explorer_version":  "10.0.26100.8875",
+                "explorer_separate_process":  0,
+                "clipboard_history_enabled":  null,
+                "cloud_clipboard_enabled":  null,
+                "defender_product_version":  "4.18.26100.4",
+                "defender_realtime_protection":  true,
+                "test_volume_filesystem":  "NTFS",
+                "test_volume_free_gib":  1310.3,
+                "cpu":  "AMD Ryzen 7 5700X3D 8-Core Processor",
+                "ram_gib":  31.9,
+                "experiment_commit":  "3835aabc8bb53923a27e083cdff156dada51a8a8",
+                "experiment_tree_dirty":  false,
+                "rustc":  "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+                "cargo_lock_sha256":  "76215d10f491622601c608a061db959f8a67c758d4254eae40692b46bed5c830"
+            },
+    "completion":  [
+                       {
+                           "destination":  "paste-target-1",
+                           "completed":  true,
+                           "seconds":  1.82,
+                           "driver_error":  null
+                       },
+                       {
+                           "destination":  "paste-target-2",
+                           "completed":  true,
+                           "seconds":  1.81,
+                           "driver_error":  null
+                       }
+                   ],
+    "explorer_windows":  [
+                             {
+                                 "destination":  "paste-target-1",
+                                 "found":  true,
+                                 "top_hwnd":  1313132,
+                                 "top_preexisting":  false,
+                                 "tabs_on_top":  1,
+                                 "close_decision":  "close"
+                             },
+                             {
+                                 "destination":  "paste-target-2",
+                                 "found":  true,
+                                 "top_hwnd":  3345084,
+                                 "top_preexisting":  false,
+                                 "tabs_on_top":  1,
+                                 "close_decision":  "close"
+                             }
+                         ],
+    "agent_exit_code":  0,
+    "agent_summary":  {
+                          "owner_thread_id":  5488,
+                          "com_call_threads":  {
+                                                   "5488":  131
+                                               },
+                          "calls":  {
+                                        "IDataObject::EnumFormatEtc":  15,
+                                        "IDataObject::GetData":  65,
+                                        "IDataObject::QueryGetData":  7,
+                                        "IDataObject::SetData":  28,
+                                        "IStream::Read":  10,
+                                        "IStream::Seek":  6
+                                    },
+                          "first_descriptor_get_data_ms":  1708.9794,
+                          "first_contents_get_data_ms":  1710.0493000000001,
+                          "first_read_ms":  1711.1303,
+                          "last_read_ms":  6559.6872,
+                          "last_stream_release_ms":  6560.3311,
+                          "clipboard_lost_ms":  null,
+                          "streams_created":  2,
+                          "streams_released":  2,
+                          "bytes_served":  2097152,
+                          "read_calls":  10,
+                          "short_reads":  2,
+                          "failed_reads":  0,
+                          "peak_private_bytes":  2342912,
+                          "peak_working_set_bytes":  12066816,
+                          "memory_samples":  11,
+                          "os_peak_commit_bytes":  2342912,
+                          "os_peak_working_set_bytes":  12333056,
+                          "per_stream":  [
+                                             {
+                                                 "stream_id":  1,
+                                                 "file_index":  0,
+                                                 "advertised_size":  1048576,
+                                                 "bytes_served":  1048576,
+                                                 "final_position":  0,
+                                                 "max_position":  1048576,
+                                                 "read_calls":  5,
+                                                 "failed_reads":  0,
+                                                 "min_request":  262144,
+                                                 "max_request":  262144,
+                                                 "seeks":  3,
+                                                 "stats_calls":  0,
+                                                 "eof_read":  true
+                                             },
+                                             {
+                                                 "stream_id":  2,
+                                                 "file_index":  0,
+                                                 "advertised_size":  1048576,
+                                                 "bytes_served":  1048576,
+                                                 "final_position":  0,
+                                                 "max_position":  1048576,
+                                                 "read_calls":  5,
+                                                 "failed_reads":  0,
+                                                 "min_request":  262144,
+                                                 "max_request":  262144,
+                                                 "seeks":  3,
+                                                 "stats_calls":  0,
+                                                 "eof_read":  true
+                                             }
+                                         ]
+                      },
+    "destinations":  [
+                         {
+                             "all_files_match":  true,
+                             "case_id":  "A-06",
+                             "files":  [
+                                           {
+                                               "advertised_size":  1048576,
+                                               "digest_match":  true,
+                                               "exists":  true,
+                                               "expected_size":  1048576,
+                                               "index":  0,
+                                               "mistakable_as_complete":  true,
+                                               "name":  "e02-A-06-f0.bin",
+                                               "original_preserved":  null,
+                                               "prefix_match":  null,
+                                               "size":  1048576,
+                                               "state":  "complete_correct",
+                                               "zone_identifier":  {
+                                                                       "present":  false
+                                                                   }
+                                           }
+                                       ],
+                             "unexpected_entries":  [
+
+                                                    ]
+                         },
+                         {
+                             "all_files_match":  true,
+                             "case_id":  "A-06",
+                             "files":  [
+                                           {
+                                               "advertised_size":  1048576,
+                                               "digest_match":  true,
+                                               "exists":  true,
+                                               "expected_size":  1048576,
+                                               "index":  0,
+                                               "mistakable_as_complete":  true,
+                                               "name":  "e02-A-06-f0.bin",
+                                               "original_preserved":  null,
+                                               "prefix_match":  null,
+                                               "size":  1048576,
+                                               "state":  "complete_correct",
+                                               "zone_identifier":  {
+                                                                       "present":  false
+                                                                   }
+                                           }
+                                       ],
+                             "unexpected_entries":  [
+
+                                                    ]
+                         }
+                     ],
+    "observer":  {
+                     "paste-target-1":  {
+                                            "events":  1,
+                                            "names_seen":  [
+                                                               "e02-A-06-f0.bin"
+                                                           ],
+                                            "removals":  0,
+                                            "stopped_by_parent_exit":  false
+                                        },
+                     "paste-target-2":  {
+                                            "events":  1,
+                                            "names_seen":  [
+                                                               "e02-A-06-f0.bin"
+                                                           ],
+                                            "removals":  0,
+                                            "stopped_by_parent_exit":  false
+                                        }
+                 },
+    "clipboard_after_exit":  {
+                                 "formats":  [
+
+                                             ],
+                                 "has_file_contents":  false,
+                                 "has_file_descriptor":  false,
+                                 "has_onecopy_marker":  false,
+                                 "sequence":  1751
+                             },
+    "harness":  {
+                    "failed_stage":  null,
+                    "exception":  null,
+                    "driver_errors":  [
+
+                                      ],
+                    "post":  {
+                                 "agent_stop":  "exited",
+                                 "watcher_stops":  [
+                                                       "exited",
+                                                       "exited"
+                                                   ]
+                             }
+                },
+    "interference":  [
+
+                     ],
+    "destination_cleanup":  {
+                                "deleted_files":  2,
+                                "removed_dirs":  3,
+                                "left_entries":  [
+
+                                                 ],
+                                "refused":  null
+                            },
+    "destination_kept":  false,
+    "result":  "pass"
+}

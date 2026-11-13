@@ -1,0 +1,475 @@
+﻿{
+    "experiment_id":  "E-02",
+    "stage":  "B1",
+    "case_id":  "SEC-01z",
+    "run_id":  "SEC-01z-20261113T190336-4fb50d3f",
+    "description":  "Observation only: ZoneIdentifier = 3 offered; is a Zone.Identifier stream written?",
+    "driver":  "D2c",
+    "dialog_driver":  "D2u",
+    "target":  "G-01",
+    "threading":  "T1",
+    "injected_harness_fault":  "none",
+    "case":  {
+                 "case_id":  "SEC-01z",
+                 "description":  "Observation only: ZoneIdentifier = 3 offered; is a Zone.Identifier stream written?",
+                 "files":  [
+                               {
+                                   "advertised_size":  1048576,
+                                   "faults":  [
+
+                                              ],
+                                   "name":  "e02-SEC-01z-f0.bin",
+                                   "size":  1048576
+                               }
+                           ],
+                 "harness":  {
+                                 "close_window_after_event":  null,
+                                 "concurrent":  false,
+                                 "dialog_actions":  [
+
+                                                    ],
+                                 "exit_mode":  "clear",
+                                 "expect":  "success",
+                                 "kill_after_event":  null,
+                                 "kill_before_paste":  false,
+                                 "kill_delay_ms":  0,
+                                 "operator_note":  "",
+                                 "pastes":  1,
+                                 "pre_existing_seed":  null,
+                                 "probe_clipboard":  false,
+                                 "replace_clipboard_after_event":  null,
+                                 "replace_delay_ms":  0,
+                                 "timeout_secs":  60
+                             },
+                 "large":  false,
+                 "read_timeout_ms":  null,
+                 "threading":  "T1",
+                 "zone_identifier":  3
+             },
+    "env":  {
+                "os_caption":  "Microsoft Windows 11 Home",
+                "os_version":  "10.0.26200",
+                "os_build":  "26200",
+                "os_ubr":  9711,
+                "os_display_version":  "25H2",
+                "explorer_version":  "10.0.26100.8875",
+                "explorer_separate_process":  0,
+                "clipboard_history_enabled":  null,
+                "cloud_clipboard_enabled":  null,
+                "defender_product_version":  "4.18.26100.4",
+                "defender_realtime_protection":  true,
+                "test_volume_filesystem":  "NTFS",
+                "test_volume_free_gib":  1309.9,
+                "cpu":  "AMD Ryzen 7 5700X3D 8-Core Processor",
+                "ram_gib":  31.9,
+                "experiment_commit":  "a9a21312c4405f57f3f9cfefd800881331b2fafa",
+                "experiment_tree_dirty":  false,
+                "rustc":  "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+                "cargo_lock_sha256":  "76215d10f491622601c608a061db959f8a67c758d4254eae40692b46bed5c830"
+            },
+    "progress":  {
+                     "completed":  true,
+                     "timed_out":  false,
+                     "seconds":  10.16,
+                     "reason":  null,
+                     "pending_dialog_actions":  [
+
+                                                ]
+                 },
+    "timeline":  [
+                     {
+                         "t_ms":  313,
+                         "source":  "agent",
+                         "event":  "ready",
+                         "detail":  {
+                                        "sequence":  2072
+                                    }
+                     },
+                     {
+                         "t_ms":  1917,
+                         "source":  "driver",
+                         "event":  "paste",
+                         "detail":  {
+                                        "target":  "paste-target-1",
+                                        "exit":  0
+                                    }
+                     },
+                     {
+                         "t_ms":  1929,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1929,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1929,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1929,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1929,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1929,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1929,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1930,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4080421792,
+                                        "format":  "TargetCLSID"
+                                    }
+                     },
+                     {
+                         "t_ms":  2151,
+                         "source":  "agent",
+                         "event":  "eof_returned",
+                         "detail":  {
+                                        "offset":  1048576,
+                                        "stream_id":  1
+                                    }
+                     },
+                     {
+                         "t_ms":  2151,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "Performed DropEffect"
+                                    }
+                     },
+                     {
+                         "t_ms":  2151,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "Logical Performed DropEffect"
+                                    }
+                     },
+                     {
+                         "t_ms":  2151,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "Logical Performed DropEffect"
+                                    }
+                     },
+                     {
+                         "t_ms":  2151,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  2151,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     }
+                 ],
+    "explorer_windows":  [
+                             {
+                                 "destination":  "paste-target-1",
+                                 "found":  true,
+                                 "top_hwnd":  2362190,
+                                 "top_preexisting":  false,
+                                 "tabs_on_top":  1,
+                                 "close_decision":  "close"
+                             }
+                         ],
+    "explorer_processes":  {
+                               "before":  {
+                                              "id":  9300,
+                                              "start":  "2026-11-12T18:48:36.7863513+02:00"
+                                          },
+                               "after":  {
+                                             "id":  9300,
+                                             "start":  "2026-11-12T18:48:36.7863513+02:00"
+                                         },
+                               "lost":  [
+
+                                        ]
+                           },
+    "dialogs":  {
+                    "appeared":  0,
+                    "attributed":  0,
+                    "error_dialog_seen":  false,
+                    "progress_dialog_seen":  false,
+                    "error_texts":  [
+
+                                    ],
+                    "events":  [
+
+                               ]
+                },
+    "dialog_actions":  [
+
+                       ],
+    "agent_exit_code":  0,
+    "agent_summary":  {
+                          "owner_thread_id":  17092,
+                          "com_call_threads":  {
+                                                   "17092":  70
+                                               },
+                          "calls":  {
+                                        "IDataObject::EnumFormatEtc":  9,
+                                        "IDataObject::GetData":  34,
+                                        "IDataObject::QueryGetData":  4,
+                                        "IDataObject::SetData":  15,
+                                        "IStream::Read":  5,
+                                        "IStream::Seek":  3
+                                    },
+                          "first_descriptor_get_data_ms":  1712.065,
+                          "first_contents_get_data_ms":  1713.4228999999998,
+                          "first_read_ms":  1714.4793,
+                          "last_read_ms":  1716.7857,
+                          "last_stream_release_ms":  1722.0312,
+                          "clipboard_lost_ms":  null,
+                          "streams_created":  1,
+                          "streams_released":  1,
+                          "bytes_served":  1048576,
+                          "read_calls":  5,
+                          "short_reads":  1,
+                          "failed_reads":  0,
+                          "peak_private_bytes":  2084864,
+                          "peak_working_set_bytes":  11988992,
+                          "memory_samples":  11,
+                          "os_peak_commit_bytes":  2359296,
+                          "os_peak_working_set_bytes":  12460032,
+                          "per_stream":  [
+                                             {
+                                                 "stream_id":  1,
+                                                 "file_index":  0,
+                                                 "advertised_size":  1048576,
+                                                 "bytes_served":  1048576,
+                                                 "final_position":  0,
+                                                 "max_position":  1048576,
+                                                 "read_calls":  5,
+                                                 "failed_reads":  0,
+                                                 "min_request":  262144,
+                                                 "max_request":  262144,
+                                                 "seeks":  3,
+                                                 "stats_calls":  0,
+                                                 "eof_read":  true
+                                             }
+                                         ]
+                      },
+    "agent_fault_events":  [
+                               "eof_returned"
+                           ],
+    "set_data":  [
+                     {
+                         "format":  "TargetCLSID",
+                         "dword":  4080421792
+                     },
+                     {
+                         "format":  "Performed DropEffect",
+                         "dword":  1
+                     },
+                     {
+                         "format":  "Logical Performed DropEffect",
+                         "dword":  1
+                     },
+                     {
+                         "format":  "Logical Performed DropEffect",
+                         "dword":  1
+                     }
+                 ],
+    "performed_drop_effect":  [
+                                  1
+                              ],
+    "streams":  {
+                    "created":  1,
+                    "released":  1,
+                    "all_reached_eof":  true
+                },
+    "destinations":  [
+                         {
+                             "all_files_match":  true,
+                             "case_id":  "SEC-01z",
+                             "files":  [
+                                           {
+                                               "advertised_size":  1048576,
+                                               "digest_match":  true,
+                                               "exists":  true,
+                                               "expected_size":  1048576,
+                                               "index":  0,
+                                               "mistakable_as_complete":  true,
+                                               "name":  "e02-SEC-01z-f0.bin",
+                                               "original_preserved":  null,
+                                               "prefix_match":  null,
+                                               "size":  1048576,
+                                               "state":  "complete_correct",
+                                               "zone_identifier":  {
+                                                                       "keys":  [
+                                                                                    "ZoneId"
+                                                                                ],
+                                                                       "present":  true,
+                                                                       "zone_id":  null
+                                                                   }
+                                           }
+                                       ],
+                             "unexpected_entries":  [
+
+                                                    ]
+                         }
+                     ],
+    "observer":  {
+                     "paste-target-1":  {
+                                            "events":  3,
+                                            "names_seen":  [
+                                                               "e02-SEC-01z-f0.bin"
+                                                           ],
+                                            "removals":  [
+
+                                                         ],
+                                            "max_sizes":  [
+                                                              {
+                                                                  "name":  "e02-SEC-01z-f0.bin",
+                                                                  "max_size":  1048576
+                                                              }
+                                                          ]
+                                        }
+                 },
+    "clipboard":  {
+                      "set_sequence":  2072,
+                      "before_release":  {
+                                             "formats":  [
+
+                                                         ],
+                                             "has_file_contents":  false,
+                                             "has_file_descriptor":  false,
+                                             "has_onecopy_marker":  false,
+                                             "sequence":  2073
+                                         },
+                      "release":  {
+                                      "available":  {
+
+                                                    },
+                                      "cleared":  false,
+                                      "formats":  [
+
+                                                  ],
+                                      "identified_as_this_run":  null,
+                                      "owner_alive":  false,
+                                      "owner_present":  false,
+                                      "refused_reason":  null,
+                                      "sequence":  2073
+                                  },
+                      "after":  {
+                                    "formats":  [
+
+                                                ],
+                                    "has_file_contents":  false,
+                                    "has_file_descriptor":  false,
+                                    "has_onecopy_marker":  false,
+                                    "sequence":  2073
+                                },
+                      "clean_after":  true,
+                      "replacement":  null,
+                      "probe":  null
+                  },
+    "classification":  {
+                           "target_report":  "success",
+                           "per_file":  [
+                                            {
+                                                "target":  "SEC-01z",
+                                                "name":  "e02-SEC-01z-f0.bin",
+                                                "state":  "complete_correct",
+                                                "size":  1048576,
+                                                "mistakable":  true,
+                                                "class":  "S"
+                                            }
+                                        ],
+                           "outcome_class":  "S",
+                           "expectation_met":  true
+                       },
+    "harness":  {
+                    "failed_stage":  null,
+                    "exception":  null,
+                    "driver_errors":  [
+
+                                      ],
+                    "post":  {
+                                 "agent_stop":  "exited",
+                                 "watcher_stops":  [
+                                                       "exited"
+                                                   ],
+                                 "dialog_watch_stop":  "exited",
+                                 "probe_stop":  "none",
+                                 "helper_stops":  [
+
+                                                  ],
+                                 "cleanup_dialogs":  [
+
+                                                     ]
+                             }
+                },
+    "interference":  [
+
+                     ],
+    "destination_cleanup":  {
+                                "deleted_files":  1,
+                                "removed_dirs":  2,
+                                "left_entries":  [
+
+                                                 ],
+                                "refused":  null
+                            },
+    "destination_kept":  false,
+    "result":  "completed"
+}

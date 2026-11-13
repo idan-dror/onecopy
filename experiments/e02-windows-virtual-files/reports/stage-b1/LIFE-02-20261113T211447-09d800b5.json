@@ -1,0 +1,707 @@
+﻿{
+    "experiment_id":  "E-02",
+    "stage":  "B1",
+    "case_id":  "LIFE-02",
+    "run_id":  "LIFE-02-20261113T211447-09d800b5",
+    "description":  "Two concurrent pastes of 64 MiB (T1)",
+    "driver":  "D2c",
+    "dialog_driver":  "D2u",
+    "target":  "G-01",
+    "threading":  "T1",
+    "injected_harness_fault":  "none",
+    "case":  {
+                 "case_id":  "LIFE-02",
+                 "description":  "Two concurrent pastes of 64 MiB (T1)",
+                 "files":  [
+                               {
+                                   "advertised_size":  67108864,
+                                   "faults":  [
+
+                                              ],
+                                   "name":  "e02-LIFE-02-f0.bin",
+                                   "size":  67108864
+                               }
+                           ],
+                 "harness":  {
+                                 "close_window_after_event":  null,
+                                 "concurrent":  true,
+                                 "dialog_actions":  [
+
+                                                    ],
+                                 "exit_mode":  "clear",
+                                 "expect":  "success",
+                                 "kill_after_event":  null,
+                                 "kill_before_paste":  false,
+                                 "kill_delay_ms":  0,
+                                 "operator_note":  "",
+                                 "pastes":  2,
+                                 "pre_existing_seed":  null,
+                                 "probe_clipboard":  false,
+                                 "replace_clipboard_after_event":  null,
+                                 "replace_delay_ms":  0,
+                                 "timeout_secs":  120
+                             },
+                 "large":  false,
+                 "read_timeout_ms":  null,
+                 "threading":  "T1",
+                 "zone_identifier":  null
+             },
+    "env":  {
+                "os_caption":  "Microsoft Windows 11 Home",
+                "os_version":  "10.0.26200",
+                "os_build":  "26200",
+                "os_ubr":  9711,
+                "os_display_version":  "25H2",
+                "explorer_version":  "10.0.26100.8875",
+                "explorer_separate_process":  0,
+                "clipboard_history_enabled":  null,
+                "cloud_clipboard_enabled":  null,
+                "defender_product_version":  "4.18.26100.4",
+                "defender_realtime_protection":  true,
+                "test_volume_filesystem":  "NTFS",
+                "test_volume_free_gib":  1309.7,
+                "cpu":  "AMD Ryzen 7 5700X3D 8-Core Processor",
+                "ram_gib":  31.9,
+                "experiment_commit":  "cb3a6813e898dcef454e5277622704264e2acb8c",
+                "experiment_tree_dirty":  false,
+                "rustc":  "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+                "cargo_lock_sha256":  "76215d10f491622601c608a061db959f8a67c758d4254eae40692b46bed5c830"
+            },
+    "progress":  {
+                     "completed":  true,
+                     "timed_out":  false,
+                     "seconds":  12.02,
+                     "reason":  null,
+                     "pending_dialog_actions":  [
+
+                                                ]
+                 },
+    "timeline":  [
+                     {
+                         "t_ms":  618,
+                         "source":  "agent",
+                         "event":  "ready",
+                         "detail":  {
+                                        "sequence":  2825
+                                    }
+                     },
+                     {
+                         "t_ms":  3048,
+                         "source":  "driver",
+                         "event":  "paste",
+                         "detail":  {
+                                        "target":  "paste-target-1",
+                                        "exit":  0
+                                    }
+                     },
+                     {
+                         "t_ms":  3847,
+                         "source":  "driver",
+                         "event":  "paste",
+                         "detail":  {
+                                        "target":  "paste-target-2",
+                                        "exit":  0
+                                    }
+                     },
+                     {
+                         "t_ms":  3911,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  3911,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  3911,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  3911,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  3912,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  3912,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  3912,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  3912,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  3912,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  3912,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  3913,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  3913,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4080421792,
+                                        "format":  "TargetCLSID"
+                                    }
+                     },
+                     {
+                         "t_ms":  3918,
+                         "source":  "agent",
+                         "event":  "eof_returned",
+                         "detail":  {
+                                        "offset":  67108864,
+                                        "stream_id":  1
+                                    }
+                     },
+                     {
+                         "t_ms":  3923,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "Performed DropEffect"
+                                    }
+                     },
+                     {
+                         "t_ms":  3924,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "Logical Performed DropEffect"
+                                    }
+                     },
+                     {
+                         "t_ms":  3924,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "Logical Performed DropEffect"
+                                    }
+                     },
+                     {
+                         "t_ms":  3924,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  3924,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  3924,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  3924,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  3924,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  3924,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4080421792,
+                                        "format":  "TargetCLSID"
+                                    }
+                     },
+                     {
+                         "t_ms":  4228,
+                         "source":  "agent",
+                         "event":  "eof_returned",
+                         "detail":  {
+                                        "offset":  67108864,
+                                        "stream_id":  2
+                                    }
+                     },
+                     {
+                         "t_ms":  4228,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "Performed DropEffect"
+                                    }
+                     },
+                     {
+                         "t_ms":  4229,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "Logical Performed DropEffect"
+                                    }
+                     },
+                     {
+                         "t_ms":  4229,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "Logical Performed DropEffect"
+                                    }
+                     },
+                     {
+                         "t_ms":  4229,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  4229,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     }
+                 ],
+    "explorer_windows":  [
+                             {
+                                 "destination":  "paste-target-1",
+                                 "found":  true,
+                                 "top_hwnd":  7867136,
+                                 "top_preexisting":  false,
+                                 "tabs_on_top":  1,
+                                 "close_decision":  "close"
+                             },
+                             {
+                                 "destination":  "paste-target-2",
+                                 "found":  true,
+                                 "top_hwnd":  10422702,
+                                 "top_preexisting":  false,
+                                 "tabs_on_top":  1,
+                                 "close_decision":  "close"
+                             }
+                         ],
+    "explorer_processes":  {
+                               "watched":  [
+                                               {
+                                                   "role":  "shell",
+                                                   "id":  9300,
+                                                   "name":  "explorer",
+                                                   "start":  "2026-11-12T18:48:36.7863513+02:00"
+                                               },
+                                               {
+                                                   "role":  "run_window_host",
+                                                   "id":  29388,
+                                                   "name":  "explorer",
+                                                   "start":  "2026-11-13T21:14:48.2934775+02:00"
+                                               },
+                                               {
+                                                   "role":  "run_window_host",
+                                                   "id":  10408,
+                                                   "name":  "explorer",
+                                                   "start":  "2026-11-13T21:14:49.0724303+02:00"
+                                               }
+                                           ],
+                               "lost":  [
+
+                                        ]
+                           },
+    "dialogs":  {
+                    "appeared":  0,
+                    "attributed":  0,
+                    "error_dialog_seen":  false,
+                    "progress_dialog_seen":  false,
+                    "error_texts":  [
+
+                                    ],
+                    "events":  [
+
+                               ]
+                },
+    "dialog_actions":  [
+
+                       ],
+    "agent_exit_code":  0,
+    "agent_summary":  {
+                          "owner_thread_id":  3588,
+                          "com_call_threads":  {
+                                                   "3588":  635
+                                               },
+                          "calls":  {
+                                        "IDataObject::EnumFormatEtc":  15,
+                                        "IDataObject::GetData":  65,
+                                        "IDataObject::QueryGetData":  7,
+                                        "IDataObject::SetData":  28,
+                                        "IStream::Read":  514,
+                                        "IStream::Seek":  6
+                                    },
+                          "first_descriptor_get_data_ms":  2625.8512,
+                          "first_contents_get_data_ms":  2626.9969,
+                          "first_read_ms":  2628.4959,
+                          "last_read_ms":  3556.3703,
+                          "last_stream_release_ms":  3557.7239,
+                          "clipboard_lost_ms":  null,
+                          "streams_created":  2,
+                          "streams_released":  2,
+                          "bytes_served":  134217728,
+                          "read_calls":  514,
+                          "short_reads":  2,
+                          "failed_reads":  0,
+                          "peak_private_bytes":  2355200,
+                          "peak_working_set_bytes":  12201984,
+                          "memory_samples":  13,
+                          "os_peak_commit_bytes":  2355200,
+                          "os_peak_working_set_bytes":  12468224,
+                          "per_stream":  [
+                                             {
+                                                 "stream_id":  1,
+                                                 "file_index":  0,
+                                                 "advertised_size":  67108864,
+                                                 "bytes_served":  67108864,
+                                                 "final_position":  0,
+                                                 "max_position":  67108864,
+                                                 "read_calls":  257,
+                                                 "failed_reads":  0,
+                                                 "min_request":  262144,
+                                                 "max_request":  262144,
+                                                 "seeks":  3,
+                                                 "stats_calls":  0,
+                                                 "eof_read":  true
+                                             },
+                                             {
+                                                 "stream_id":  2,
+                                                 "file_index":  0,
+                                                 "advertised_size":  67108864,
+                                                 "bytes_served":  67108864,
+                                                 "final_position":  0,
+                                                 "max_position":  67108864,
+                                                 "read_calls":  257,
+                                                 "failed_reads":  0,
+                                                 "min_request":  262144,
+                                                 "max_request":  262144,
+                                                 "seeks":  3,
+                                                 "stats_calls":  0,
+                                                 "eof_read":  true
+                                             }
+                                         ]
+                      },
+    "agent_fault_events":  [
+                               "eof_returned"
+                           ],
+    "set_data":  [
+                     {
+                         "format":  "TargetCLSID",
+                         "dword":  4080421792
+                     },
+                     {
+                         "format":  "Performed DropEffect",
+                         "dword":  1
+                     },
+                     {
+                         "format":  "Logical Performed DropEffect",
+                         "dword":  1
+                     },
+                     {
+                         "format":  "Logical Performed DropEffect",
+                         "dword":  1
+                     },
+                     {
+                         "format":  "TargetCLSID",
+                         "dword":  4080421792
+                     },
+                     {
+                         "format":  "Performed DropEffect",
+                         "dword":  1
+                     },
+                     {
+                         "format":  "Logical Performed DropEffect",
+                         "dword":  1
+                     },
+                     {
+                         "format":  "Logical Performed DropEffect",
+                         "dword":  1
+                     }
+                 ],
+    "performed_drop_effect":  [
+                                  1,
+                                  1
+                              ],
+    "streams":  {
+                    "created":  2,
+                    "released":  2,
+                    "all_reached_eof":  true
+                },
+    "destinations":  [
+                         {
+                             "all_files_match":  true,
+                             "case_id":  "LIFE-02",
+                             "files":  [
+                                           {
+                                               "advertised_size":  67108864,
+                                               "digest_match":  true,
+                                               "exists":  true,
+                                               "expected_size":  67108864,
+                                               "index":  0,
+                                               "mistakable_as_complete":  true,
+                                               "name":  "e02-LIFE-02-f0.bin",
+                                               "original_preserved":  null,
+                                               "prefix_match":  null,
+                                               "size":  67108864,
+                                               "state":  "complete_correct",
+                                               "zone_identifier":  {
+                                                                       "present":  false
+                                                                   }
+                                           }
+                                       ],
+                             "unexpected_entries":  [
+
+                                                    ]
+                         },
+                         {
+                             "all_files_match":  true,
+                             "case_id":  "LIFE-02",
+                             "files":  [
+                                           {
+                                               "advertised_size":  67108864,
+                                               "digest_match":  true,
+                                               "exists":  true,
+                                               "expected_size":  67108864,
+                                               "index":  0,
+                                               "mistakable_as_complete":  true,
+                                               "name":  "e02-LIFE-02-f0.bin",
+                                               "original_preserved":  null,
+                                               "prefix_match":  null,
+                                               "size":  67108864,
+                                               "state":  "complete_correct",
+                                               "zone_identifier":  {
+                                                                       "present":  false
+                                                                   }
+                                           }
+                                       ],
+                             "unexpected_entries":  [
+
+                                                    ]
+                         }
+                     ],
+    "observer":  {
+                     "paste-target-1":  {
+                                            "events":  3,
+                                            "names_seen":  [
+                                                               "e02-LIFE-02-f0.bin"
+                                                           ],
+                                            "removals":  [
+
+                                                         ],
+                                            "max_sizes":  [
+                                                              {
+                                                                  "name":  "e02-LIFE-02-f0.bin",
+                                                                  "max_size":  67108864
+                                                              }
+                                                          ]
+                                        },
+                     "paste-target-2":  {
+                                            "events":  3,
+                                            "names_seen":  [
+                                                               "e02-LIFE-02-f0.bin"
+                                                           ],
+                                            "removals":  [
+
+                                                         ],
+                                            "max_sizes":  [
+                                                              {
+                                                                  "name":  "e02-LIFE-02-f0.bin",
+                                                                  "max_size":  67108864
+                                                              }
+                                                          ]
+                                        }
+                 },
+    "clipboard":  {
+                      "set_sequence":  2825,
+                      "before_release":  {
+                                             "formats":  [
+
+                                                         ],
+                                             "has_file_contents":  false,
+                                             "has_file_descriptor":  false,
+                                             "has_onecopy_marker":  false,
+                                             "sequence":  2826
+                                         },
+                      "release":  {
+                                      "available":  {
+
+                                                    },
+                                      "cleared":  false,
+                                      "formats":  [
+
+                                                  ],
+                                      "identified_as_this_run":  null,
+                                      "owner_alive":  false,
+                                      "owner_present":  false,
+                                      "refused_reason":  null,
+                                      "sequence":  2826
+                                  },
+                      "after":  {
+                                    "formats":  [
+
+                                                ],
+                                    "has_file_contents":  false,
+                                    "has_file_descriptor":  false,
+                                    "has_onecopy_marker":  false,
+                                    "sequence":  2826
+                                },
+                      "clean_after":  true,
+                      "replacement":  null,
+                      "probe":  null
+                  },
+    "classification":  {
+                           "target_report":  "success",
+                           "per_file":  [
+                                            {
+                                                "target":  "LIFE-02",
+                                                "name":  "e02-LIFE-02-f0.bin",
+                                                "state":  "complete_correct",
+                                                "size":  67108864,
+                                                "mistakable":  true,
+                                                "class":  "S"
+                                            },
+                                            {
+                                                "target":  "LIFE-02",
+                                                "name":  "e02-LIFE-02-f0.bin",
+                                                "state":  "complete_correct",
+                                                "size":  67108864,
+                                                "mistakable":  true,
+                                                "class":  "S"
+                                            }
+                                        ],
+                           "outcome_class":  "S",
+                           "expectation_met":  true
+                       },
+    "harness":  {
+                    "failed_stage":  null,
+                    "exception":  null,
+                    "driver_errors":  [
+
+                                      ],
+                    "post":  {
+                                 "agent_stop":  "exited",
+                                 "watcher_stops":  [
+                                                       "exited",
+                                                       "exited"
+                                                   ],
+                                 "dialog_watch_stop":  "exited",
+                                 "probe_stop":  "none",
+                                 "helper_stops":  [
+
+                                                  ],
+                                 "cleanup_dialogs":  [
+
+                                                     ]
+                             }
+                },
+    "interference":  [
+
+                     ],
+    "destination_cleanup":  {
+                                "deleted_files":  2,
+                                "removed_dirs":  3,
+                                "left_entries":  [
+
+                                                 ],
+                                "refused":  null
+                            },
+    "destination_kept":  false,
+    "result":  "completed"
+}

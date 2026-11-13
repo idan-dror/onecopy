@@ -1,0 +1,54 @@
+{
+  "note": "Corrections to recorded classifications, applied by scripts/summarize-stage-b1.mjs. Raw records are not edited. Each entry names the harness defect, the fixing commit and the corrected value.",
+  "corrections": {
+    "STREAM-04-20261113T192639-5550f4fa": {
+      "class": "S",
+      "reason": "False crash flag: a short-lived explorer.exe launcher from an earlier run exited during this run. Shell and run-window processes were intact; target reported success; destination complete and correct. Fixed in edb289a (process-based crash check)."
+    },
+    "STREAM-08t2-20261113T192211-4a2bc40e": {
+      "class": "S",
+      "reason": "False crash flag (launcher exit), as above. Fixed in edb289a."
+    },
+    "STREAM-08a-20261113T192425-e2e80458": {
+      "class": "S",
+      "reason": "False crash flag (launcher exit), as above. Fixed in edb289a."
+    },
+    "ERR-08-20261113T190721-41ec2a19": {
+      "result": "inconclusive",
+      "reason": "The conflict dialog's choices (tileMain, btnCancel) were unknown to the harness, so nothing was chosen and the run timed out. The original was preserved only because no choice was made. Fixed in edb289a (tileMain#1, btnCancel)."
+    },
+    "LIFE-02-20261113T191202-ccf8a682": {
+      "result": "inconclusive",
+      "reason": "Harness pasted the two folders sequentially instead of concurrently. Valid only as two sequential pastes (both correct). Fixed in 7dbb85f."
+    },
+    "LIFE-02t2-20261113T191226-86e9814a": {
+      "result": "inconclusive",
+      "reason": "Sequential instead of concurrent pastes. Fixed in 7dbb85f."
+    },
+    "LIFE-02s-20261113T191439-4a107807": {
+      "result": "inconclusive",
+      "reason": "Sequential instead of concurrent pastes. Fixed in 7dbb85f."
+    },
+    "LIFE-02st2-20261113T191523-9b38fa03": {
+      "result": "inconclusive",
+      "reason": "Sequential instead of concurrent pastes. Fixed in 7dbb85f."
+    },
+    "ERR-08-20261113T205334-e40babe8": {
+      "result": "inconclusive",
+      "reason": "The harness compared plain ids against the position form tileMain#1, judged Replace not offered and pressed Cancel in the conflict dialog; the replace-then-error path was not exercised. Fixed in a8c4da5 (Test-OffersAction)."
+    },
+    "ERR-08-20261113T211634-139e4660": {
+      "result": "inconclusive",
+      "reason": "The harness compared plain ids against the position form tileMain#1, judged Replace not offered and pressed Cancel in the conflict dialog; the replace-then-error path was not exercised. Fixed in a8c4da5 (Test-OffersAction)."
+    },
+    "ERR-08-20261113T213320-1559127a": {
+      "result": "inconclusive",
+      "reason": "The harness compared plain ids against the position form tileMain#1, judged Replace not offered and pressed Cancel in the conflict dialog; the replace-then-error path was not exercised. Fixed in a8c4da5 (Test-OffersAction)."
+    },
+    "CANCEL-03-20261113T191651-98374427": {
+      "report": "cancelled",
+      "class": "O1",
+      "reason": "Report precedence at a9a2131 put a later error dialog before the user cancel; the read timeout produced that error after the cancel. Same facts as the repeats; precedence fixed in edb289a."
+    }
+  }
+}

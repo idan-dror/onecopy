@@ -1,0 +1,572 @@
+﻿{
+    "experiment_id":  "E-02",
+    "stage":  "B1",
+    "case_id":  "STREAM-07",
+    "run_id":  "STREAM-07-20261113T191000-5c065e90",
+    "description":  "Short reads of at most 4 KiB, 16 MiB",
+    "driver":  "D2c",
+    "dialog_driver":  "D2u",
+    "target":  "G-01",
+    "threading":  "T1",
+    "injected_harness_fault":  "none",
+    "case":  {
+                 "case_id":  "STREAM-07",
+                 "description":  "Short reads of at most 4 KiB, 16 MiB",
+                 "files":  [
+                               {
+                                   "advertised_size":  16777216,
+                                   "faults":  [
+                                                  {
+                                                      "kind":  "short_reads",
+                                                      "max_bytes":  4096
+                                                  }
+                                              ],
+                                   "name":  "e02-STREAM-07-f0.bin",
+                                   "size":  16777216
+                               }
+                           ],
+                 "harness":  {
+                                 "close_window_after_event":  null,
+                                 "concurrent":  false,
+                                 "dialog_actions":  [
+
+                                                    ],
+                                 "exit_mode":  "clear",
+                                 "expect":  "success",
+                                 "kill_after_event":  null,
+                                 "kill_before_paste":  false,
+                                 "kill_delay_ms":  0,
+                                 "operator_note":  "",
+                                 "pastes":  1,
+                                 "pre_existing_seed":  null,
+                                 "probe_clipboard":  false,
+                                 "replace_clipboard_after_event":  null,
+                                 "replace_delay_ms":  0,
+                                 "timeout_secs":  180
+                             },
+                 "large":  false,
+                 "read_timeout_ms":  null,
+                 "threading":  "T1",
+                 "zone_identifier":  null
+             },
+    "env":  {
+                "os_caption":  "Microsoft Windows 11 Home",
+                "os_version":  "10.0.26200",
+                "os_build":  "26200",
+                "os_ubr":  9711,
+                "os_display_version":  "25H2",
+                "explorer_version":  "10.0.26100.8875",
+                "explorer_separate_process":  0,
+                "clipboard_history_enabled":  null,
+                "cloud_clipboard_enabled":  null,
+                "defender_product_version":  "4.18.26100.4",
+                "defender_realtime_protection":  true,
+                "test_volume_filesystem":  "NTFS",
+                "test_volume_free_gib":  1309.9,
+                "cpu":  "AMD Ryzen 7 5700X3D 8-Core Processor",
+                "ram_gib":  31.9,
+                "experiment_commit":  "a9a21312c4405f57f3f9cfefd800881331b2fafa",
+                "experiment_tree_dirty":  false,
+                "rustc":  "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+                "cargo_lock_sha256":  "76215d10f491622601c608a061db959f8a67c758d4254eae40692b46bed5c830"
+            },
+    "progress":  {
+                     "completed":  true,
+                     "timed_out":  false,
+                     "seconds":  13.35,
+                     "reason":  null,
+                     "pending_dialog_actions":  [
+
+                                                ]
+                 },
+    "timeline":  [
+                     {
+                         "t_ms":  333,
+                         "source":  "agent",
+                         "event":  "ready",
+                         "detail":  {
+                                        "sequence":  2224
+                                    }
+                     },
+                     {
+                         "t_ms":  1936,
+                         "source":  "driver",
+                         "event":  "paste",
+                         "detail":  {
+                                        "target":  "paste-target-1",
+                                        "exit":  0
+                                    }
+                     },
+                     {
+                         "t_ms":  1947,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1948,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1948,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1948,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1948,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1948,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1948,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1948,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4080421792,
+                                        "format":  "TargetCLSID"
+                                    }
+                     },
+                     {
+                         "t_ms":  2823,
+                         "source":  "agent",
+                         "event":  "eof_returned",
+                         "detail":  {
+                                        "offset":  16777216,
+                                        "stream_id":  1
+                                    }
+                     },
+                     {
+                         "t_ms":  3916,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "Performed DropEffect"
+                                    }
+                     },
+                     {
+                         "t_ms":  3917,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "Logical Performed DropEffect"
+                                    }
+                     },
+                     {
+                         "t_ms":  3917,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "Logical Performed DropEffect"
+                                    }
+                     },
+                     {
+                         "t_ms":  3917,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  3917,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  3922,
+                         "source":  "dialog",
+                         "event":  "appear",
+                         "detail":  {
+                                        "ours":  true,
+                                        "hwnd":  4459286,
+                                        "title":  "‏‏מעתיק..."
+                                    }
+                     },
+                     {
+                         "t_ms":  5177,
+                         "source":  "dialog",
+                         "event":  "gone",
+                         "detail":  {
+                                        "ours":  true,
+                                        "hwnd":  4459286,
+                                        "title":  null
+                                    }
+                     }
+                 ],
+    "explorer_windows":  [
+                             {
+                                 "destination":  "paste-target-1",
+                                 "found":  true,
+                                 "top_hwnd":  5572916,
+                                 "top_preexisting":  false,
+                                 "tabs_on_top":  1,
+                                 "close_decision":  "close"
+                             }
+                         ],
+    "explorer_processes":  {
+                               "before":  [
+                                              {
+                                                  "id":  9300,
+                                                  "start":  "2026-11-12T18:48:36.7863513+02:00"
+                                              },
+                                              {
+                                                  "id":  10544,
+                                                  "start":  "2026-11-13T19:07:22.9378346+02:00"
+                                              }
+                                          ],
+                               "after":  [
+                                             {
+                                                 "id":  9300,
+                                                 "start":  "2026-11-12T18:48:36.7863513+02:00"
+                                             },
+                                             {
+                                                 "id":  10544,
+                                                 "start":  "2026-11-13T19:07:22.9378346+02:00"
+                                             }
+                                         ],
+                               "lost":  [
+
+                                        ]
+                           },
+    "dialogs":  {
+                    "appeared":  1,
+                    "attributed":  1,
+                    "error_dialog_seen":  false,
+                    "progress_dialog_seen":  true,
+                    "error_texts":  [
+
+                                    ],
+                    "events":  [
+                                   {
+                                       "buttons":  [
+                                                       {
+                                                           "enabled":  true,
+                                                           "id":  "CancelButton",
+                                                           "name":  "ביטול"
+                                                       },
+                                                       {
+                                                           "enabled":  true,
+                                                           "id":  "",
+                                                           "name":  "‏‏מזער"
+                                                       },
+                                                       {
+                                                           "enabled":  false,
+                                                           "id":  "",
+                                                           "name":  "הגדל"
+                                                       },
+                                                       {
+                                                           "enabled":  true,
+                                                           "id":  "",
+                                                           "name":  "סגור"
+                                                       }
+                                                   ],
+                                       "class":  "#32770",
+                                       "event":  "appear",
+                                       "hwnd":  4459286,
+                                       "names":  [
+                                                     "‏‏מעתיק...",
+                                                     "‏‏מעתיק את \u0027e02-STREAM-07-f0.bin\u0027",
+                                                     "‏‏אל \u0027\u003ctestroot\u003e\\dest\\STREAM-07-20261113T191000-5c065e90\\paste-target-1\u0027",
+                                                     "ביטול",
+                                                     "‏‏מד התקדמות",
+                                                     "מערכת",
+                                                     "‏‏מזער",
+                                                     "הגדל",
+                                                     "סגור"
+                                                 ],
+                                       "ours":  true,
+                                       "ours_by":  "token",
+                                       "owner":  1903212,
+                                       "owner_classes":  [
+                                                             "CabinetWClass"
+                                                         ],
+                                       "owner_texts":  [
+                                                           "paste-target-1 - סייר הקבצים",
+                                                           "Non Client Input Sink Window",
+                                                           "paste-target-1",
+                                                           "‏‏פקד עץ של מרחב שמות",
+                                                           "‏‏פקד עץ של מרחב שמות",
+                                                           "חלונית הניווט",
+                                                           "Shell Preview Extension Host",
+                                                           "ShellView"
+                                                       ],
+                                       "progress_bar":  true,
+                                       "root_owner":  1903212,
+                                       "t_ms":  3516.0352000000003,
+                                       "title":  "‏‏מעתיק..."
+                                   },
+                                   {
+                                       "class":  "#32770",
+                                       "event":  "gone",
+                                       "hwnd":  4459286,
+                                       "lifetime_ms":  1357.8154999999997,
+                                       "ours":  true,
+                                       "progress_bar":  true,
+                                       "t_ms":  4873.8507
+                                   }
+                               ]
+                },
+    "dialog_actions":  [
+
+                       ],
+    "agent_exit_code":  0,
+    "agent_summary":  {
+                          "owner_thread_id":  25820,
+                          "com_call_threads":  {
+                                                   "25820":  4170
+                                               },
+                          "calls":  {
+                                        "IDataObject::EnumFormatEtc":  11,
+                                        "IDataObject::GetData":  37,
+                                        "IDataObject::QueryGetData":  5,
+                                        "IDataObject::SetData":  17,
+                                        "IStream::Read":  4097,
+                                        "IStream::Seek":  3
+                                    },
+                          "first_descriptor_get_data_ms":  1727.4876,
+                          "first_contents_get_data_ms":  1728.6616999999999,
+                          "first_read_ms":  1729.7535000000003,
+                          "last_read_ms":  2468.6449000000002,
+                          "last_stream_release_ms":  3473.6369,
+                          "clipboard_lost_ms":  null,
+                          "streams_created":  1,
+                          "streams_released":  1,
+                          "bytes_served":  16777216,
+                          "read_calls":  4097,
+                          "short_reads":  2,
+                          "failed_reads":  0,
+                          "peak_private_bytes":  2826240,
+                          "peak_working_set_bytes":  12533760,
+                          "memory_samples":  15,
+                          "os_peak_commit_bytes":  2834432,
+                          "os_peak_working_set_bytes":  12615680,
+                          "per_stream":  [
+                                             {
+                                                 "stream_id":  1,
+                                                 "file_index":  0,
+                                                 "advertised_size":  16777216,
+                                                 "bytes_served":  16777216,
+                                                 "final_position":  0,
+                                                 "max_position":  16777216,
+                                                 "read_calls":  4097,
+                                                 "failed_reads":  0,
+                                                 "min_request":  262144,
+                                                 "max_request":  262144,
+                                                 "seeks":  3,
+                                                 "stats_calls":  0,
+                                                 "eof_read":  true
+                                             }
+                                         ]
+                      },
+    "agent_fault_events":  [
+                               "eof_returned"
+                           ],
+    "set_data":  [
+                     {
+                         "format":  "TargetCLSID",
+                         "dword":  4080421792
+                     },
+                     {
+                         "format":  "Performed DropEffect",
+                         "dword":  1
+                     },
+                     {
+                         "format":  "Logical Performed DropEffect",
+                         "dword":  1
+                     },
+                     {
+                         "format":  "Logical Performed DropEffect",
+                         "dword":  1
+                     }
+                 ],
+    "performed_drop_effect":  [
+                                  1
+                              ],
+    "streams":  {
+                    "created":  1,
+                    "released":  1,
+                    "all_reached_eof":  true
+                },
+    "destinations":  [
+                         {
+                             "all_files_match":  true,
+                             "case_id":  "STREAM-07",
+                             "files":  [
+                                           {
+                                               "advertised_size":  16777216,
+                                               "digest_match":  true,
+                                               "exists":  true,
+                                               "expected_size":  16777216,
+                                               "index":  0,
+                                               "mistakable_as_complete":  true,
+                                               "name":  "e02-STREAM-07-f0.bin",
+                                               "original_preserved":  null,
+                                               "prefix_match":  null,
+                                               "size":  16777216,
+                                               "state":  "complete_correct",
+                                               "zone_identifier":  {
+                                                                       "present":  false
+                                                                   }
+                                           }
+                                       ],
+                             "unexpected_entries":  [
+
+                                                    ]
+                         }
+                     ],
+    "observer":  {
+                     "paste-target-1":  {
+                                            "events":  3,
+                                            "names_seen":  [
+                                                               "e02-STREAM-07-f0.bin"
+                                                           ],
+                                            "removals":  [
+
+                                                         ],
+                                            "max_sizes":  [
+                                                              {
+                                                                  "name":  "e02-STREAM-07-f0.bin",
+                                                                  "max_size":  16777216
+                                                              }
+                                                          ]
+                                        }
+                 },
+    "clipboard":  {
+                      "set_sequence":  2224,
+                      "before_release":  {
+                                             "formats":  [
+
+                                                         ],
+                                             "has_file_contents":  false,
+                                             "has_file_descriptor":  false,
+                                             "has_onecopy_marker":  false,
+                                             "sequence":  2225
+                                         },
+                      "release":  {
+                                      "available":  {
+
+                                                    },
+                                      "cleared":  false,
+                                      "formats":  [
+
+                                                  ],
+                                      "identified_as_this_run":  null,
+                                      "owner_alive":  false,
+                                      "owner_present":  false,
+                                      "refused_reason":  null,
+                                      "sequence":  2225
+                                  },
+                      "after":  {
+                                    "formats":  [
+
+                                                ],
+                                    "has_file_contents":  false,
+                                    "has_file_descriptor":  false,
+                                    "has_onecopy_marker":  false,
+                                    "sequence":  2225
+                                },
+                      "clean_after":  true,
+                      "replacement":  null,
+                      "probe":  null
+                  },
+    "classification":  {
+                           "target_report":  "success",
+                           "per_file":  [
+                                            {
+                                                "target":  "STREAM-07",
+                                                "name":  "e02-STREAM-07-f0.bin",
+                                                "state":  "complete_correct",
+                                                "size":  16777216,
+                                                "mistakable":  true,
+                                                "class":  "S"
+                                            }
+                                        ],
+                           "outcome_class":  "S",
+                           "expectation_met":  true
+                       },
+    "harness":  {
+                    "failed_stage":  null,
+                    "exception":  null,
+                    "driver_errors":  [
+
+                                      ],
+                    "post":  {
+                                 "agent_stop":  "exited",
+                                 "watcher_stops":  [
+                                                       "exited"
+                                                   ],
+                                 "dialog_watch_stop":  "exited",
+                                 "probe_stop":  "none",
+                                 "helper_stops":  [
+
+                                                  ],
+                                 "cleanup_dialogs":  [
+
+                                                     ]
+                             }
+                },
+    "interference":  [
+
+                     ],
+    "destination_cleanup":  {
+                                "deleted_files":  1,
+                                "removed_dirs":  2,
+                                "left_entries":  [
+
+                                                 ],
+                                "refused":  null
+                            },
+    "destination_kept":  false,
+    "result":  "completed"
+}

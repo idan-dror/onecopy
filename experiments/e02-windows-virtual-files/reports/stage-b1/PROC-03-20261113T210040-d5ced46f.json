@@ -1,0 +1,307 @@
+﻿{
+    "experiment_id":  "E-02",
+    "stage":  "B1",
+    "case_id":  "PROC-03",
+    "run_id":  "PROC-03-20261113T210040-d5ced46f",
+    "description":  "Provider killed after placing the clipboard, before the paste",
+    "driver":  "D2c",
+    "dialog_driver":  "D2u",
+    "target":  "G-01",
+    "threading":  "T1",
+    "injected_harness_fault":  "none",
+    "case":  {
+                 "case_id":  "PROC-03",
+                 "description":  "Provider killed after placing the clipboard, before the paste",
+                 "files":  [
+                               {
+                                   "advertised_size":  1048576,
+                                   "faults":  [
+
+                                              ],
+                                   "name":  "e02-PROC-03-f0.bin",
+                                   "size":  1048576
+                               }
+                           ],
+                 "harness":  {
+                                 "close_window_after_event":  null,
+                                 "concurrent":  false,
+                                 "dialog_actions":  [
+                                                        "cancel"
+                                                    ],
+                                 "exit_mode":  "clear",
+                                 "expect":  "observe",
+                                 "kill_after_event":  null,
+                                 "kill_before_paste":  true,
+                                 "kill_delay_ms":  0,
+                                 "operator_note":  "",
+                                 "pastes":  1,
+                                 "pre_existing_seed":  null,
+                                 "probe_clipboard":  false,
+                                 "replace_clipboard_after_event":  null,
+                                 "replace_delay_ms":  0,
+                                 "timeout_secs":  60
+                             },
+                 "large":  false,
+                 "read_timeout_ms":  null,
+                 "threading":  "T1",
+                 "zone_identifier":  null
+             },
+    "env":  {
+                "os_caption":  "Microsoft Windows 11 Home",
+                "os_version":  "10.0.26200",
+                "os_build":  "26200",
+                "os_ubr":  9711,
+                "os_display_version":  "25H2",
+                "explorer_version":  "10.0.26100.8875",
+                "explorer_separate_process":  0,
+                "clipboard_history_enabled":  null,
+                "cloud_clipboard_enabled":  null,
+                "defender_product_version":  "4.18.26100.4",
+                "defender_realtime_protection":  true,
+                "test_volume_filesystem":  "NTFS",
+                "test_volume_free_gib":  1309.9,
+                "cpu":  "AMD Ryzen 7 5700X3D 8-Core Processor",
+                "ram_gib":  31.9,
+                "experiment_commit":  "cb3a6813e898dcef454e5277622704264e2acb8c",
+                "experiment_tree_dirty":  false,
+                "rustc":  "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+                "cargo_lock_sha256":  "76215d10f491622601c608a061db959f8a67c758d4254eae40692b46bed5c830"
+            },
+    "progress":  {
+                     "completed":  true,
+                     "timed_out":  false,
+                     "seconds":  10.53,
+                     "reason":  null,
+                     "pending_dialog_actions":  [
+                                                    "cancel"
+                                                ]
+                 },
+    "timeline":  [
+                     {
+                         "t_ms":  306,
+                         "source":  "agent",
+                         "event":  "ready",
+                         "detail":  {
+                                        "sequence":  2695
+                                    }
+                     },
+                     {
+                         "t_ms":  317,
+                         "source":  "harness",
+                         "event":  "agent_killed_before_paste",
+                         "detail":  "stopped"
+                     },
+                     {
+                         "t_ms":  2404,
+                         "source":  "driver",
+                         "event":  "paste",
+                         "detail":  {
+                                        "target":  "paste-target-1",
+                                        "exit":  0
+                                    }
+                     },
+                     {
+                         "t_ms":  2407,
+                         "source":  "agent",
+                         "event":  "process_exited",
+                         "detail":  {
+                                        "exit_code":  -1
+                                    }
+                     }
+                 ],
+    "explorer_windows":  [
+                             {
+                                 "destination":  "paste-target-1",
+                                 "found":  true,
+                                 "top_hwnd":  7932700,
+                                 "top_preexisting":  false,
+                                 "tabs_on_top":  1,
+                                 "close_decision":  "close"
+                             }
+                         ],
+    "explorer_processes":  {
+                               "watched":  [
+                                               {
+                                                   "role":  "shell",
+                                                   "id":  9300,
+                                                   "name":  "explorer",
+                                                   "start":  "2026-11-12T18:48:36.7863513+02:00"
+                                               },
+                                               {
+                                                   "role":  "run_window_host",
+                                                   "id":  11784,
+                                                   "name":  "explorer",
+                                                   "start":  "2026-11-13T21:00:41.2874939+02:00"
+                                               }
+                                           ],
+                               "lost":  [
+
+                                        ]
+                           },
+    "dialogs":  {
+                    "appeared":  0,
+                    "attributed":  0,
+                    "error_dialog_seen":  false,
+                    "progress_dialog_seen":  false,
+                    "error_texts":  [
+
+                                    ],
+                    "events":  [
+
+                               ]
+                },
+    "dialog_actions":  [
+
+                       ],
+    "agent_exit_code":  -1,
+    "agent_summary":  null,
+    "agent_fault_events":  [
+
+                           ],
+    "set_data":  [
+
+                 ],
+    "performed_drop_effect":  [
+
+                              ],
+    "streams":  {
+                    "created":  0,
+                    "released":  0,
+                    "all_reached_eof":  false
+                },
+    "destinations":  [
+                         {
+                             "all_files_match":  false,
+                             "case_id":  "PROC-03",
+                             "files":  [
+                                           {
+                                               "advertised_size":  1048576,
+                                               "digest_match":  null,
+                                               "exists":  false,
+                                               "expected_size":  1048576,
+                                               "index":  0,
+                                               "mistakable_as_complete":  false,
+                                               "name":  "e02-PROC-03-f0.bin",
+                                               "original_preserved":  null,
+                                               "prefix_match":  null,
+                                               "size":  null,
+                                               "state":  "absent",
+                                               "zone_identifier":  null
+                                           }
+                                       ],
+                             "unexpected_entries":  [
+
+                                                    ]
+                         }
+                     ],
+    "observer":  {
+                     "paste-target-1":  {
+                                            "events":  0,
+                                            "names_seen":  [
+
+                                                           ],
+                                            "removals":  [
+
+                                                         ],
+                                            "max_sizes":  [
+
+                                                          ]
+                                        }
+                 },
+    "clipboard":  {
+                      "set_sequence":  2695,
+                      "before_release":  {
+                                             "formats":  [
+                                                             "DataObject",
+                                                             "Ole Private Data"
+                                                         ],
+                                             "has_file_contents":  false,
+                                             "has_file_descriptor":  false,
+                                             "has_onecopy_marker":  false,
+                                             "sequence":  2696
+                                         },
+                      "release":  {
+                                      "available":  {
+                                                        "DataObject":  {
+                                                                           "rendered":  true,
+                                                                           "size":  8
+                                                                       },
+                                                        "Ole Private Data":  {
+                                                                                 "rendered":  true,
+                                                                                 "size":  312
+                                                                             }
+                                                    },
+                                      "cleared":  true,
+                                      "formats":  [
+                                                      "DataObject",
+                                                      "Ole Private Data"
+                                                  ],
+                                      "identified_as_this_run":  "stale_ole_formats_and_sequence",
+                                      "owner_alive":  false,
+                                      "owner_present":  false,
+                                      "refused_reason":  null,
+                                      "sequence":  2696
+                                  },
+                      "after":  {
+                                    "formats":  [
+
+                                                ],
+                                    "has_file_contents":  false,
+                                    "has_file_descriptor":  false,
+                                    "has_onecopy_marker":  false,
+                                    "sequence":  2697
+                                },
+                      "clean_after":  true,
+                      "replacement":  null,
+                      "probe":  null
+                  },
+    "classification":  {
+                           "target_report":  "no_operation",
+                           "per_file":  [
+                                            {
+                                                "target":  "PROC-03",
+                                                "name":  "e02-PROC-03-f0.bin",
+                                                "state":  "absent",
+                                                "size":  null,
+                                                "mistakable":  false,
+                                                "class":  "N"
+                                            }
+                                        ],
+                           "outcome_class":  "N",
+                           "expectation_met":  null
+                       },
+    "harness":  {
+                    "failed_stage":  null,
+                    "exception":  null,
+                    "driver_errors":  [
+
+                                      ],
+                    "post":  {
+                                 "agent_stop":  "exited",
+                                 "watcher_stops":  [
+                                                       "exited"
+                                                   ],
+                                 "dialog_watch_stop":  "exited",
+                                 "probe_stop":  "none",
+                                 "helper_stops":  [
+
+                                                  ],
+                                 "cleanup_dialogs":  [
+
+                                                     ]
+                             }
+                },
+    "interference":  [
+
+                     ],
+    "destination_cleanup":  {
+                                "deleted_files":  0,
+                                "removed_dirs":  2,
+                                "left_entries":  [
+
+                                                 ],
+                                "refused":  null
+                            },
+    "destination_kept":  false,
+    "result":  "completed"
+}
