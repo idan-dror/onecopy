@@ -24,7 +24,8 @@ $ErrorActionPreference = 'Stop'
 $ws = Split-Path -Parent $PSScriptRoot
 if (-not $ReportDir) { $ReportDir = Join-Path $ws 'reports\stage-b1' }
 $abort = Join-Path $ws 'evidence\ABORT'
-$explorerBefore = @(Get-Process explorer -ErrorAction SilentlyContinue | ForEach-Object { "$($_.Id)@$($_.StartTime.ToString('o'))" })
+# Long-lived explorer.exe processes only (folder launches start short-lived ones).
+$explorerBefore = @(Get-Process explorer -ErrorAction SilentlyContinue | Where-Object { $_.StartTime -lt (Get-Date).AddSeconds(-120) } | ForEach-Object { "$($_.Id)@$($_.StartTime.ToString('o'))" })
 $rows = @()
 $stopReason = $null
 :outer for ($r = 1; $r -le $Repeats; $r++) {

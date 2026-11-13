@@ -49,12 +49,14 @@ if (-not $ReportDir) { $ReportDir = Join-Path $ws 'reports\stage-b1' }
 # Dialog actions map to Win32 control ids (UIA automation ids), so the UI language does not
 # matter: 1 = IDOK, 2 = IDCANCEL, 4 = IDRETRY, 5 = IDIGNORE, 10 = IDTRYAGAIN, 11 = IDCONTINUE.
 # "cancel" on an error box that only offers OK dismisses it (the operation has already failed).
+# Observed on this build: the progress dialog's Cancel is "CancelButton"; the copy error box is
+# a task dialog whose OK is "CommandButton_1" (CommandButton_<Win32 id>).
 $ActionIds = @{
-    cancel    = @('2', '1')
-    try_again = @('10', '4')
-    skip      = @('5', '11')
-    replace   = @('6')
-    keep_both = @('7')
+    cancel    = @('CancelButton', 'CommandButton_2', '2', 'CommandButton_1', '1')
+    try_again = @('CommandButton_10', 'CommandButton_4', '10', '4')
+    skip      = @('CommandButton_5', 'CommandButton_11', '5', '11')
+    replace   = @('CommandButton_6', '6')
+    keep_both = @('CommandButton_7', '7')
 }
 
 function Invoke-Native {
@@ -92,7 +94,9 @@ function Read-NewJson($Reader) {
 function Read-DialogState([string] $Path) {
     try { return (Get-Content -Raw -LiteralPath $Path -ErrorAction Stop | ConvertFrom-Json) } catch { return $null }
 }
-function Get-ExplorerProcesses { @(Get-Process explorer -ErrorAction SilentlyContinue | ForEach-Object { [ordered]@{ id = $_.Id; start = $_.StartTime.ToString('o') } }) }
+# Only long-lived explorer.exe processes count for crash detection: launching a folder starts a
+# short-lived explorer.exe that exits on its own.
+function Get-ExplorerProcesses { @(Get-Process explorer -ErrorAction SilentlyContinue | Where-Object { $_.StartTime -lt (Get-Date).AddSeconds(-120) } | ForEach-Object { [ordered]@{ id = $_.Id; start = $_.StartTime.ToString('o') } }) }
 
 $clock = [Diagnostics.Stopwatch]::StartNew()
 $timeline = New-Object System.Collections.ArrayList

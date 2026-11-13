@@ -27,7 +27,7 @@ use windows::Win32::UI::Accessibility::{
     UIA_HyperlinkControlTypeId, UIA_InvokePatternId, UIA_ProgressBarControlTypeId, UIA_SplitButtonControlTypeId,
 };
 use windows::Win32::UI::WindowsAndMessaging::{
-    EnumWindows, GA_ROOTOWNER, GW_OWNER, GetAncestor, GetClassNameW, GetWindow, GetWindowTextW, GetWindowThreadProcessId,
+    EnumChildWindows, EnumWindows, GA_ROOTOWNER, GW_OWNER, GetAncestor, GetClassNameW, GetWindow, GetWindowTextW, GetWindowThreadProcessId,
     IsWindow, IsWindowVisible,
 };
 use windows::core::{BOOL, PWSTR};
@@ -120,6 +120,40 @@ fn title_of(hwnd: HWND) -> String {
     let mut buf = [0u16; 256];
     let n = unsafe { GetWindowTextW(hwnd, &mut buf) };
     String::from_utf16_lossy(&buf[..n.max(0) as usize])
+}
+
+/// Window texts of a window's child controls (Win32 WM_GETTEXT; works for hidden windows).
+fn child_texts(hwnd: HWND) -> Vec<String> {
+    unsafe extern "system" fn cb(hwnd: HWND, lparam: LPARAM) -> BOOL {
+        let out = unsafe { &mut *(lparam.0 as *mut Vec<HWND>) };
+        out.push(hwnd);
+        BOOL((out.len() < 64) as i32)
+    }
+    let mut kids: Vec<HWND> = Vec::new();
+    unsafe {
+        let _ = EnumChildWindows(Some(hwnd), Some(cb), LPARAM(&mut kids as *mut Vec<HWND> as isize));
+    }
+    kids.into_iter().map(title_of).filter(|s| !s.trim().is_empty()).collect()
+}
+
+/// Titles and child-control texts along a dialog's owner chain (up to four levels). Explorer's
+/// copy error box names no file, but it is owned by the (possibly hidden) progress window of
+/// the same operation, whose text does.
+pub fn owner_chain_texts(w: &Win) -> (Vec<String>, Vec<String>) {
+    let mut texts = Vec::new();
+    let mut classes = Vec::new();
+    let mut h = w.owner;
+    for _ in 0..4 {
+        if h == 0 || h == w.hwnd {
+            break;
+        }
+        let hw = HWND(h as *mut _);
+        classes.push(class_of(hw));
+        texts.push(title_of(hw));
+        texts.extend(child_texts(hw));
+        h = unsafe { GetWindow(hw, GW_OWNER) }.map(|o| o.0 as isize).unwrap_or(0);
+    }
+    (texts, classes)
 }
 
 /// Visible top-level Explorer dialog windows.
@@ -248,12 +282,15 @@ pub fn mentions(texts: &[String], tokens: &[String]) -> bool {
     })
 }
 
-/// Why a dialog is attributed to this run, if it is.
-pub fn ours_by(w: &Win, text: &DialogText, tokens: &[String], owners: &[isize]) -> Option<&'static str> {
+/// Why a dialog is attributed to this run, if it is: its owner chain reaches one of the run's
+/// own Explorer windows, its own text names a run token, or its owner chain's text does.
+pub fn ours_by(w: &Win, text: &DialogText, tokens: &[String], owners: &[isize], owner_texts: &[String]) -> Option<&'static str> {
     if owners.iter().any(|o| *o != 0 && (*o == w.root_owner || *o == w.owner)) {
         Some("owner")
     } else if mentions(&text.names, tokens) || mentions(std::slice::from_ref(&w.title), tokens) {
         Some("token")
+    } else if mentions(owner_texts, tokens) {
+        Some("owner_text")
     } else {
         None
     }
@@ -312,13 +349,16 @@ pub fn watch(
             }
             last_read.insert(w.hwnd, Instant::now());
             let raw = uia.read(w.hwnd).unwrap_or_default();
-            let ours = ours_by(w, &raw, tokens, &owners);
+            let (owner_texts, owner_classes) = owner_chain_texts(w);
+            let ours = ours_by(w, &raw, tokens, &owners, &owner_texts);
             let text = clean_text(&raw);
             let title = san.clean(&w.title);
             match tracked.get_mut(&w.hwnd) {
                 None => {
                     writeln!(writer, "{}", json!({ "t_ms": t_ms, "event": "appear", "hwnd": w.hwnd, "class": w.class, "title": title,
-                        "owner": w.owner, "root_owner": w.root_owner, "ours": ours.is_some(), "ours_by": ours,
+                        "owner": w.owner, "root_owner": w.root_owner, "owner_classes": owner_classes,
+                        "owner_texts": owner_texts.iter().map(|s| san.clean(s)).collect::<Vec<_>>(),
+                        "ours": ours.is_some(), "ours_by": ours,
                         "progress_bar": text.progress_bar, "names": text.names, "buttons": text.buttons }))?;
                     tracked.insert(w.hwnd, Tracked { class: w.class.clone(), title, text, ours, first_ms: t_ms });
                 }
@@ -378,7 +418,8 @@ pub fn act(hwnd: isize, ids: &[String], tokens: &[String], owners: &[isize], tes
     };
     let uia = Uia::new()?;
     let text = uia.read(hwnd)?;
-    let Some(why) = ours_by(&w, &text, tokens, owners) else {
+    let (owner_texts, _) = owner_chain_texts(&w);
+    let Some(why) = ours_by(&w, &text, tokens, owners, &owner_texts) else {
         return refuse("dialog is not attributed to this run (owner or token)");
     };
     let san = Sanitizer::new(test_root);
@@ -407,12 +448,15 @@ mod tests {
     #[test]
     fn attribution_by_owner_chain_or_token_only() {
         let t = DialogText { names: vec!["Unspecified error".into()], ..Default::default() };
-        assert_eq!(ours_by(&win(0, 7), &t, &[], &[7]), Some("owner"));
-        assert_eq!(ours_by(&win(7, 9), &t, &[], &[7]), Some("owner"));
-        assert_eq!(ours_by(&win(0, 9), &t, &["paste-target-1".into()], &[7]), None, "a foreign dialog");
-        assert_eq!(ours_by(&win(0, 0), &t, &[], &[0]), None, "a null owner never matches");
+        assert_eq!(ours_by(&win(0, 7), &t, &[], &[7], &[]), Some("owner"));
+        assert_eq!(ours_by(&win(7, 9), &t, &[], &[7], &[]), Some("owner"));
+        assert_eq!(ours_by(&win(0, 9), &t, &["paste-target-1".into()], &[7], &[]), None, "a foreign dialog");
+        assert_eq!(ours_by(&win(0, 0), &t, &[], &[0], &[]), None, "a null owner never matches");
         let named = DialogText { names: vec!["Copying 'e02-ERR-01-f0.bin'".into()], ..Default::default() };
-        assert_eq!(ours_by(&win(0, 9), &named, &["e02-ERR-01-f0.bin".into()], &[7]), Some("token"));
+        assert_eq!(ours_by(&win(0, 9), &named, &["e02-ERR-01-f0.bin".into()], &[7], &[]), Some("token"));
+        let owner_text = vec!["Copying 'e02-ERR-01-f0.bin'".to_owned()];
+        assert_eq!(ours_by(&win(3, 9), &t, &["e02-ERR-01-f0.bin".into()], &[7], &owner_text), Some("owner_text"));
+        assert_eq!(ours_by(&win(3, 9), &t, &["e02-ERR-02-f0.bin".into()], &[7], &owner_text), None, "another run's file");
     }
 
     #[test]
