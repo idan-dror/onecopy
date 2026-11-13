@@ -1,11 +1,12 @@
 {
   "rollup": {
-    "runs": 24,
-    "passed": 24,
+    "runs": 36,
+    "passed": 36,
     "commits": [
       "d85b1c5",
       "1c2b07c",
       "af648cc",
+      "9964dc9",
       "e1657ad"
     ],
     "any_dirty": false,
@@ -13,19 +14,19 @@
       "A-01": 2.24,
       "A-02": 2.02,
       "A-03": 2.01,
-      "A-04": 2.24,
-      "A-05": 2.24,
+      "A-04": 2.37,
+      "A-05": 2.25,
       "A-06": 2.25
     },
     "os_peak_commit_mib_by_case": {
-      "A-01": 2.24,
-      "A-02": null,
-      "A-03": null,
-      "A-04": 2.23,
-      "A-05": null,
-      "A-06": null
+      "A-01": 2.25,
+      "A-02": 1.99,
+      "A-03": 1.99,
+      "A-04": 2.37,
+      "A-05": 2.25,
+      "A-06": 2.24
     },
-    "sa4_a04_minus_a01_mib": 0,
+    "sa4_a04_minus_a01_mib": 0.13,
     "any_other_stream_calls": false,
     "any_zone_identifier": false,
     "any_unexpected_entries": false,
@@ -250,6 +251,111 @@
       "com_calls_on_owner_only": true
     },
     {
+      "run_id": "A-01-20261112T220409-1015744e",
+      "case_id": "A-01",
+      "result": "pass",
+      "driver": "D2c",
+      "commit": "9964dc9",
+      "dirty": false,
+      "files_ok": 1,
+      "files_total": 1,
+      "streams_created": 1,
+      "streams_released": 1,
+      "bytes_served": 1048576,
+      "read_calls": 5,
+      "max_request": 262144,
+      "stat_calls": 0,
+      "seeks": 3,
+      "other_stream_calls": [],
+      "eof_read_all": true,
+      "peak_private_mib": 1.98,
+      "os_peak_commit_mib": 2.25,
+      "paste_to_last_release_ms": 5,
+      "zone_identifier_present": false,
+      "unexpected_entries": 0,
+      "observer_names": [
+        "e02-A-01-f0.bin"
+      ],
+      "clipboard_after_exit_formats": 0,
+      "marker_after_exit": false,
+      "exit_code": 0,
+      "owner_thread_id": 18444,
+      "com_call_threads": {
+        "18444": 62
+      },
+      "com_calls_on_owner_only": true
+    },
+    {
+      "run_id": "A-01-20261112T220503-0bade5a4",
+      "case_id": "A-01",
+      "result": "pass",
+      "driver": "D2c",
+      "commit": "9964dc9",
+      "dirty": false,
+      "files_ok": 1,
+      "files_total": 1,
+      "streams_created": 1,
+      "streams_released": 1,
+      "bytes_served": 1048576,
+      "read_calls": 5,
+      "max_request": 262144,
+      "stat_calls": 0,
+      "seeks": 3,
+      "other_stream_calls": [],
+      "eof_read_all": true,
+      "peak_private_mib": 2.19,
+      "os_peak_commit_mib": 2.19,
+      "paste_to_last_release_ms": 5,
+      "zone_identifier_present": false,
+      "unexpected_entries": 0,
+      "observer_names": [
+        "e02-A-01-f0.bin"
+      ],
+      "clipboard_after_exit_formats": 0,
+      "marker_after_exit": false,
+      "exit_code": 0,
+      "owner_thread_id": 6892,
+      "com_call_threads": {
+        "6892": 62
+      },
+      "com_calls_on_owner_only": true
+    },
+    {
+      "run_id": "A-01-20261113T173143-b143b344",
+      "case_id": "A-01",
+      "result": "pass",
+      "driver": "D1",
+      "commit": "9964dc9",
+      "dirty": false,
+      "files_ok": 1,
+      "files_total": 1,
+      "streams_created": 1,
+      "streams_released": 1,
+      "bytes_served": 1048576,
+      "read_calls": 5,
+      "max_request": 262144,
+      "stat_calls": 0,
+      "seeks": 3,
+      "other_stream_calls": [],
+      "eof_read_all": true,
+      "peak_private_mib": 1.99,
+      "os_peak_commit_mib": 2.24,
+      "paste_to_last_release_ms": 6,
+      "zone_identifier_present": false,
+      "unexpected_entries": 0,
+      "observer_names": [
+        "e02-A-01-f0.bin"
+      ],
+      "clipboard_after_exit_formats": 0,
+      "marker_after_exit": false,
+      "exit_code": 0,
+      "owner_thread_id": 27272,
+      "com_call_threads": {
+        "27272": 62
+      },
+      "com_calls_on_owner_only": true
+    },
+    {
       "run_id": "A-02-20261112T212611",
       "case_id": "A-02",
       "result": "pass",
@@ -355,6 +461,41 @@
       "com_calls_on_owner_only": true
     },
     {
+      "run_id": "A-02-20261112T220418-c373de38",
+      "case_id": "A-02",
+      "result": "pass",
+      "driver": "D2c",
+      "commit": "9964dc9",
+      "dirty": false,
+      "files_ok": 1,
+      "files_total": 1,
+      "streams_created": 1,
+      "streams_released": 1,
+      "bytes_served": 0,
+      "read_calls": 0,
+      "max_request": 0,
+      "stat_calls": 1,
+      "seeks": 3,
+      "other_stream_calls": [],
+      "eof_read_all": true,
+      "peak_private_mib": 1.99,
+      "os_peak_commit_mib": 1.99,
+      "paste_to_last_release_ms": 3,
+      "zone_identifier_present": false,
+      "unexpected_entries": 0,
+      "observer_names": [
+        "e02-A-02-f0.bin"
+      ],
+      "clipboard_after_exit_formats": 0,
+      "marker_after_exit": false,
+      "exit_code": 0,
+      "owner_thread_id": 23368,
+      "com_call_threads": {
+        "23368": 58
+      },
+      "com_calls_on_owner_only": true
+    },
+    {
       "run_id": "A-03-20261112T212619",
       "case_id": "A-03",
       "result": "pass",
@@ -456,6 +597,41 @@
       "owner_thread_id": 26408,
       "com_call_threads": {
         "26408": 67
+      },
+      "com_calls_on_owner_only": true
+    },
+    {
+      "run_id": "A-03-20261112T220426-6e4ec712",
+      "case_id": "A-03",
+      "result": "pass",
+      "driver": "D2c",
+      "commit": "9964dc9",
+      "dirty": false,
+      "files_ok": 1,
+      "files_total": 1,
+      "streams_created": 1,
+      "streams_released": 1,
+      "bytes_served": 4096,
+      "read_calls": 2,
+      "max_request": 4096,
+      "stat_calls": 0,
+      "seeks": 3,
+      "other_stream_calls": [],
+      "eof_read_all": true,
+      "peak_private_mib": 1.99,
+      "os_peak_commit_mib": 1.99,
+      "paste_to_last_release_ms": 1498,
+      "zone_identifier_present": false,
+      "unexpected_entries": 0,
+      "observer_names": [
+        "e02-A-03-f0.bin"
+      ],
+      "clipboard_after_exit_formats": 0,
+      "marker_after_exit": false,
+      "exit_code": 0,
+      "owner_thread_id": 7476,
+      "com_call_threads": {
+        "7476": 59
       },
       "com_calls_on_owner_only": true
     },
@@ -670,6 +846,111 @@
       "com_calls_on_owner_only": true
     },
     {
+      "run_id": "A-04-20261112T220434-87a32a49",
+      "case_id": "A-04",
+      "result": "pass",
+      "driver": "D2c",
+      "commit": "9964dc9",
+      "dirty": false,
+      "files_ok": 1,
+      "files_total": 1,
+      "streams_created": 1,
+      "streams_released": 1,
+      "bytes_served": 67108864,
+      "read_calls": 257,
+      "max_request": 262144,
+      "stat_calls": 0,
+      "seeks": 3,
+      "other_stream_calls": [],
+      "eof_read_all": true,
+      "peak_private_mib": 1.98,
+      "os_peak_commit_mib": 2.25,
+      "paste_to_last_release_ms": 141,
+      "zone_identifier_present": false,
+      "unexpected_entries": 0,
+      "observer_names": [
+        "e02-A-04-f0.bin"
+      ],
+      "clipboard_after_exit_formats": 0,
+      "marker_after_exit": false,
+      "exit_code": 0,
+      "owner_thread_id": 16860,
+      "com_call_threads": {
+        "16860": 314
+      },
+      "com_calls_on_owner_only": true
+    },
+    {
+      "run_id": "A-04-20261112T220511-d9fc6200",
+      "case_id": "A-04",
+      "result": "pass",
+      "driver": "D2c",
+      "commit": "9964dc9",
+      "dirty": false,
+      "files_ok": 1,
+      "files_total": 1,
+      "streams_created": 1,
+      "streams_released": 1,
+      "bytes_served": 67108864,
+      "read_calls": 257,
+      "max_request": 262144,
+      "stat_calls": 0,
+      "seeks": 3,
+      "other_stream_calls": [],
+      "eof_read_all": true,
+      "peak_private_mib": 2.25,
+      "os_peak_commit_mib": 2.25,
+      "paste_to_last_release_ms": 140,
+      "zone_identifier_present": false,
+      "unexpected_entries": 0,
+      "observer_names": [
+        "e02-A-04-f0.bin"
+      ],
+      "clipboard_after_exit_formats": 0,
+      "marker_after_exit": false,
+      "exit_code": 0,
+      "owner_thread_id": 22832,
+      "com_call_threads": {
+        "22832": 314
+      },
+      "com_calls_on_owner_only": true
+    },
+    {
+      "run_id": "A-04-20261113T173215-4096de28",
+      "case_id": "A-04",
+      "result": "pass",
+      "driver": "D1",
+      "commit": "9964dc9",
+      "dirty": false,
+      "files_ok": 1,
+      "files_total": 1,
+      "streams_created": 1,
+      "streams_released": 1,
+      "bytes_served": 67108864,
+      "read_calls": 257,
+      "max_request": 262144,
+      "stat_calls": 0,
+      "seeks": 3,
+      "other_stream_calls": [],
+      "eof_read_all": true,
+      "peak_private_mib": 2.37,
+      "os_peak_commit_mib": 2.37,
+      "paste_to_last_release_ms": 140,
+      "zone_identifier_present": false,
+      "unexpected_entries": 0,
+      "observer_names": [
+        "e02-A-04-f0.bin"
+      ],
+      "clipboard_after_exit_formats": 0,
+      "marker_after_exit": false,
+      "exit_code": 0,
+      "owner_thread_id": 23716,
+      "com_call_threads": {
+        "23716": 314
+      },
+      "com_calls_on_owner_only": true
+    },
+    {
       "run_id": "A-05-20261112T212637",
       "case_id": "A-05",
       "result": "pass",
@@ -781,6 +1062,117 @@
       "com_calls_on_owner_only": true
     },
     {
+      "run_id": "A-05-20261112T220442-ed1d8ba9",
+      "case_id": "A-05",
+      "result": "pass",
+      "driver": "D2c",
+      "commit": "9964dc9",
+      "dirty": false,
+      "files_ok": 3,
+      "files_total": 3,
+      "streams_created": 3,
+      "streams_released": 3,
+      "bytes_served": 9438208,
+      "read_calls": 40,
+      "max_request": 262144,
+      "stat_calls": 0,
+      "seeks": 9,
+      "other_stream_calls": [],
+      "eof_read_all": true,
+      "peak_private_mib": 2.25,
+      "os_peak_commit_mib": 2.25,
+      "paste_to_last_release_ms": 770,
+      "zone_identifier_present": false,
+      "unexpected_entries": 0,
+      "observer_names": [
+        "e02-A-05-f0.bin",
+        "e02-A-05-f1.bin",
+        "e02-A-05-f2.bin"
+      ],
+      "clipboard_after_exit_formats": 0,
+      "marker_after_exit": false,
+      "exit_code": 0,
+      "owner_thread_id": 23356,
+      "com_call_threads": {
+        "23356": 105
+      },
+      "com_calls_on_owner_only": true
+    },
+    {
+      "run_id": "A-05-20261112T220519-9b74765f",
+      "case_id": "A-05",
+      "result": "pass",
+      "driver": "D2c",
+      "commit": "9964dc9",
+      "dirty": false,
+      "files_ok": 3,
+      "files_total": 3,
+      "streams_created": 3,
+      "streams_released": 3,
+      "bytes_served": 9438208,
+      "read_calls": 40,
+      "max_request": 262144,
+      "stat_calls": 0,
+      "seeks": 9,
+      "other_stream_calls": [],
+      "eof_read_all": true,
+      "peak_private_mib": 2.19,
+      "os_peak_commit_mib": 2.19,
+      "paste_to_last_release_ms": 819,
+      "zone_identifier_present": false,
+      "unexpected_entries": 0,
+      "observer_names": [
+        "e02-A-05-f0.bin",
+        "e02-A-05-f1.bin",
+        "e02-A-05-f2.bin"
+      ],
+      "clipboard_after_exit_formats": 0,
+      "marker_after_exit": false,
+      "exit_code": 0,
+      "owner_thread_id": 23964,
+      "com_call_threads": {
+        "23964": 105
+      },
+      "com_calls_on_owner_only": true
+    },
+    {
+      "run_id": "A-05-20261113T173233-77e58232",
+      "case_id": "A-05",
+      "result": "pass",
+      "driver": "D1",
+      "commit": "9964dc9",
+      "dirty": false,
+      "files_ok": 3,
+      "files_total": 3,
+      "streams_created": 3,
+      "streams_released": 3,
+      "bytes_served": 9438208,
+      "read_calls": 40,
+      "max_request": 262144,
+      "stat_calls": 0,
+      "seeks": 9,
+      "other_stream_calls": [],
+      "eof_read_all": true,
+      "peak_private_mib": 2.19,
+      "os_peak_commit_mib": 2.19,
+      "paste_to_last_release_ms": 1081,
+      "zone_identifier_present": false,
+      "unexpected_entries": 0,
+      "observer_names": [
+        "e02-A-05-f0.bin",
+        "e02-A-05-f1.bin",
+        "e02-A-05-f2.bin"
+      ],
+      "clipboard_after_exit_formats": 0,
+      "marker_after_exit": false,
+      "exit_code": 0,
+      "owner_thread_id": 16852,
+      "com_call_threads": {
+        "16852": 110
+      },
+      "com_calls_on_owner_only": true
+    },
+    {
       "run_id": "A-06-20261112T212645",
       "case_id": "A-06",
       "result": "pass",
@@ -882,6 +1274,41 @@
       "owner_thread_id": 28120,
       "com_call_threads": {
         "28120": 123
+      },
+      "com_calls_on_owner_only": true
+    },
+    {
+      "run_id": "A-06-20261112T220451-bf975874",
+      "case_id": "A-06",
+      "result": "pass",
+      "driver": "D2c",
+      "commit": "9964dc9",
+      "dirty": false,
+      "files_ok": 2,
+      "files_total": 2,
+      "streams_created": 2,
+      "streams_released": 2,
+      "bytes_served": 2097152,
+      "read_calls": 10,
+      "max_request": 262144,
+      "stat_calls": 0,
+      "seeks": 6,
+      "other_stream_calls": [],
+      "eof_read_all": true,
+      "peak_private_mib": 2.24,
+      "os_peak_commit_mib": 2.24,
+      "paste_to_last_release_ms": 4820,
+      "zone_identifier_present": false,
+      "unexpected_entries": 0,
+      "observer_names": [
+        "e02-A-06-f0.bin"
+      ],
+      "clipboard_after_exit_formats": 0,
+      "marker_after_exit": false,
+      "exit_code": 0,
+      "owner_thread_id": 8084,
+      "com_call_threads": {
+        "8084": 123
       },
       "com_calls_on_owner_only": true
     }

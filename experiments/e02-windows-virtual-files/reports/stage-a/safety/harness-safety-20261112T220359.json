@@ -1,0 +1,135 @@
+﻿{
+    "generated":  "2026-11-12T22:04:09",
+    "include_desktop":  true,
+    "total":  21,
+    "passed":  21,
+    "failed":  0,
+    "tests":  [
+                  {
+                      "id":  "FS-01",
+                      "test":  "new test root is created with a marker",
+                      "result":  "pass",
+                      "detail":  null
+                  },
+                  {
+                      "id":  "FS-02",
+                      "test":  "existing non-empty directory without marker is refused and untouched",
+                      "result":  "pass",
+                      "detail":  null
+                  },
+                  {
+                      "id":  "FS-03",
+                      "test":  "drive roots and protected locations are refused",
+                      "result":  "pass",
+                      "detail":  null
+                  },
+                  {
+                      "id":  "FS-04",
+                      "test":  "a test root that is a junction (or under one) is refused",
+                      "result":  "pass",
+                      "detail":  null
+                  },
+                  {
+                      "id":  "FS-05",
+                      "test":  "run ids are unique and cleanup removes only expected files of a passing run",
+                      "result":  "pass",
+                      "detail":  null
+                  },
+                  {
+                      "id":  "FS-06",
+                      "test":  "unexpected files are left in place and reported",
+                      "result":  "pass",
+                      "detail":  null
+                  },
+                  {
+                      "id":  "FS-07",
+                      "test":  "a junction named like an expected file is not followed or deleted",
+                      "result":  "pass",
+                      "detail":  null
+                  },
+                  {
+                      "id":  "FS-08",
+                      "test":  "a paste target replaced by a junction is not entered",
+                      "result":  "pass",
+                      "detail":  null
+                  },
+                  {
+                      "id":  "FS-09",
+                      "test":  "a run folder without a marker (pre-existing) is refused",
+                      "result":  "pass",
+                      "detail":  null
+                  },
+                  {
+                      "id":  "FS-10",
+                      "test":  "a run marker that does not match is refused",
+                      "result":  "pass",
+                      "detail":  null
+                  },
+                  {
+                      "id":  "FS-11",
+                      "test":  "malformed run ids and expected names are refused",
+                      "result":  "pass",
+                      "detail":  null
+                  },
+                  {
+                      "id":  "FS-12",
+                      "test":  "cleanup refuses a test root whose marker disappeared",
+                      "result":  "pass",
+                      "detail":  null
+                  },
+                  {
+                      "id":  "FS-13",
+                      "test":  "a run destination that is a junction is refused",
+                      "result":  "pass",
+                      "detail":  null
+                  },
+                  {
+                      "id":  "PR-01",
+                      "test":  "a process whose identity does not match is not stopped",
+                      "result":  "pass",
+                      "detail":  null
+                  },
+                  {
+                      "id":  "PR-02",
+                      "test":  "an owned process is stopped; an exited one is reported",
+                      "result":  "pass",
+                      "detail":  null
+                  },
+                  {
+                      "id":  "PR-03",
+                      "test":  "the directory observer exits when its parent harness process exits",
+                      "result":  "pass",
+                      "detail":  null
+                  },
+                  {
+                      "id":  "PR-04",
+                      "test":  "an injected failure before the agent starts still yields a durable inconclusive record",
+                      "result":  "pass",
+                      "detail":  null
+                  },
+                  {
+                      "id":  "DT-01",
+                      "test":  "after losing ownership the agent does not clear another application\u0027s clipboard",
+                      "result":  "pass",
+                      "detail":  null
+                  },
+                  {
+                      "id":  "DT-02",
+                      "test":  "the agent exits and releases its own clipboard when the harness disappears",
+                      "result":  "pass",
+                      "detail":  null
+                  },
+                  {
+                      "id":  "DT-03",
+                      "test":  "a second agent refuses to start while one is running",
+                      "result":  "pass",
+                      "detail":  null
+                  },
+                  {
+                      "id":  "DT-04",
+                      "test":  "an injected failure after the agent took the clipboard yields a durable record and a released clipboard",
+                      "result":  "pass",
+                      "detail":  null
+                  }
+              ]
+}
