@@ -88,6 +88,15 @@ fn read_small(cf: u32) -> Option<Vec<u8>> {
     }
 }
 
+/// After a provider process dies, only OLE's private formats remain. They are this run's only if
+/// the clipboard has changed at most twice since the provider set it (the system removing the
+/// dead owner's delayed formats). Anything else on the clipboard means it is not ours.
+pub fn stale_ole_only(names: &[String], sequence: u32, expect_sequence: Option<u32>) -> bool {
+    !names.is_empty()
+        && names.iter().all(|n| n == "DataObject" || n == "Ole Private Data")
+        && expect_sequence.is_some_and(|s| sequence >= s && sequence - s <= 2)
+}
+
 fn tag_matches(data: &[u8], tag: &str) -> bool {
     let trimmed: &[u8] = match data.iter().position(|&b| b == 0) {
         Some(i) => &data[..i],
@@ -223,8 +232,8 @@ pub fn release(tag: &str, expect_sequence: Option<u32>, probe_only: bool) -> Any
             // After the provider process dies, the system drops its delayed-render formats and
             // leaves only OLE's private formats pointing at the dead process. They are this
             // run's only if nothing else touched the clipboard since the provider set it.
-            let ole_only = !formats.is_empty() && formats.iter().all(|(_, n)| n == "DataObject" || n == "Ole Private Data");
-            if identified.is_none() && ole_only && expect_sequence.is_some_and(|s| sequence >= s && sequence - s <= 2) {
+            let names: Vec<String> = formats.iter().map(|(_, n)| n.clone()).collect();
+            if identified.is_none() && stale_ole_only(&names, sequence, expect_sequence) {
                 identified = Some("stale_ole_formats_and_sequence");
             }
             if identified.is_none() && has(MARKER) {
@@ -315,7 +324,20 @@ pub fn probe(out: &Path, stop_file: &Path, parent: Option<&crate::win::ProcessWa
 
 #[cfg(test)]
 mod tests {
-    use super::tag_matches;
+    use super::{stale_ole_only, tag_matches};
+
+    #[test]
+    fn stale_ole_rule_needs_ole_only_formats_and_a_close_sequence() {
+        let ole = vec!["DataObject".to_owned(), "Ole Private Data".to_owned()];
+        assert!(stale_ole_only(&ole, 101, Some(100)));
+        assert!(stale_ole_only(&ole, 102, Some(100)));
+        assert!(!stale_ole_only(&ole, 103, Some(100)), "something else changed the clipboard");
+        assert!(!stale_ole_only(&ole, 99, Some(100)), "sequence went backwards");
+        assert!(!stale_ole_only(&ole, 100, None), "no provider sequence known");
+        let user = vec!["DataObject".to_owned(), "CF_UNICODETEXT".to_owned()];
+        assert!(!stale_ole_only(&user, 100, Some(100)), "user content present");
+        assert!(!stale_ole_only(&[], 100, Some(100)), "empty clipboard");
+    }
 
     #[test]
     fn tag_match_requires_exact_run_tag() {
