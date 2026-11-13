@@ -25,29 +25,36 @@ Every COM call is logged to `evidence/<run>/events.jsonl` without content. The a
 
 ## Safety
 
-- Synthetic data only.
-- Destinations live under `D:\OneCopyE02\dest\<run>\` (not the user profile) and are deleted after verification.
-- Running a case **replaces the current clipboard contents**.
-- No networking, encryption, services, installers or settings changes.
-- Blocked here: SEC-04 (disposable VM only) and DEST-01..04 (VHD creation deferred).
+- **Synthetic data only.**
+- **Test root.** It must be marker-identified (`D:\OneCopyE02`, marker `.onecopy-e02-testroot`) and sit outside protected locations, with no reparse points in its path.
+- **Run folders.** Each run gets a unique `dest\<case>-<timestamp>-<hex>\paste-target-N` folder with a run marker.
+- **Cleanup.** Deletes only the expected synthetic files, by exact name, and only after a pass. It never deletes recursively and never deletes through reparse points.
+- **Clipboard.** A run **replaces the clipboard**, so run desktop batches only in an agreed hands-off window.
+  - The agent releases the clipboard only if it still owns it: it opens the clipboard, re-checks ownership, then empties it.
+  - It never empties another application's clipboard.
+- **Processes.** The agent and observers exit if the harness process disappears. Only experiment-owned processes are stopped, after an identity check.
+- **Explorer windows.** An Explorer window is closed only if it was created for this run and has no other tabs.
+- **Out of scope here:** networking, encryption, services, installers and settings changes.
+- **Blocked:** SEC-04 (disposable VM only) and DEST-01..04 (VHD creation deferred).
 
 ## Build and test
 
 ```powershell
 cargo build --release --locked
 cargo test --release --locked
+.\scripts\test-harness-safety.ps1                  # non-desktop safety tests (no clipboard, no Explorer)
+.\scripts\test-harness-safety.ps1 -IncludeDesktop  # adds clipboard tests: hands-off window only
 ```
 
-## Run Stage A cases
+## Run Stage A cases (hands-off window)
 
 ```powershell
-# Automated driver D2c (pending D1 calibration):
-.\scripts\run-stage-a.ps1 -Case A-01 -Driver ExplorerCommand
+.\scripts\run-stage-a.ps1 -Case A-01 -Driver ExplorerCommand           # D2c, calibrated against D1 for Stage A
 .\scripts\run-stage-a.ps1 -Case A-06 -Driver ExplorerCommand -Pastes 2
-# Ground truth D1 (operator presses Ctrl+V in the Explorer window that opens):
-.\scripts\run-stage-a.ps1 -Case A-01 -Driver Manual
-# Log audit (A-08):
+.\scripts\run-stage-a.ps1 -Case A-01 -Driver Manual                    # D1: operator presses Ctrl+V in 'paste-target-1'
+node scripts/summarize-stage-a.mjs reports/stage-a
+node scripts/compare-drivers.mjs reports/stage-a reports/stage-a/calibration <commit-prefix>
 .\target\release\e02-verify.exe audit --dir evidence --cases cases\A-01.toml --cases cases\A-04.toml
 ```
 
-Each run writes a sanitized record to `reports/stage-a/<run>.json`. Raw evidence stays in the git-ignored `evidence/` directory.
+Every run writes a durable record to `reports/stage-a/<run>.json`, including failed and inconclusive runs. Raw evidence stays in the git-ignored `evidence/` directory. The Stage A report is `reports/E-02-stage-a-report.md`.
