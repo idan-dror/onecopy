@@ -1,0 +1,17 @@
+# Stage B1 (P0).
+case_id = "ERR-04"
+description = "Failure on the read that delivers the final byte (source-consistency failure)"
+seed = 2013
+
+[harness]
+dialog_actions = ["cancel"]
+expect = "failure"
+
+[[files]]
+name = "e02-ERR-04-f0.bin"
+size = 67108864
+
+[[files.faults]]
+kind = "error"
+at_offset = 67108863
+hresult = 0x8003001E

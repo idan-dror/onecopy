@@ -1,0 +1,17 @@
+# Stage B1 (P0).
+case_id = "DESC-03"
+description = "Premature EOF at 50%, FD_FILESIZE correct"
+seed = 2005
+
+[harness]
+dialog_actions = ["cancel"]
+expect = "observe"
+timeout_secs = 120
+
+[[files]]
+name = "e02-DESC-03-f0.bin"
+size = 67108864
+
+[[files.faults]]
+kind = "premature_eof"
+at_offset = 33554432

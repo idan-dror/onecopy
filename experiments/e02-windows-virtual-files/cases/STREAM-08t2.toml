@@ -1,0 +1,21 @@
+# Stage B1 (P0).
+case_id = "STREAM-08t2"
+description = "120 s stall at 50% (T2) while another process uses the clipboard"
+seed = 2027
+
+[variants]
+threading = "T2"
+
+[harness]
+probe_clipboard = true
+dialog_actions = ["cancel"]
+timeout_secs = 330
+
+[[files]]
+name = "e02-STREAM-08t2-f0.bin"
+size = 67108864
+
+[[files.faults]]
+kind = "stall"
+at_offset = 33554432
+duration_ms = 120000

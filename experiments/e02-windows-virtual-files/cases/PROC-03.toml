@@ -1,0 +1,14 @@
+# Stage B1 (P0).
+case_id = "PROC-03"
+description = "Provider killed after placing the clipboard, before the paste"
+seed = 2037
+
+[harness]
+kill_before_paste = true
+dialog_actions = ["cancel"]
+expect = "observe"
+timeout_secs = 60
+
+[[files]]
+name = "e02-PROC-03-f0.bin"
+size = 1048576

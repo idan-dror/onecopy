@@ -1,0 +1,18 @@
+# Stage B1 (P0).
+case_id = "CANCEL-02"
+description = "Cancel while a Read is stalled (90 s stall at 50%, RT off)"
+seed = 2032
+
+[harness]
+dialog_actions = ["cancel"]
+expect = "cancel"
+timeout_secs = 300
+
+[[files]]
+name = "e02-CANCEL-02-f0.bin"
+size = 67108864
+
+[[files.faults]]
+kind = "stall"
+at_offset = 33554432
+duration_ms = 90000

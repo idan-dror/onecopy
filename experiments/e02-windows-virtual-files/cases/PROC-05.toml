@@ -1,0 +1,12 @@
+# Stage B1 (P0).
+case_id = "PROC-05"
+description = "Guarded OleFlushClipboard at exit (8 MiB, byte budget)"
+seed = 2038
+
+[harness]
+exit_mode = "flush"
+timeout_secs = 60
+
+[[files]]
+name = "e02-PROC-05-f0.bin"
+size = 8388608

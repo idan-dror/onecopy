@@ -1,0 +1,18 @@
+# Stage B1 (P0).
+case_id = "CANCEL-01c"
+description = "Cancel near 99%: fast to 99%, then 0.05 MiB/s"
+seed = 2031
+
+[harness]
+dialog_actions = ["cancel"]
+expect = "cancel"
+timeout_secs = 180
+
+[[files]]
+name = "e02-CANCEL-01c-f0.bin"
+size = 67108864
+
+[[files.faults]]
+kind = "throttle"
+mib_per_s = 0.05
+from_offset = 66437775

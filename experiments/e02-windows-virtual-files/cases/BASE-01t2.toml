@@ -1,0 +1,14 @@
+# Stage B1 (P1).
+case_id = "BASE-01t2"
+description = "B1 baseline: 1 MiB, no fault, T2 (agile streams)"
+seed = 2002
+
+[variants]
+threading = "T2"
+
+[harness]
+timeout_secs = 60
+
+[[files]]
+name = "e02-BASE-01t2-f0.bin"
+size = 1048576

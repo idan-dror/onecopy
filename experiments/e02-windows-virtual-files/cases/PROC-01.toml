@@ -1,0 +1,17 @@
+# Stage B1 (P0).
+case_id = "PROC-01"
+description = "Provider terminates itself during the read at 50%"
+seed = 2035
+
+[harness]
+dialog_actions = ["cancel"]
+expect = "failure"
+timeout_secs = 120
+
+[[files]]
+name = "e02-PROC-01-f0.bin"
+size = 67108864
+
+[[files.faults]]
+kind = "self_kill"
+at_offset = 33554432

@@ -1,0 +1,18 @@
+# Stage B1 (P0).
+case_id = "ERR-04e"
+description = "All data delivered, then the end-of-stream read fails (late consistency failure)"
+seed = 2014
+
+[harness]
+dialog_actions = ["cancel"]
+expect = "observe"
+timeout_secs = 90
+
+[[files]]
+name = "e02-ERR-04e-f0.bin"
+size = 67108864
+
+[[files.faults]]
+kind = "error"
+at_offset = 67108864
+hresult = 0x8003001E

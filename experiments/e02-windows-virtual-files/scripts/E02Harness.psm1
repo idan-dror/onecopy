@@ -15,7 +15,8 @@ Set-StrictMode -Version 2
 
 $script:TestRootMarker = '.onecopy-e02-testroot'
 $script:RunMarker = '.onecopy-e02-run'
-$script:RunIdPattern = '^A-0\d-\d{8}T\d{6}-[0-9a-f]{8}$'
+# Case ids: Stage A 'A-01'; Stage B1 spec ids such as 'ERR-01' or 'CANCEL-01b'.
+$script:RunIdPattern = '^[A-Z]{1,6}-\d{2}[a-z0-9]{0,4}-\d{8}T\d{6}-[0-9a-f]{8}$'
 
 function Test-IsReparsePoint {
     param([Parameter(Mandatory = $true)][string] $Path)
@@ -82,7 +83,7 @@ function Assert-SafeTestRoot {
 function New-RunLayout {
     param(
         [Parameter(Mandatory = $true)][string] $TestRoot,
-        [Parameter(Mandatory = $true)][ValidatePattern('^A-0\d$')][string] $Case,
+        [Parameter(Mandatory = $true)][ValidatePattern('^[A-Z]{1,6}-\d{2}[a-z0-9]{0,4}$')][string] $Case,
         [ValidateRange(1, 4)][int] $Pastes = 1
     )
     $root = Assert-SafeTestRoot -Path $TestRoot
@@ -171,9 +172,13 @@ function Remove-RunDestination {
 }
 
 function Start-OwnedProcess {
-    param([Parameter(Mandatory = $true)][string] $FilePath, [string[]] $ArgumentList = @())
+    param([Parameter(Mandatory = $true)][string] $FilePath, [string[]] $ArgumentList = @(), [string] $StdOut = '')
     $path = (Resolve-Path -LiteralPath $FilePath).Path
-    $p = Start-Process -FilePath $path -ArgumentList $ArgumentList -PassThru -WindowStyle Hidden
+    if ($StdOut) {
+        $p = Start-Process -FilePath $path -ArgumentList $ArgumentList -PassThru -WindowStyle Hidden -RedirectStandardOutput $StdOut
+    } else {
+        $p = Start-Process -FilePath $path -ArgumentList $ArgumentList -PassThru -WindowStyle Hidden
+    }
     $null = $p.Handle    # holding a handle keeps the PID from being reused and makes ExitCode reliable
     return [pscustomobject]@{ Process = $p; Id = $p.Id; StartTime = $p.StartTime; Path = $path }
 }

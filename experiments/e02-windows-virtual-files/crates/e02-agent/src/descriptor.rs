@@ -40,8 +40,9 @@ pub fn build(case: &Case) -> Result<(HGLOBAL, DescriptorInfo)> {
         for (i, file) in case.files.iter().enumerate() {
             let mut fd = FILEDESCRIPTORW { dwFlags: flags, ..Default::default() };
             if case.variants.advertise_size {
-                fd.nFileSizeHigh = (file.size >> 32) as u32;
-                fd.nFileSizeLow = file.size as u32;
+                let size = file.descriptor_size();
+                fd.nFileSizeHigh = (size >> 32) as u32;
+                fd.nFileSizeLow = size as u32;
             }
             // Names were validated as relative and shorter than MAX_PATH.
             let wide: Vec<u16> = file.name.replace('/', "\\").encode_utf16().collect();
@@ -66,8 +67,12 @@ mod tests {
             case_id: "T".into(),
             description: "test".into(),
             seed: 1,
-            files: files.iter().map(|(n, s)| CaseFile { name: (*n).into(), size: *s }).collect(),
+            files: files
+                .iter()
+                .map(|(n, s)| CaseFile { name: (*n).into(), size: *s, advertised_size: None, stat_size: None, faults: vec![] })
+                .collect(),
             variants: Variants { advertise_size, ..Default::default() },
+            harness: Default::default(),
         }
     }
 
@@ -92,6 +97,34 @@ mod tests {
             let name1 = { fd1.cFileName };
             let len = name1.iter().position(|&c| c == 0).unwrap();
             assert_eq!(String::from_utf16_lossy(&name1[..len]), r"dir\b.bin");
+            let _ = GlobalUnlock(h);
+            let _ = GlobalFree(Some(h));
+        }
+    }
+
+    #[test]
+    fn global_unlock_reports_err_when_the_unlock_succeeds() {
+        // HRESULT/return-code audit: GlobalUnlock returns FALSE with NO_ERROR when the lock
+        // count reaches zero. windows-rs maps that to Err, so "?" on it would fail spuriously.
+        // Every call site ignores the result.
+        unsafe {
+            let h = GlobalAlloc(GMEM_MOVEABLE, 16).unwrap();
+            assert!(!GlobalLock(h).is_null());
+            let r = GlobalUnlock(h);
+            assert!(r.is_err(), "unlocked to zero is reported as an error");
+            assert_eq!(r.unwrap_err().code().0, 0, "with a success code");
+            let _ = GlobalFree(Some(h));
+        }
+    }
+
+    #[test]
+    fn advertised_size_override_is_written() {
+        let mut c = case(&[("a.bin", 100)], true);
+        c.files[0].advertised_size = Some(250);
+        let (h, _) = build(&c).unwrap();
+        unsafe {
+            let fd = (GlobalLock(h).cast::<u8>().add(4) as *const FILEDESCRIPTORW).read_unaligned();
+            assert_eq!({ fd.nFileSizeLow }, 250);
             let _ = GlobalUnlock(h);
             let _ = GlobalFree(Some(h));
         }

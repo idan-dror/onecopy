@@ -24,6 +24,8 @@ pub struct Stats {
     pub bytes_served: u64,
     pub read_calls: u64,
     pub short_reads: u64,
+    /// Reads that returned a failure HRESULT (injected errors, timeouts, aborts, budget).
+    pub failed_reads: u64,
     pub peak_private_bytes: u64,
     pub peak_working_set_bytes: u64,
     pub memory_samples: u64,
@@ -43,6 +45,7 @@ pub struct StreamSummary {
     /// Furthest position reached by reads (targets may seek back afterwards).
     pub max_position: u64,
     pub read_calls: u64,
+    pub failed_reads: u64,
     pub min_request: Option<u32>,
     pub max_request: Option<u32>,
     pub seeks: u64,

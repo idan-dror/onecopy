@@ -1,0 +1,237 @@
+[
+  {
+    "id": "BASE-01",
+    "pri": "P0",
+    "desc": "B1 baseline: 1 MiB, no fault, T1"
+  },
+  {
+    "id": "BASE-01t2",
+    "pri": "P1",
+    "desc": "B1 baseline: 1 MiB, no fault, T2 (agile streams)"
+  },
+  {
+    "id": "BASE-01a",
+    "pri": "P2",
+    "desc": "B1 baseline: 1 MiB, no fault, T2A (agile data object and streams)"
+  },
+  {
+    "id": "DESC-01s",
+    "pri": "P0",
+    "desc": "Control: 64 MiB, FD_FILESIZE absent, no fault"
+  },
+  {
+    "id": "DESC-03",
+    "pri": "P0",
+    "desc": "Premature EOF at 50%, FD_FILESIZE correct"
+  },
+  {
+    "id": "DESC-04",
+    "pri": "P0",
+    "desc": "Premature EOF at 50%, FD_FILESIZE absent"
+  },
+  {
+    "id": "DESC-05",
+    "pri": "P1",
+    "desc": "Overrun: stream delivers 1 MiB beyond FD_FILESIZE (source grew)"
+  },
+  {
+    "id": "DESC-06",
+    "pri": "P1",
+    "desc": "IStream::Stat cbSize (32 MiB) differs from FD_FILESIZE (64 MiB)"
+  },
+  {
+    "id": "ERR-01",
+    "pri": "P0",
+    "desc": "E_FAIL at 50%"
+  },
+  {
+    "id": "ERR-01z",
+    "pri": "P0",
+    "desc": "E_FAIL on the first read (offset 0)"
+  },
+  {
+    "id": "ERR-02",
+    "pri": "P0",
+    "desc": "STG_E_READFAULT at 50%"
+  },
+  {
+    "id": "ERR-03",
+    "pri": "P1",
+    "desc": "HRESULT_FROM_WIN32(ERROR_NETWORK_UNREACHABLE) at 50%"
+  },
+  {
+    "id": "ERR-04",
+    "pri": "P0",
+    "desc": "Failure on the read that delivers the final byte (source-consistency failure)"
+  },
+  {
+    "id": "ERR-04e",
+    "pri": "P0",
+    "desc": "All data delivered, then the end-of-stream read fails (late consistency failure)"
+  },
+  {
+    "id": "ERR-05",
+    "pri": "P0",
+    "desc": "E_FAIL at 50% once, then Try Again"
+  },
+  {
+    "id": "ERR-06",
+    "pri": "P1",
+    "desc": "E_FAIL at 50%, then Skip"
+  },
+  {
+    "id": "ERR-07",
+    "pri": "P0",
+    "desc": "Five 8 MiB files, E_FAIL at 50% of file 3 (index 2), then Cancel"
+  },
+  {
+    "id": "ERR-08",
+    "pri": "P0",
+    "desc": "Destination holds a synthetic original; Replace; E_FAIL at 50%; Cancel. Is the original lost?"
+  },
+  {
+    "id": "STREAM-01",
+    "pri": "P0",
+    "desc": "50 ms latency on every read, 16 MiB"
+  },
+  {
+    "id": "STREAM-03",
+    "pri": "P0",
+    "desc": "30 s stall at 50%"
+  },
+  {
+    "id": "STREAM-04",
+    "pri": "P0",
+    "desc": "180 s stall at 50%: does Explorer time out?"
+  },
+  {
+    "id": "STREAM-04rt",
+    "pri": "P0",
+    "desc": "180 s stall at 50% with provider read timeout 30 s (variant RT)"
+  },
+  {
+    "id": "STREAM-05",
+    "pri": "P0",
+    "desc": "Descriptor GetData delayed 10 s"
+  },
+  {
+    "id": "STREAM-06",
+    "pri": "P1",
+    "desc": "Contents GetData delayed 10 s"
+  },
+  {
+    "id": "STREAM-07",
+    "pri": "P1",
+    "desc": "Short reads of at most 4 KiB, 16 MiB"
+  },
+  {
+    "id": "STREAM-08",
+    "pri": "P0",
+    "desc": "120 s stall at 50% (T1) while another process uses the clipboard"
+  },
+  {
+    "id": "STREAM-08t2",
+    "pri": "P0",
+    "desc": "120 s stall at 50% (T2) while another process uses the clipboard"
+  },
+  {
+    "id": "STREAM-08a",
+    "pri": "P2",
+    "desc": "120 s stall at 50% (T2A) while another process uses the clipboard"
+  },
+  {
+    "id": "CANCEL-01a",
+    "pri": "P0",
+    "desc": "Cancel early: whole copy throttled to 0.5 MiB/s; Cancel when the progress dialog appears"
+  },
+  {
+    "id": "CANCEL-01b",
+    "pri": "P0",
+    "desc": "Cancel near 50%: fast to 50%, then 0.25 MiB/s"
+  },
+  {
+    "id": "CANCEL-01c",
+    "pri": "P0",
+    "desc": "Cancel near 99%: fast to 99%, then 0.05 MiB/s"
+  },
+  {
+    "id": "CANCEL-02",
+    "pri": "P0",
+    "desc": "Cancel while a Read is stalled (90 s stall at 50%, RT off)"
+  },
+  {
+    "id": "CANCEL-03",
+    "pri": "P0",
+    "desc": "CANCEL-02 with provider read timeout 30 s"
+  },
+  {
+    "id": "CANCEL-04",
+    "pri": "P1",
+    "desc": "Close the destination window during a throttled copy (2 MiB/s)"
+  },
+  {
+    "id": "PROC-01",
+    "pri": "P0",
+    "desc": "Provider terminates itself during the read at 50%"
+  },
+  {
+    "id": "PROC-02",
+    "pri": "P0",
+    "desc": "Provider killed by the harness 2 s into a 60 s stall at 50%"
+  },
+  {
+    "id": "PROC-03",
+    "pri": "P0",
+    "desc": "Provider killed after placing the clipboard, before the paste"
+  },
+  {
+    "id": "PROC-05",
+    "pri": "P0",
+    "desc": "Guarded OleFlushClipboard at exit (8 MiB, byte budget)"
+  },
+  {
+    "id": "PROC-07",
+    "pri": "P1",
+    "desc": "Exit without releasing the clipboard (leave), 8 MiB"
+  },
+  {
+    "id": "PROC-07b",
+    "pri": "P1",
+    "desc": "Exit without releasing the clipboard (leave), 64 MiB, byte budget"
+  },
+  {
+    "id": "LIFE-02",
+    "pri": "P1",
+    "desc": "Two concurrent pastes of 64 MiB (T1)"
+  },
+  {
+    "id": "LIFE-02s",
+    "pri": "P0",
+    "desc": "Two concurrent pastes; the first stream to reach 50% stalls 20 s (T1)"
+  },
+  {
+    "id": "LIFE-03",
+    "pri": "P0",
+    "desc": "Another application replaces the clipboard during the copy (T1, 8 MiB/s)"
+  },
+  {
+    "id": "LIFE-02t2",
+    "pri": "P1",
+    "desc": "Two concurrent pastes of 64 MiB (T2)"
+  },
+  {
+    "id": "LIFE-02st2",
+    "pri": "P0",
+    "desc": "Two concurrent pastes; the first stream to reach 50% stalls 20 s (T2)"
+  },
+  {
+    "id": "LIFE-03t2",
+    "pri": "P0",
+    "desc": "Another application replaces the clipboard during the copy (T2, 8 MiB/s)"
+  },
+  {
+    "id": "SEC-01z",
+    "pri": "P1",
+    "desc": "Observation only: ZoneIdentifier = 3 offered; is a Zone.Identifier stream written?"
+  }
+]

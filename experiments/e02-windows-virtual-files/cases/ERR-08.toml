@@ -1,0 +1,18 @@
+# Stage B1 (P0).
+case_id = "ERR-08"
+description = "Destination holds a synthetic original; Replace; E_FAIL at 50%; Cancel. Is the original lost?"
+seed = 2018
+
+[harness]
+dialog_actions = ["replace", "cancel"]
+expect = "failure"
+pre_existing_seed = 9008
+
+[[files]]
+name = "e02-ERR-08-f0.bin"
+size = 67108864
+
+[[files.faults]]
+kind = "error"
+at_offset = 33554432
+hresult = 0x80004005

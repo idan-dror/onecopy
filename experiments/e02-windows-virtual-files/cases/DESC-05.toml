@@ -1,0 +1,17 @@
+# Stage B1 (P1).
+case_id = "DESC-05"
+description = "Overrun: stream delivers 1 MiB beyond FD_FILESIZE (source grew)"
+seed = 2007
+
+[harness]
+dialog_actions = ["cancel"]
+expect = "observe"
+timeout_secs = 120
+
+[[files]]
+name = "e02-DESC-05-f0.bin"
+size = 67108864
+
+[[files.faults]]
+kind = "overrun"
+extra_bytes = 1048576

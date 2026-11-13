@@ -1,0 +1,14 @@
+# Stage B1 (P1).
+case_id = "STREAM-06"
+description = "Contents GetData delayed 10 s"
+seed = 2024
+
+[variants]
+contents_getdata_delay_ms = 10000
+
+[harness]
+timeout_secs = 120
+
+[[files]]
+name = "e02-STREAM-06-f0.bin"
+size = 1048576

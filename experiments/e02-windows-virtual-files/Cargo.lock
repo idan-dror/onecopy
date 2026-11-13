@@ -196,6 +196,7 @@ dependencies = [
  "e02-synth",
  "serde",
  "serde_json",
+ "toml",
  "windows",
  "windows-core",
 ]

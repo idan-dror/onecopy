@@ -1,0 +1,23 @@
+# Stage B1 (P1).
+case_id = "CANCEL-04"
+description = "Close the destination window during a throttled copy (2 MiB/s)"
+seed = 2034
+
+[harness]
+close_window_after_event = "mark"
+dialog_actions = ["cancel"]
+expect = "observe"
+timeout_secs = 180
+
+[[files]]
+name = "e02-CANCEL-04-f0.bin"
+size = 67108864
+
+[[files.faults]]
+kind = "throttle"
+mib_per_s = 2
+
+[[files.faults]]
+kind = "mark"
+at_offset = 16777216
+label = "quarter"

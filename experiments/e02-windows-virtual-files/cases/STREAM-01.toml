@@ -1,0 +1,15 @@
+# Stage B1 (P0).
+case_id = "STREAM-01"
+description = "50 ms latency on every read, 16 MiB"
+seed = 2019
+
+[harness]
+timeout_secs = 120
+
+[[files]]
+name = "e02-STREAM-01-f0.bin"
+size = 16777216
+
+[[files.faults]]
+kind = "latency"
+ms = 50

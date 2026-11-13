@@ -1,0 +1,14 @@
+# Stage B1 (P2).
+case_id = "BASE-01a"
+description = "B1 baseline: 1 MiB, no fault, T2A (agile data object and streams)"
+seed = 2003
+
+[variants]
+threading = "T2A"
+
+[harness]
+timeout_secs = 60
+
+[[files]]
+name = "e02-BASE-01a-f0.bin"
+size = 1048576

@@ -1,0 +1,17 @@
+# Stage B1 (P0).
+case_id = "CANCEL-01a"
+description = "Cancel early: whole copy throttled to 0.5 MiB/s; Cancel when the progress dialog appears"
+seed = 2029
+
+[harness]
+dialog_actions = ["cancel"]
+expect = "cancel"
+timeout_secs = 180
+
+[[files]]
+name = "e02-CANCEL-01a-f0.bin"
+size = 67108864
+
+[[files.faults]]
+kind = "throttle"
+mib_per_s = 0.5

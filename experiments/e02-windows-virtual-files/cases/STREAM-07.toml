@@ -1,0 +1,15 @@
+# Stage B1 (P1).
+case_id = "STREAM-07"
+description = "Short reads of at most 4 KiB, 16 MiB"
+seed = 2025
+
+[harness]
+timeout_secs = 180
+
+[[files]]
+name = "e02-STREAM-07-f0.bin"
+size = 16777216
+
+[[files.faults]]
+kind = "short_reads"
+max_bytes = 4096

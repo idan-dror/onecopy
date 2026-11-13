@@ -1,0 +1,16 @@
+# Stage B1 (P1).
+case_id = "LIFE-02t2"
+description = "Two concurrent pastes of 64 MiB (T2)"
+seed = 2044
+
+[variants]
+threading = "T2"
+
+[harness]
+pastes = 2
+concurrent = true
+timeout_secs = 120
+
+[[files]]
+name = "e02-LIFE-02t2-f0.bin"
+size = 67108864

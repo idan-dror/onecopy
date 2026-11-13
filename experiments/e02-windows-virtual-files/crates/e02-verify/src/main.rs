@@ -5,9 +5,15 @@
 //! - `clipboard-formats`: names of the formats currently on the clipboard
 //! - `audit`: scans evidence for user/machine names, profile paths and content markers
 //! - `explorer-paste` / `explorer-close`: automated driver D2c for an Explorer folder window
+//! - Stage B1: `write-synthetic`, `clipboard-replace`, `clipboard-release`, `clipboard-probe`,
+//!   `dialog-watch` (read-only UI Automation) and `dialog-act` (one targeted button)
 //!
 //! Output never contains user names, machine names or clipboard content.
 
+#[cfg(windows)]
+mod clip;
+#[cfg(windows)]
+mod dialogs;
 mod explorer;
 
 use clap::{Parser, Subcommand};
@@ -36,7 +42,7 @@ enum Command {
         #[arg(long)]
         size: u64,
     },
-    /// Verify the destination files of a case.
+    /// Verify the destination files of a case (complete, partial-prefix, wrong, original kept).
     Verify {
         #[arg(long)]
         case: PathBuf,
@@ -44,6 +50,80 @@ enum Command {
         dest: PathBuf,
         #[arg(long)]
         out: PathBuf,
+        /// Seed of the pre-existing originals (ERR-08): reports whether each original survived.
+        #[arg(long)]
+        pre_existing_seed: Option<u64>,
+    },
+    /// Write one synthetic file (never overwrites; used for pre-existing originals).
+    WriteSynthetic {
+        #[arg(long)]
+        seed: u64,
+        #[arg(long)]
+        index: u32,
+        #[arg(long)]
+        size: u64,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Replace the clipboard with tagged synthetic text, as another application would (LIFE-03).
+    ClipboardReplace {
+        #[arg(long)]
+        tag: String,
+    },
+    /// Empty the clipboard only if it holds this run's tagged content; report what persists.
+    ClipboardRelease {
+        #[arg(long)]
+        tag: String,
+        #[arg(long)]
+        expect_sequence: Option<u32>,
+        /// Report only; never empty.
+        #[arg(long)]
+        probe_only: bool,
+    },
+    /// Measure clipboard access latency for other applications (STREAM-08).
+    ClipboardProbe {
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long)]
+        stop_file: PathBuf,
+        #[arg(long, default_value_t = 500)]
+        interval_ms: u64,
+        #[arg(long, default_value_t = 600)]
+        timeout_secs: u64,
+        #[arg(long)]
+        parent_pid: Option<u32>,
+    },
+    /// Observe Explorer file-operation dialogs (read-only UI Automation).
+    DialogWatch {
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long)]
+        state: PathBuf,
+        #[arg(long)]
+        stop_file: PathBuf,
+        /// Comma-separated run tokens (destination folder names, synthetic file names).
+        #[arg(long)]
+        tokens: String,
+        #[arg(long)]
+        test_root: String,
+        #[arg(long, default_value_t = 250)]
+        interval_ms: u64,
+        #[arg(long, default_value_t = 900)]
+        timeout_secs: u64,
+        #[arg(long)]
+        parent_pid: Option<u32>,
+    },
+    /// Invoke one named button in one of this run's Explorer dialogs (experiment only, D-041).
+    DialogAct {
+        #[arg(long)]
+        hwnd: isize,
+        /// Comma-separated acceptable button names, in preference order.
+        #[arg(long)]
+        names: String,
+        #[arg(long)]
+        tokens: String,
+        #[arg(long)]
+        test_root: String,
     },
     /// Observe a destination directory until a stop file appears or the timeout expires.
     Watch {
@@ -121,13 +201,23 @@ fn main() {
             println!("{}", json!({ "seed": seed, "index": index, "size": size, "blake3": digest.to_hex().to_string() }));
             Ok(())
         }
-        Command::Verify { case, dest, out } => verify(&case, &dest, &out),
+        Command::Verify { case, dest, out, pre_existing_seed } => verify(&case, &dest, &out, pre_existing_seed),
+        Command::WriteSynthetic { seed, index, size, out } => write_synthetic(seed, index, size, &out),
+        Command::ClipboardReplace { tag } => b1::clipboard_replace(&tag),
+        Command::ClipboardRelease { tag, expect_sequence, probe_only } => b1::clipboard_release(&tag, expect_sequence, probe_only),
+        Command::ClipboardProbe { out, stop_file, interval_ms, timeout_secs, parent_pid } => {
+            b1::clipboard_probe(&out, &stop_file, interval_ms, timeout_secs, parent_pid)
+        }
+        Command::DialogWatch { out, state, stop_file, tokens, test_root, interval_ms, timeout_secs, parent_pid } => {
+            b1::dialog_watch(&out, &state, &stop_file, &split(&tokens), &test_root, interval_ms, timeout_secs, parent_pid)
+        }
+        Command::DialogAct { hwnd, names, tokens, test_root } => b1::dialog_act(hwnd, &split(&names), &split(&tokens), &test_root),
         Command::Watch { dest, out, stop_file, interval_ms, timeout_secs, parent_pid } => {
             watch(&dest, &out, &stop_file, interval_ms, timeout_secs, parent_pid)
         }
         Command::ClipboardFormats { out } => win::clipboard_formats().and_then(|v| emit(&v, out.as_deref())),
         Command::Audit { dir, cases, out } => audit(&dir, &cases).and_then(|v| emit(&v, out.as_deref())),
-        Command::ExplorerSnapshot { out } => explorer_cmd(|| explorer::win::snapshot()).and_then(|v| emit(&v, Some(&out))),
+        Command::ExplorerSnapshot { out } => explorer_cmd(explorer::win::snapshot).and_then(|v| emit(&v, Some(&out))),
         Command::ExplorerFind { dest, pre_snapshot, timeout_secs } => {
             explorer_cmd(|| explorer::win::find_owned(&dest, &pre_snapshot, timeout_secs)).and_then(|v| emit(&v, None))
         }
@@ -138,8 +228,19 @@ fn main() {
             explorer_cmd(|| explorer::win::close_owned(&dest, &pre_snapshot, expected_top)).and_then(|v| emit(&v, None))
         }
         Command::CaseFiles { case } => Case::load(&case).map_err(Into::into).and_then(|c| {
-            let files: Vec<Value> = c.files.iter().map(|f| json!({ "name": f.name.replace('/', "\\"), "size": f.size })).collect();
-            emit(&json!({ "case_id": c.case_id, "files": files }), None)
+            let files: Vec<Value> = c
+                .files
+                .iter()
+                .map(|f| json!({ "name": f.name.replace('/', "\\"), "size": f.size, "advertised_size": f.descriptor_size(),
+                                 "faults": f.faults }))
+                .collect();
+            emit(
+                &json!({ "case_id": c.case_id, "description": c.description, "files": files,
+                         "threading": c.variants.threading, "large": c.variants.large,
+                         "read_timeout_ms": c.variants.read_timeout_ms, "zone_identifier": c.variants.zone_identifier,
+                         "harness": c.harness }),
+                None,
+            )
         }),
     };
     if let Err(e) = result {
@@ -149,6 +250,92 @@ fn main() {
 }
 
 type AnyResult<T> = Result<T, Box<dyn std::error::Error>>;
+
+fn split(s: &str) -> Vec<String> {
+    s.split(',').map(|x| x.trim().to_owned()).filter(|x| !x.is_empty()).collect()
+}
+
+#[cfg(windows)]
+mod b1 {
+    use super::{AnyResult, emit, win};
+    use std::path::Path;
+
+    pub fn clipboard_replace(tag: &str) -> AnyResult<()> {
+        emit(&crate::clip::set_replacement(tag)?, None)
+    }
+    pub fn clipboard_release(tag: &str, expect_sequence: Option<u32>, probe_only: bool) -> AnyResult<()> {
+        emit(&crate::clip::release(tag, expect_sequence, probe_only)?, None)
+    }
+    pub fn clipboard_probe(out: &Path, stop: &Path, interval_ms: u64, timeout_secs: u64, parent_pid: Option<u32>) -> AnyResult<()> {
+        let parent = parent_pid.map(win::ProcessWatch::open).transpose()?;
+        crate::clip::probe(out, stop, parent.as_ref(), interval_ms, timeout_secs)
+    }
+    #[allow(clippy::too_many_arguments)]
+    pub fn dialog_watch(
+        out: &Path,
+        state: &Path,
+        stop: &Path,
+        tokens: &[String],
+        test_root: &str,
+        interval_ms: u64,
+        timeout_secs: u64,
+        parent_pid: Option<u32>,
+    ) -> AnyResult<()> {
+        let parent = parent_pid.map(win::ProcessWatch::open).transpose()?;
+        crate::dialogs::watch(out, state, stop, parent.as_ref(), tokens, test_root, interval_ms, timeout_secs)
+    }
+    pub fn dialog_act(hwnd: isize, names: &[String], tokens: &[String], test_root: &str) -> AnyResult<()> {
+        emit(&crate::dialogs::act(hwnd, names, tokens, test_root)?, None)
+    }
+}
+
+#[cfg(not(windows))]
+mod b1 {
+    use super::AnyResult;
+    use std::path::Path;
+    pub fn clipboard_replace(_: &str) -> AnyResult<()> {
+        Err("Windows only".into())
+    }
+    pub fn clipboard_release(_: &str, _: Option<u32>, _: bool) -> AnyResult<()> {
+        Err("Windows only".into())
+    }
+    pub fn clipboard_probe(_: &Path, _: &Path, _: u64, _: u64, _: Option<u32>) -> AnyResult<()> {
+        Err("Windows only".into())
+    }
+    #[allow(clippy::too_many_arguments)]
+    pub fn dialog_watch(_: &Path, _: &Path, _: &Path, _: &[String], _: &str, _: u64, _: u64, _: Option<u32>) -> AnyResult<()> {
+        Err("Windows only".into())
+    }
+    pub fn dialog_act(_: isize, _: &[String], _: &[String], _: &str) -> AnyResult<()> {
+        Err("Windows only".into())
+    }
+}
+
+/// Writes one synthetic file; refuses to overwrite anything.
+fn write_synthetic(seed: u64, index: u32, size: u64, out: &Path) -> AnyResult<()> {
+    if size > e02_synth::BOUNDED_CASE_MAX_BYTES {
+        return Err("write-synthetic is limited to bounded sizes in Stage B1".into());
+    }
+    let file = std::fs::OpenOptions::new().write(true).create_new(true).open(out)?;
+    let mut w = std::io::BufWriter::new(file);
+    let mut stream = Synth::new(seed).stream_at(index, 0);
+    let mut buf = vec![0u8; 1 << 20];
+    let mut remaining = size;
+    while remaining > 0 {
+        let n = remaining.min(buf.len() as u64) as usize;
+        stream.fill_next(&mut buf[..n]);
+        w.write_all(&buf[..n])?;
+        remaining -= n as u64;
+    }
+    w.flush()?;
+    println!("{}", json!({ "written": size }));
+    Ok(())
+}
+
+/// True if the file's bytes equal the first `size` bytes of synthetic file `index`.
+fn is_synthetic_prefix(path: &Path, synth: &Synth, index: u32, size: u64) -> std::io::Result<bool> {
+    Ok(hash_file(path)? == synth.digest(index, size))
+}
 
 #[cfg(windows)]
 fn explorer_cmd(f: impl FnOnce() -> AnyResult<Value>) -> AnyResult<Value> {
@@ -231,14 +418,27 @@ fn list_entries(root: &Path) -> BTreeMap<String, Option<u64>> {
     out
 }
 
-fn verify(case_path: &Path, dest: &Path, out: &Path) -> AnyResult<()> {
+/// Destination state of one expected file (spec §9.1 inputs).
+fn file_state(exists: bool, size: Option<u64>, true_size: u64, full_match: Option<bool>, prefix_match: Option<bool>, original: Option<bool>) -> &'static str {
+    match (exists, size) {
+        (false, _) | (_, None) => "absent",
+        _ if original == Some(true) => "original_preserved",
+        (_, Some(0)) if true_size > 0 => "empty",
+        (_, Some(s)) if s == true_size => if full_match == Some(true) { "complete_correct" } else { "full_size_wrong_content" },
+        (_, Some(s)) if s < true_size => if prefix_match == Some(true) { "partial_correct_prefix" } else { "partial_wrong_content" },
+        _ => if prefix_match == Some(true) { "oversize_synthetic_continuation" } else { "oversize_wrong_content" },
+    }
+}
+
+fn verify(case_path: &Path, dest: &Path, out: &Path, pre_existing_seed: Option<u64>) -> AnyResult<()> {
     let case = Case::load(case_path)?;
     let synth = Synth::new(case.seed);
+    let original_synth = pre_existing_seed.map(Synth::new);
     let mut files = Vec::new();
     let mut all_match = true;
     for (index, file) in case.files.iter().enumerate() {
         let path = dest.join(file.name.replace('/', "\\"));
-        let meta = std::fs::metadata(&path).ok();
+        let meta = std::fs::metadata(&path).ok().filter(|m| m.is_file());
         let size = meta.as_ref().map(|m| m.len());
         let digest_match = if size == Some(file.size) {
             let expected = synth.digest(index as u32, file.size);
@@ -246,20 +446,50 @@ fn verify(case_path: &Path, dest: &Path, out: &Path) -> AnyResult<()> {
         } else {
             None
         };
+        // Is whatever is there a correct prefix (or synthetic continuation) of the stream?
+        let prefix_match = match size {
+            Some(s) if s > 0 && s != file.size && s <= e02_synth::BOUNDED_CASE_MAX_BYTES => {
+                Some(is_synthetic_prefix(&path, &synth, index as u32, s)?)
+            }
+            _ => None,
+        };
+        let original_preserved = match (&original_synth, size) {
+            (Some(o), Some(s)) if s == file.size => Some(hash_file(&path)? == o.digest(index as u32, file.size)),
+            (Some(_), _) => Some(false),
+            _ => None,
+        };
+        let advertised = case.variants.advertise_size.then(|| file.descriptor_size());
+        // A file with the final name that a user could take as complete: its size equals the
+        // advertised size, or no size was advertised at all.
+        let mistakable = meta.is_some() && advertised.is_none_or(|a| size == Some(a));
+        let state = file_state(meta.is_some(), size, file.size, digest_match, prefix_match, original_preserved);
         let ok = digest_match == Some(true);
         all_match &= ok;
         files.push(json!({
-            "index": index, "name": file.name, "expected_size": file.size,
-            "exists": meta.is_some(), "size": size, "digest_match": digest_match,
+            "index": index, "name": file.name, "expected_size": file.size, "advertised_size": advertised,
+            "exists": meta.is_some(), "size": size, "digest_match": digest_match, "prefix_match": prefix_match,
+            "original_preserved": original_preserved, "state": state, "mistakable_as_complete": mistakable,
             "zone_identifier": if meta.is_some() { zone_identifier(&path) } else { Value::Null },
         }));
     }
     let expected: Vec<String> = case.files.iter().map(|f| f.name.replace('/', "\\")).collect();
-    let extra: Vec<Value> = list_entries(dest)
-        .into_iter()
-        .filter(|(name, _)| !name.ends_with('\\') && !expected.contains(name))
-        .map(|(name, size)| json!({ "name": name, "size": size }))
-        .collect();
+    let mut extra: Vec<Value> = Vec::new();
+    for (name, size) in list_entries(dest) {
+        if name.ends_with('\\') || expected.contains(&name) || name == ".onecopy-e02-run" {
+            continue;
+        }
+        // Temporary or renamed copies: does the content match a prefix of any case file?
+        let mut matches_file = None;
+        if let Some(s) = size.filter(|s| *s > 0 && *s <= e02_synth::BOUNDED_CASE_MAX_BYTES) {
+            for index in 0..case.files.len() {
+                if is_synthetic_prefix(&dest.join(&name), &synth, index as u32, s)? {
+                    matches_file = Some(index);
+                    break;
+                }
+            }
+        }
+        extra.push(json!({ "name": name, "size": size, "synthetic_prefix_of_file": matches_file }));
+    }
     let result = json!({ "case_id": case.case_id, "all_files_match": all_match, "files": files, "unexpected_entries": extra });
     std::fs::write(out, serde_json::to_string_pretty(&result)?)?;
     println!("{}", json!({ "case_id": case.case_id, "all_files_match": all_match }));

@@ -1,0 +1,22 @@
+# Stage B1 (P0).
+case_id = "LIFE-02s"
+description = "Two concurrent pastes; the first stream to reach 50% stalls 20 s (T1)"
+seed = 2042
+
+[variants]
+threading = "T1"
+
+[harness]
+pastes = 2
+concurrent = true
+timeout_secs = 150
+
+[[files]]
+name = "e02-LIFE-02s-f0.bin"
+size = 67108864
+
+[[files.faults]]
+kind = "stall"
+at_offset = 33554432
+duration_ms = 20000
+once = true

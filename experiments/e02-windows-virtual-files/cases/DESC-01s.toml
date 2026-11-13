@@ -1,0 +1,14 @@
+# Stage B1 (P0).
+case_id = "DESC-01s"
+description = "Control: 64 MiB, FD_FILESIZE absent, no fault"
+seed = 2004
+
+[variants]
+advertise_size = false
+
+[harness]
+timeout_secs = 90
+
+[[files]]
+name = "e02-DESC-01s-f0.bin"
+size = 67108864

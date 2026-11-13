@@ -1,0 +1,33 @@
+# Stage B1 (P0).
+case_id = "ERR-07"
+description = "Five 8 MiB files, E_FAIL at 50% of file 3 (index 2), then Cancel"
+seed = 2017
+
+[harness]
+dialog_actions = ["cancel"]
+expect = "failure"
+
+[[files]]
+name = "e02-ERR-07-f0.bin"
+size = 8388608
+
+[[files]]
+name = "e02-ERR-07-f1.bin"
+size = 8388608
+
+[[files]]
+name = "e02-ERR-07-f2.bin"
+size = 8388608
+
+[[files.faults]]
+kind = "error"
+at_offset = 4194304
+hresult = 0x80004005
+
+[[files]]
+name = "e02-ERR-07-f3.bin"
+size = 8388608
+
+[[files]]
+name = "e02-ERR-07-f4.bin"
+size = 8388608

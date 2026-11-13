@@ -1,0 +1,14 @@
+# Stage B1 (P1).
+case_id = "SEC-01z"
+description = "Observation only: ZoneIdentifier = 3 offered; is a Zone.Identifier stream written?"
+seed = 2047
+
+[variants]
+zone_identifier = 3
+
+[harness]
+timeout_secs = 60
+
+[[files]]
+name = "e02-SEC-01z-f0.bin"
+size = 1048576
