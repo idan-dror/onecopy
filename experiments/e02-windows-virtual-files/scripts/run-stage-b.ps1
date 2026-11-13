@@ -46,16 +46,16 @@ $verifyExe = Join-Path $bin 'e02-verify.exe'
 $caseFile = Join-Path $ws "cases\$Case.toml"
 if (-not $ReportDir) { $ReportDir = Join-Path $ws 'reports\stage-b1' }
 
-# Button names per dialog action (Windows 11 Explorer, en-US), in preference order.
-$ActionNames = @{
-    cancel    = @('Cancel')
-    try_again = @('Try Again', 'Try again', 'Retry')
-    skip      = @('Skip', 'Skip this file')
-    replace   = @('Replace the file in the destination', 'Replace the files in the destination', 'Replace')
-    keep_both = @('Keep both files')
+# Dialog actions map to Win32 control ids (UIA automation ids), so the UI language does not
+# matter: 1 = IDOK, 2 = IDCANCEL, 4 = IDRETRY, 5 = IDIGNORE, 10 = IDTRYAGAIN, 11 = IDCONTINUE.
+# "cancel" on an error box that only offers OK dismisses it (the operation has already failed).
+$ActionIds = @{
+    cancel    = @('2', '1')
+    try_again = @('10', '4')
+    skip      = @('5', '11')
+    replace   = @('6')
+    keep_both = @('7')
 }
-# Buttons that only an error/decision dialog shows (never the plain progress dialog).
-$ErrorDialogButtons = @('Try Again', 'Try again', 'Skip', 'Skip this file', 'Retry')
 
 function Invoke-Native {
     param([string] $Exe, [string[]] $Arguments)
@@ -151,8 +151,11 @@ try {
             '--stop-file', "`"$stopFile`"", '--timeout-secs', [string]($timeout + 180), '--parent-pid', [string]$PID)
     }
     $dialogLog = Join-Path $runDir 'dialogs.jsonl'; $dialogState = Join-Path $runDir 'dialogs-state.json'
+    $ownersFile = Join-Path $runDir 'owners.json'
+    Set-Content -LiteralPath $ownersFile -Value '[]' -Encoding ASCII
     $dialogWatch = Start-OwnedProcess -FilePath $verifyExe -ArgumentList @(
         'dialog-watch', '--out', "`"$dialogLog`"", '--state', "`"$dialogState`"", '--stop-file', "`"$stopFile`"",
+        '--owners-file', "`"$ownersFile`"",
         '--tokens', "`"$($tokens -join ',')`"", '--test-root', "`"$rootFull`"", '--timeout-secs', [string]($timeout + 180),
         '--parent-pid', [string]$PID)
     if ($h.probe_clipboard) {
@@ -198,6 +201,9 @@ try {
     }
     $pasteTargets = @()
     for ($k = 0; $k -lt $layout.Targets.Count; $k++) { if ($windows[$k].found) { $pasteTargets += $k } }
+    # The dialog watcher attributes dialogs whose owner chain leads to these windows to this run.
+    $ownerTops = @($windows | Where-Object { $_.found } | ForEach-Object { [int64]$_.top_hwnd })
+    Set-Content -LiteralPath $ownersFile -Value ('[' + ($ownerTops -join ',') + ']') -Encoding ASCII
     function Invoke-Paste([int] $Index) {
         $t = $layout.Targets[$Index]
         if ($Driver -eq 'ExplorerCommand') {
@@ -266,22 +272,24 @@ try {
             }
             # Dialogs.
             $ds = Read-DialogState $dialogState
-            $ours = @(); if ($ds -and $ds.dialogs) { $ours = @($ds.dialogs | Where-Object { $_.ours }) }
+            $ours = @(); $openDialogs = @()
+            if ($ds -and $ds.dialogs) { $openDialogs = @($ds.dialogs); $ours = @($ds.dialogs | Where-Object { $_.ours }) }
             if ($DialogDriver -eq 'Uia' -and $pendingActions.Count -gt 0 -and $ours.Count -gt 0) {
                 $next = $pendingActions[0]
                 foreach ($dlg in $ours) {
-                    $buttons = @($dlg.buttons)
-                    $isErrorDialog = [bool](@($buttons | Where-Object { $ErrorDialogButtons -contains $_ }).Count)
+                    $ids = @($dlg.button_ids)
+                    # A dialog without a progress bar is an error or decision dialog.
+                    $isErrorDialog = -not $dlg.progress_bar
                     $allowed = $false
                     if ($next -eq 'cancel') { $allowed = ($h.expect -eq 'cancel') -or $isErrorDialog }
-                    elseif ($next -eq 'replace' -or $next -eq 'keep_both') { $allowed = $true }
                     else { $allowed = $isErrorDialog }
-                    $hasButton = [bool](@($buttons | Where-Object { $ActionNames[$next] -contains $_ }).Count)
+                    $hasButton = [bool](@($ids | Where-Object { $ActionIds[$next] -contains $_ }).Count)
                     if ($allowed -and $hasButton) {
-                        $r = Invoke-Native $verifyExe @('dialog-act', '--hwnd', [string]$dlg.hwnd, '--names', ($ActionNames[$next] -join ','),
-                            '--tokens', ($tokens -join ','), '--test-root', $rootFull)
+                        $r = Invoke-Native $verifyExe @('dialog-act', '--hwnd', [string]$dlg.hwnd, '--ids', ($ActionIds[$next] -join ','),
+                            '--tokens', ($tokens -join ','), '--owners', ($ownerTops -join ','), '--test-root', $rootFull)
                         $res = $null; try { $res = $r.Output | ConvertFrom-Json } catch { }
-                        [void]$actions.Add([ordered]@{ t_ms = [math]::Round($clock.Elapsed.TotalMilliseconds); action = $next; dialog_class = $dlg.class; result = $res; raw_exit = $r.ExitCode })
+                        [void]$actions.Add([ordered]@{ t_ms = [math]::Round($clock.Elapsed.TotalMilliseconds); action = $next; dialog_class = $dlg.class
+                            dialog_progress = [bool]$dlg.progress_bar; result = $res; raw_exit = $r.ExitCode })
                         Add-Timeline 'harness' "dialog_$next" $res
                         if ($res -and $res.invoked) { $pendingActions.RemoveAt(0) }
                         Start-Sleep -Milliseconds 700
@@ -292,7 +300,7 @@ try {
             # Completion.
             $streamsSettled = ($created -gt $createdAtStart) -and ($created -eq $released)
             $nothingHappened = ($created -eq $createdAtStart) -and (($now - $groupStart) -gt 20)
-            $settled = ($ours.Count -eq 0) -and ($agentGone -or $streamsSettled -or $nothingHappened)
+            $settled = ($openDialogs.Count -eq 0) -and ($agentGone -or $streamsSettled -or $nothingHappened)
             if ($settled) {
                 if ($null -eq $quietSince) { $quietSince = $now }
                 # Give Explorer time to show an error dialog after a fault or a provider exit.
@@ -301,7 +309,7 @@ try {
                 if ($agentGone -and ($now - $agentGoneAt) -lt 15) { $needQuiet = [math]::Max($needQuiet, 15 - ($now - $agentGoneAt)) }
                 if (($now - $quietSince) -ge $needQuiet -and ($now - $groupStart) -ge 3) { break }
             } else { $quietSince = $null }
-            if ($now -gt $deadline) { $progress.timed_out = $true; Add-Timeline 'harness' 'timeout' @{ open_dialogs = $ours.Count; created = $created; released = $released }; break }
+            if ($now -gt $deadline) { $progress.timed_out = $true; Add-Timeline 'harness' 'timeout' @{ open_dialogs = $openDialogs.Count; created = $created; released = $released }; break }
             Start-Sleep -Milliseconds 200
         }
         if ($progress.timed_out) { break }
@@ -390,18 +398,28 @@ try {
     $explorerLost = @($explorerBefore | Where-Object { $b = $_; -not ($explorerAfter | Where-Object { $_.id -eq $b.id -and $_.start -eq $b.start }) })
 
     # --- Classification (spec §9.1) -------------------------------------------------------------
-    $ourDialogs = @($dialogEvents | Where-Object { $_.event -eq 'appear' -and $_.ours })
-    $allOurDialogEvents = @($dialogEvents | Where-Object { ($_.event -eq 'appear' -or $_.event -eq 'change') -and $_.ours })
-    $errorDialogSeen = [bool](@($allOurDialogEvents | Where-Object { @($_.buttons | Where-Object { $ErrorDialogButtons -contains $_[0] }).Count -gt 0 }).Count)
-    $cancelInvoked = [bool](@($actions | Where-Object { $_.action -eq 'cancel' -and $_.result -and $_.result.invoked }).Count)
+    # Every Explorer dialog that appeared during the run is counted (hands-off window); its
+    # attribution (owner chain or token) is recorded separately.
+    $appeared = @($dialogEvents | Where-Object { $_.event -eq 'appear' })
+    $ourDialogs = @($appeared | Where-Object { $_.ours })
+    $errorDialogs = @($appeared | Where-Object { -not $_.progress_bar })
+    $progressDialogs = @($appeared | Where-Object { $_.progress_bar })
+    $errorDialogSeen = $errorDialogs.Count -gt 0
+    $errorTexts = @($errorDialogs | ForEach-Object { @($_.names) } | Sort-Object -Unique)
+    $cancelInvoked = [bool](@($actions | Where-Object { $_.action -eq 'cancel' -and $_.result -and $_.result.invoked -and $_.dialog_progress }).Count)
     $streamsCreated = @($agentEvents | Where-Object { $_.event -eq 'stream_create' }).Count
+    $releases = @($agentEvents | Where-Object { $_.event -eq 'stream_release' })
+    $allEof = ($releases.Count -gt 0) -and -not ($releases | Where-Object { -not $_.eof_read })
     $faultEvents = @($agentEvents | Where-Object { $_.event -eq 'fault' } | ForEach-Object { $_.action } | Sort-Object -Unique)
-    $setData = @($agentEvents | Where-Object { $_.event -eq 'set_data' } | ForEach-Object { [ordered]@{ format = $_.format; dword = $_.dword } })
+    $setData = @($agentEvents | Where-Object { $_.event -eq 'set_data' -and $_.format -ne 'DropDescription' } | ForEach-Object { [ordered]@{ format = $_.format; dword = $_.dword } })
+    $performedEffect = @($setData | Where-Object { $_.format -eq 'Performed DropEffect' })
     $targetReport = 'success'
     if ($progress.timed_out) { $targetReport = 'hang_or_timeout' }
     elseif ($errorDialogSeen) { $targetReport = 'failure' }
     elseif ($cancelInvoked) { $targetReport = 'cancelled' }
     elseif ($streamsCreated -eq 0) { $targetReport = 'no_operation' }
+    elseif ($DialogDriver -eq 'Manual' -and $caseInfo.harness.expect -eq 'cancel' -and $progressDialogs.Count -gt 0 -and -not $allEof) { $targetReport = 'cancelled' }
+    elseif (-not $allEof -and $performedEffect.Count -eq 0) { $targetReport = 'silent_stop' }
     $severity = @{ 'O5' = 7; 'O4' = 6; 'O3' = 5; 'O2' = 4; 'O1' = 3; 'C' = 2; 'S' = 1; 'N' = 0 }
     $perFile = @(); $worst = 'N'
     foreach ($v in $verifications) {
@@ -411,6 +429,10 @@ try {
             elseif ($f.state -eq 'full_size_wrong_content') { $cls = 'O3' }
             elseif ($targetReport -eq 'success') { $cls = $(if ($f.state -eq 'complete_correct') { 'S' } else { 'O4' }) }
             elseif ($targetReport -eq 'no_operation') { $cls = $(if ($f.state -eq 'absent' -or $f.state -eq 'original_preserved') { 'N' } else { 'O4' }) }
+            elseif ($targetReport -eq 'silent_stop') {
+                # No error shown and no success signal: a remaining file looks like a finished copy.
+                $cls = $(if ($f.state -eq 'absent' -or $f.state -eq 'original_preserved') { 'O1' } elseif ($f.state -eq 'complete_correct') { 'S' } else { 'O4' })
+            }
             else {
                 switch ($f.state) {
                     'absent' { $cls = 'O1' }
@@ -461,10 +483,12 @@ try {
         progress = $progress; timeline = $timeline
         explorer_windows = $windows
         explorer_processes = [ordered]@{ before = $explorerBefore; after = $explorerAfter; lost = $explorerLost }
-        dialogs = [ordered]@{ ours_seen = $ourDialogs.Count; error_dialog_seen = $errorDialogSeen; events = @($dialogEvents | Where-Object { $_.event -ne 'start' }) }
+        dialogs = [ordered]@{ appeared = $appeared.Count; attributed = $ourDialogs.Count; error_dialog_seen = $errorDialogSeen
+            progress_dialog_seen = ($progressDialogs.Count -gt 0); error_texts = $errorTexts; events = @($dialogEvents | Where-Object { $_.event -ne 'start' }) }
         dialog_actions = $actions
         agent_exit_code = $agentExit; agent_summary = $summary
-        agent_fault_events = $faultEvents; set_data = $setData
+        agent_fault_events = $faultEvents; set_data = $setData; performed_drop_effect = @($performedEffect | ForEach-Object { $_.dword })
+        streams = [ordered]@{ created = $streamsCreated; released = $releases.Count; all_reached_eof = $allEof }
         destinations = $verifications; observer = $observers
         clipboard = [ordered]@{ set_sequence = $setSequence; before_release = $clipBefore; release = $clipRelease; after = $clipAfter; clean_after = $clipClean; replacement = $replace; probe = $probeStats }
         classification = [ordered]@{ target_report = $targetReport; per_file = $perFile; outcome_class = $worst; expectation_met = $expectMet }

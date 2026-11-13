@@ -14,6 +14,8 @@
 mod clip;
 #[cfg(windows)]
 mod dialogs;
+#[cfg(windows)]
+mod fsnotify;
 mod explorer;
 
 use clap::{Parser, Subcommand};
@@ -106,6 +108,9 @@ enum Command {
         tokens: String,
         #[arg(long)]
         test_root: String,
+        /// JSON file with the run's own Explorer top-level window handles (re-read every poll).
+        #[arg(long)]
+        owners_file: Option<PathBuf>,
         #[arg(long, default_value_t = 250)]
         interval_ms: u64,
         #[arg(long, default_value_t = 900)]
@@ -113,15 +118,19 @@ enum Command {
         #[arg(long)]
         parent_pid: Option<u32>,
     },
-    /// Invoke one named button in one of this run's Explorer dialogs (experiment only, D-041).
+    /// Invoke one button, by Win32 control id, in one of this run's Explorer dialogs
+    /// (experiment only, D-041). The UI language is not assumed.
     DialogAct {
         #[arg(long)]
         hwnd: isize,
-        /// Comma-separated acceptable button names, in preference order.
+        /// Comma-separated acceptable control ids, in preference order (e.g. "2" = IDCANCEL).
         #[arg(long)]
-        names: String,
+        ids: String,
         #[arg(long)]
         tokens: String,
+        /// Comma-separated handles of the run's own Explorer top-level windows.
+        #[arg(long, default_value = "")]
+        owners: String,
         #[arg(long)]
         test_root: String,
     },
@@ -208,10 +217,13 @@ fn main() {
         Command::ClipboardProbe { out, stop_file, interval_ms, timeout_secs, parent_pid } => {
             b1::clipboard_probe(&out, &stop_file, interval_ms, timeout_secs, parent_pid)
         }
-        Command::DialogWatch { out, state, stop_file, tokens, test_root, interval_ms, timeout_secs, parent_pid } => {
-            b1::dialog_watch(&out, &state, &stop_file, &split(&tokens), &test_root, interval_ms, timeout_secs, parent_pid)
+        Command::DialogWatch { out, state, stop_file, tokens, test_root, owners_file, interval_ms, timeout_secs, parent_pid } => {
+            b1::dialog_watch(&out, &state, &stop_file, &split(&tokens), owners_file.as_deref(), &test_root, interval_ms, timeout_secs, parent_pid)
         }
-        Command::DialogAct { hwnd, names, tokens, test_root } => b1::dialog_act(hwnd, &split(&names), &split(&tokens), &test_root),
+        Command::DialogAct { hwnd, ids, tokens, owners, test_root } => {
+            let owners: Vec<isize> = split(&owners).iter().filter_map(|s| s.parse().ok()).collect();
+            b1::dialog_act(hwnd, &split(&ids), &split(&tokens), &owners, &test_root)
+        }
         Command::Watch { dest, out, stop_file, interval_ms, timeout_secs, parent_pid } => {
             watch(&dest, &out, &stop_file, interval_ms, timeout_secs, parent_pid)
         }
@@ -276,16 +288,17 @@ mod b1 {
         state: &Path,
         stop: &Path,
         tokens: &[String],
+        owners_file: Option<&Path>,
         test_root: &str,
         interval_ms: u64,
         timeout_secs: u64,
         parent_pid: Option<u32>,
     ) -> AnyResult<()> {
         let parent = parent_pid.map(win::ProcessWatch::open).transpose()?;
-        crate::dialogs::watch(out, state, stop, parent.as_ref(), tokens, test_root, interval_ms, timeout_secs)
+        crate::dialogs::watch(out, state, stop, parent.as_ref(), tokens, owners_file, test_root, interval_ms, timeout_secs)
     }
-    pub fn dialog_act(hwnd: isize, names: &[String], tokens: &[String], test_root: &str) -> AnyResult<()> {
-        emit(&crate::dialogs::act(hwnd, names, tokens, test_root)?, None)
+    pub fn dialog_act(hwnd: isize, ids: &[String], tokens: &[String], owners: &[isize], test_root: &str) -> AnyResult<()> {
+        emit(&crate::dialogs::act(hwnd, ids, tokens, owners, test_root)?, None)
     }
 }
 
@@ -303,10 +316,10 @@ mod b1 {
         Err("Windows only".into())
     }
     #[allow(clippy::too_many_arguments)]
-    pub fn dialog_watch(_: &Path, _: &Path, _: &Path, _: &[String], _: &str, _: u64, _: u64, _: Option<u32>) -> AnyResult<()> {
+    pub fn dialog_watch(_: &Path, _: &Path, _: &Path, _: &[String], _: Option<&Path>, _: &str, _: u64, _: u64, _: Option<u32>) -> AnyResult<()> {
         Err("Windows only".into())
     }
-    pub fn dialog_act(_: isize, _: &[String], _: &[String], _: &str) -> AnyResult<()> {
+    pub fn dialog_act(_: isize, _: &[String], _: &[String], _: &[isize], _: &str) -> AnyResult<()> {
         Err("Windows only".into())
     }
 }
@@ -501,7 +514,16 @@ fn watch(dest: &Path, out: &Path, stop_file: &Path, interval_ms: u64, timeout_se
     let start = Instant::now();
     let mut writer = std::io::BufWriter::new(std::fs::File::create(out)?);
     let mut previous: BTreeMap<String, Option<u64>> = BTreeMap::new();
+    // Change notifications catch entries that live shorter than one polling interval.
+    #[cfg(windows)]
+    let notifications = fsnotify::spawn(dest, start).ok();
     loop {
+        #[cfg(windows)]
+        if let Some(rx) = &notifications {
+            for event in rx.try_iter() {
+                writeln!(writer, "{event}")?;
+            }
+        }
         let current = list_entries(dest);
         if current != previous {
             let t_ms = start.elapsed().as_secs_f64() * 1000.0;

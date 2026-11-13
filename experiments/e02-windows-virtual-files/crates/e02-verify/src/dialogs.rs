@@ -3,13 +3,17 @@
 //!
 //! Observation: every poll lists visible top-level windows that belong to an `explorer.exe`
 //! process and have a dialog class (`OperationStatusWindow`, `#32770`). Windows that existed
-//! when the watcher started are ignored. For new ones, UI Automation element names are read,
-//! sanitized (test root, profile, user and machine names replaced) and logged.
+//! when the watcher started are ignored. For new ones, UI Automation element names, control
+//! types and automation ids are read, sanitized and logged.
+//!
+//! A dialog is "ours" if its owner chain leads to one of the run's own Explorer windows, or its
+//! text mentions a run token (synthetic file name, run folder). The UI language is not assumed:
+//! buttons are matched by Win32 control id (automation id, e.g. "2" = IDCANCEL), not by label.
 //!
 //! Invocation (`act`) re-validates the window first: it must still exist, belong to
-//! `explorer.exe`, have an allowed class, and its text must contain one of this run's tokens
-//! (unique destination folder or synthetic file name). Otherwise nothing is invoked.
+//! `explorer.exe`, have an allowed class, and be ours. Otherwise nothing is invoked.
 
+use serde::Serialize;
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
 use std::io::Write;
@@ -20,9 +24,12 @@ use windows::Win32::System::Com::{CLSCTX_INPROC_SERVER, COINIT_MULTITHREADED, Co
 use windows::Win32::System::Threading::{OpenProcess, PROCESS_NAME_WIN32, PROCESS_QUERY_LIMITED_INFORMATION, QueryFullProcessImageNameW};
 use windows::Win32::UI::Accessibility::{
     CUIAutomation, IUIAutomation, IUIAutomationInvokePattern, TreeScope_Subtree, UIA_ButtonControlTypeId,
-    UIA_HyperlinkControlTypeId, UIA_InvokePatternId, UIA_SplitButtonControlTypeId,
+    UIA_HyperlinkControlTypeId, UIA_InvokePatternId, UIA_ProgressBarControlTypeId, UIA_SplitButtonControlTypeId,
 };
-use windows::Win32::UI::WindowsAndMessaging::{EnumWindows, GetClassNameW, GetWindowTextW, GetWindowThreadProcessId, IsWindow, IsWindowVisible};
+use windows::Win32::UI::WindowsAndMessaging::{
+    EnumWindows, GA_ROOTOWNER, GW_OWNER, GetAncestor, GetClassNameW, GetWindow, GetWindowTextW, GetWindowThreadProcessId,
+    IsWindow, IsWindowVisible,
+};
 use windows::core::{BOOL, PWSTR};
 
 type AnyResult<T> = Result<T, Box<dyn std::error::Error>>;
@@ -30,14 +37,29 @@ type AnyResult<T> = Result<T, Box<dyn std::error::Error>>;
 const DIALOG_CLASSES: &[&str] = &["OperationStatusWindow", "#32770"];
 const MAX_ELEMENTS: i32 = 400;
 
-/// (element names, button-like elements as (name, enabled)).
-pub type DialogText = (Vec<String>, Vec<(String, bool)>);
-
 #[derive(Clone, Debug)]
 pub struct Win {
     pub hwnd: isize,
     pub class: String,
     pub title: String,
+    pub owner: isize,
+    pub root_owner: isize,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize)]
+pub struct Button {
+    pub name: String,
+    /// Win32 control id as UIA automation id ("1" = IDOK, "2" = IDCANCEL, ...); title-bar
+    /// buttons have non-numeric ids.
+    pub id: String,
+    pub enabled: bool,
+}
+
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct DialogText {
+    pub names: Vec<String>,
+    pub buttons: Vec<Button>,
+    pub progress_bar: bool,
 }
 
 /// Replaces identifying strings; keeps synthetic names and run folders.
@@ -123,7 +145,9 @@ pub fn explorer_dialogs() -> Vec<Win> {
             if !process_is_explorer(pid) {
                 return None;
             }
-            Some(Win { hwnd: h.0 as isize, class, title: title_of(h) })
+            let owner = unsafe { GetWindow(h, GW_OWNER) }.map(|o| o.0 as isize).unwrap_or(0);
+            let root_owner = unsafe { GetAncestor(h, GA_ROOTOWNER) }.0 as isize;
+            Some(Win { hwnd: h.0 as isize, class, title: title_of(h), owner, root_owner })
         })
         .collect()
 }
@@ -132,6 +156,9 @@ pub struct Uia {
     automation: IUIAutomation,
     owns_com: bool,
 }
+
+const BUTTON_TYPES: [windows::Win32::UI::Accessibility::UIA_CONTROLTYPE_ID; 3] =
+    [UIA_ButtonControlTypeId, UIA_HyperlinkControlTypeId, UIA_SplitButtonControlTypeId];
 
 impl Uia {
     pub fn new() -> AnyResult<Self> {
@@ -146,56 +173,62 @@ impl Uia {
         Ok(Self { automation, owns_com })
     }
 
-    /// (all element names, button-like elements as (name, enabled)).
-    pub fn read(&self, hwnd: isize) -> AnyResult<DialogText> {
+    fn elements(&self, hwnd: isize) -> AnyResult<Vec<windows::Win32::UI::Accessibility::IUIAutomationElement>> {
         unsafe {
             let el = self.automation.ElementFromHandle(HWND(hwnd as *mut _))?;
             let cond = self.automation.CreateTrueCondition()?;
             let arr = el.FindAll(TreeScope_Subtree, &cond)?;
             let n = arr.Length()?.min(MAX_ELEMENTS);
-            let mut names = Vec::new();
-            let mut buttons = Vec::new();
-            for i in 0..n {
-                let Ok(e) = arr.GetElement(i) else { continue };
-                let name = e.CurrentName().map(|b| b.to_string()).unwrap_or_default();
-                let ct = e.CurrentControlType().unwrap_or_default();
-                if [UIA_ButtonControlTypeId, UIA_HyperlinkControlTypeId, UIA_SplitButtonControlTypeId].contains(&ct) {
-                    buttons.push((name.clone(), e.CurrentIsEnabled().map(|b| b.as_bool()).unwrap_or(false)));
-                }
-                if !name.trim().is_empty() && !names.contains(&name) {
-                    names.push(name);
-                }
-            }
-            Ok((names, buttons))
+            Ok((0..n).filter_map(|i| arr.GetElement(i).ok()).collect())
         }
     }
 
-    /// Invokes the first enabled button-like element whose name equals one of `names`
-    /// (case-insensitive). Returns the invoked name.
-    pub fn invoke(&self, hwnd: isize, names: &[String]) -> AnyResult<Option<String>> {
-        unsafe {
-            let el = self.automation.ElementFromHandle(HWND(hwnd as *mut _))?;
-            let cond = self.automation.CreateTrueCondition()?;
-            let arr = el.FindAll(TreeScope_Subtree, &cond)?;
-            let n = arr.Length()?.min(MAX_ELEMENTS);
-            for wanted in names {
-                for i in 0..n {
-                    let Ok(e) = arr.GetElement(i) else { continue };
-                    let ct = e.CurrentControlType().unwrap_or_default();
-                    if ![UIA_ButtonControlTypeId, UIA_HyperlinkControlTypeId, UIA_SplitButtonControlTypeId].contains(&ct) {
+    pub fn read(&self, hwnd: isize) -> AnyResult<DialogText> {
+        let mut out = DialogText::default();
+        for e in self.elements(hwnd)? {
+            unsafe {
+                let name = e.CurrentName().map(|b| b.to_string()).unwrap_or_default();
+                let ct = e.CurrentControlType().unwrap_or_default();
+                if ct == UIA_ProgressBarControlTypeId {
+                    out.progress_bar = true;
+                }
+                if BUTTON_TYPES.contains(&ct) {
+                    out.buttons.push(Button {
+                        name: name.clone(),
+                        id: e.CurrentAutomationId().map(|b| b.to_string()).unwrap_or_default(),
+                        enabled: e.CurrentIsEnabled().map(|b| b.as_bool()).unwrap_or(false),
+                    });
+                }
+                if !name.trim().is_empty() && !out.names.contains(&name) {
+                    out.names.push(name);
+                }
+            }
+        }
+        Ok(out)
+    }
+
+    /// Invokes the first enabled button whose automation id is in `ids` (in preference order).
+    /// Returns (id, name) of the invoked button.
+    pub fn invoke(&self, hwnd: isize, ids: &[String]) -> AnyResult<Option<(String, String)>> {
+        let elements = self.elements(hwnd)?;
+        for wanted in ids {
+            for e in &elements {
+                unsafe {
+                    if !BUTTON_TYPES.contains(&e.CurrentControlType().unwrap_or_default()) {
+                        continue;
+                    }
+                    let id = e.CurrentAutomationId().map(|b| b.to_string()).unwrap_or_default();
+                    if id != *wanted || !e.CurrentIsEnabled().map(|b| b.as_bool()).unwrap_or(false) {
                         continue;
                     }
                     let name = e.CurrentName().map(|b| b.to_string()).unwrap_or_default();
-                    if !name.trim().eq_ignore_ascii_case(wanted.trim()) || !e.CurrentIsEnabled().map(|b| b.as_bool()).unwrap_or(false) {
-                        continue;
-                    }
                     let pattern: IUIAutomationInvokePattern = e.GetCurrentPatternAs(UIA_InvokePatternId)?;
                     pattern.Invoke()?;
-                    return Ok(Some(name));
+                    return Ok(Some((id, name)));
                 }
             }
-            Ok(None)
         }
+        Ok(None)
     }
 }
 
@@ -215,13 +248,30 @@ pub fn mentions(texts: &[String], tokens: &[String]) -> bool {
     })
 }
 
+/// Why a dialog is attributed to this run, if it is.
+pub fn ours_by(w: &Win, text: &DialogText, tokens: &[String], owners: &[isize]) -> Option<&'static str> {
+    if owners.iter().any(|o| *o != 0 && (*o == w.root_owner || *o == w.owner)) {
+        Some("owner")
+    } else if mentions(&text.names, tokens) || mentions(std::slice::from_ref(&w.title), tokens) {
+        Some("token")
+    } else {
+        None
+    }
+}
+
+fn read_owners(path: Option<&Path>) -> Vec<isize> {
+    path.and_then(|p| std::fs::read_to_string(p).ok())
+        .and_then(|s| serde_json::from_str::<Vec<i64>>(s.trim_start_matches('\u{feff}')).ok())
+        .map(|v| v.into_iter().map(|x| x as isize).collect())
+        .unwrap_or_default()
+}
+
 #[derive(Clone)]
 struct Tracked {
     class: String,
     title: String,
-    names: Vec<String>,
-    buttons: Vec<(String, bool)>,
-    ours: bool,
+    text: DialogText,
+    ours: Option<&'static str>,
     first_ms: f64,
 }
 
@@ -232,6 +282,7 @@ pub fn watch(
     stop_file: &Path,
     parent: Option<&crate::win::ProcessWatch>,
     tokens: &[String],
+    owners_file: Option<&Path>,
     test_root: &str,
     interval_ms: u64,
     timeout_secs: u64,
@@ -244,35 +295,43 @@ pub fn watch(
     writeln!(writer, "{}", json!({ "t_ms": 0.0, "event": "start", "preexisting_dialogs": preexisting.len() }))?;
     let mut tracked: BTreeMap<isize, Tracked> = BTreeMap::new();
     let mut last_read: BTreeMap<isize, Instant> = BTreeMap::new();
+    let clean_text = |t: &DialogText| DialogText {
+        names: t.names.iter().map(|s| san.clean(s)).collect(),
+        buttons: t.buttons.iter().map(|b| Button { name: san.clean(&b.name), id: san.clean(&b.id), enabled: b.enabled }).collect(),
+        progress_bar: t.progress_bar,
+    };
     loop {
         let t_ms = start.elapsed().as_secs_f64() * 1000.0;
+        let owners = read_owners(owners_file);
         let now: Vec<Win> = explorer_dialogs().into_iter().filter(|w| !preexisting.contains(&w.hwnd)).collect();
         for w in &now {
-            let due = last_read.get(&w.hwnd).is_none_or(|t| t.elapsed() >= Duration::from_millis(1000));
+            let first = !tracked.contains_key(&w.hwnd);
+            let due = first || last_read.get(&w.hwnd).is_none_or(|t| t.elapsed() >= Duration::from_millis(1000));
             if !due {
                 continue;
             }
             last_read.insert(w.hwnd, Instant::now());
-            let (names, buttons) = uia.read(w.hwnd).unwrap_or_default();
-            let names: Vec<String> = names.iter().map(|s| san.clean(s)).collect();
-            let buttons: Vec<(String, bool)> = buttons.iter().map(|(s, e)| (san.clean(s), *e)).collect();
-            let ours = mentions(&names, tokens) || mentions(std::slice::from_ref(&w.title), tokens);
+            let raw = uia.read(w.hwnd).unwrap_or_default();
+            let ours = ours_by(w, &raw, tokens, &owners);
+            let text = clean_text(&raw);
             let title = san.clean(&w.title);
             match tracked.get_mut(&w.hwnd) {
                 None => {
                     writeln!(writer, "{}", json!({ "t_ms": t_ms, "event": "appear", "hwnd": w.hwnd, "class": w.class, "title": title,
-                        "ours": ours, "names": names, "buttons": buttons }))?;
-                    tracked.insert(w.hwnd, Tracked { class: w.class.clone(), title, names, buttons, ours, first_ms: t_ms });
+                        "owner": w.owner, "root_owner": w.root_owner, "ours": ours.is_some(), "ours_by": ours,
+                        "progress_bar": text.progress_bar, "names": text.names, "buttons": text.buttons }))?;
+                    tracked.insert(w.hwnd, Tracked { class: w.class.clone(), title, text, ours, first_ms: t_ms });
                 }
                 Some(tr) => {
-                    if tr.names != names || tr.buttons != buttons || tr.title != title {
+                    let ours = tr.ours.or(ours);
+                    if tr.text != text || tr.title != title || tr.ours != ours {
                         writeln!(writer, "{}", json!({ "t_ms": t_ms, "event": "change", "hwnd": w.hwnd, "title": title,
-                            "ours": ours || tr.ours, "names": names, "buttons": buttons }))?;
-                        tr.names = names;
-                        tr.buttons = buttons;
+                            "ours": ours.is_some(), "ours_by": ours, "progress_bar": text.progress_bar,
+                            "names": text.names, "buttons": text.buttons }))?;
+                        tr.text = text;
                         tr.title = title;
+                        tr.ours = ours;
                     }
-                    tr.ours |= ours;
                 }
             }
         }
@@ -280,14 +339,19 @@ pub fn watch(
         for h in gone {
             let tr = tracked.remove(&h).unwrap();
             last_read.remove(&h);
-            writeln!(writer, "{}", json!({ "t_ms": t_ms, "event": "gone", "hwnd": h, "class": tr.class, "ours": tr.ours,
-                "lifetime_ms": t_ms - tr.first_ms }))?;
+            writeln!(writer, "{}", json!({ "t_ms": t_ms, "event": "gone", "hwnd": h, "class": tr.class, "ours": tr.ours.is_some(),
+                "progress_bar": tr.text.progress_bar, "lifetime_ms": t_ms - tr.first_ms }))?;
         }
         writer.flush()?;
         let snapshot: Vec<Value> = tracked
             .iter()
-            .map(|(h, tr)| json!({ "hwnd": h, "class": tr.class, "title": tr.title, "ours": tr.ours,
-                "buttons": tr.buttons.iter().filter(|b| b.1).map(|b| b.0.clone()).collect::<Vec<_>>() }))
+            .map(|(h, tr)| {
+                let enabled: Vec<&Button> = tr.text.buttons.iter().filter(|b| b.enabled).collect();
+                json!({ "hwnd": h, "class": tr.class, "title": tr.title, "ours": tr.ours.is_some(), "ours_by": tr.ours,
+                        "progress_bar": tr.text.progress_bar,
+                        "button_ids": enabled.iter().map(|b| b.id.clone()).collect::<Vec<_>>(),
+                        "buttons": enabled.iter().map(|b| b.name.clone()).collect::<Vec<_>>() })
+            })
             .collect();
         let tmp = state.with_extension("tmp");
         // The run script may hold the state file open while reading; a failed replace is retried next poll.
@@ -302,8 +366,8 @@ pub fn watch(
     Ok(())
 }
 
-/// Invokes a named button in one of this run's dialogs, after re-validating the window.
-pub fn act(hwnd: isize, names: &[String], tokens: &[String], test_root: &str) -> AnyResult<Value> {
+/// Invokes one button (by control id) in one of this run's dialogs, after re-validating it.
+pub fn act(hwnd: isize, ids: &[String], tokens: &[String], owners: &[isize], test_root: &str) -> AnyResult<Value> {
     let refuse = |why: &str| Ok(json!({ "invoked": null, "refused": why }));
     let h = HWND(hwnd as *mut _);
     if !unsafe { IsWindow(Some(h)) }.as_bool() {
@@ -313,14 +377,14 @@ pub fn act(hwnd: isize, names: &[String], tokens: &[String], test_root: &str) ->
         return refuse("not a visible Explorer dialog window");
     };
     let uia = Uia::new()?;
-    let (texts, _) = uia.read(hwnd)?;
-    if !mentions(&texts, tokens) && !mentions(std::slice::from_ref(&w.title), tokens) {
-        return refuse("dialog does not mention this run");
-    }
+    let text = uia.read(hwnd)?;
+    let Some(why) = ours_by(&w, &text, tokens, owners) else {
+        return refuse("dialog is not attributed to this run (owner or token)");
+    };
     let san = Sanitizer::new(test_root);
-    match uia.invoke(hwnd, names)? {
-        Some(name) => Ok(json!({ "invoked": san.clean(&name), "class": w.class, "refused": null })),
-        None => refuse("no enabled button with a requested name"),
+    match uia.invoke(hwnd, ids)? {
+        Some((id, name)) => Ok(json!({ "invoked": id, "name": san.clean(&name), "class": w.class, "ours_by": why, "refused": null })),
+        None => refuse("no enabled button with a requested control id"),
     }
 }
 
@@ -328,12 +392,27 @@ pub fn act(hwnd: isize, names: &[String], tokens: &[String], test_root: &str) ->
 mod tests {
     use super::*;
 
+    fn win(owner: isize, root: isize) -> Win {
+        Win { hwnd: 50, class: "#32770".into(), title: "x".into(), owner, root_owner: root }
+    }
+
     #[test]
     fn mentions_needs_a_long_enough_run_token() {
         let texts = vec!["Copying 1 item to paste-target-1".to_owned()];
         assert!(mentions(&texts, &["paste-target-1".into()]));
         assert!(!mentions(&texts, &["item".into()]), "short tokens are ignored");
         assert!(!mentions(&texts, &["e02-ERR-01-f0.bin".into()]));
+    }
+
+    #[test]
+    fn attribution_by_owner_chain_or_token_only() {
+        let t = DialogText { names: vec!["Unspecified error".into()], ..Default::default() };
+        assert_eq!(ours_by(&win(0, 7), &t, &[], &[7]), Some("owner"));
+        assert_eq!(ours_by(&win(7, 9), &t, &[], &[7]), Some("owner"));
+        assert_eq!(ours_by(&win(0, 9), &t, &["paste-target-1".into()], &[7]), None, "a foreign dialog");
+        assert_eq!(ours_by(&win(0, 0), &t, &[], &[0]), None, "a null owner never matches");
+        let named = DialogText { names: vec!["Copying 'e02-ERR-01-f0.bin'".into()], ..Default::default() };
+        assert_eq!(ours_by(&win(0, 9), &named, &["e02-ERR-01-f0.bin".into()], &[7]), Some("token"));
     }
 
     #[test]

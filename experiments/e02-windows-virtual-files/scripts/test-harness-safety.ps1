@@ -245,12 +245,12 @@ Test-Case 'NB-02' 'unbounded (Stage B2) and unsafe cases are refused before the 
     Assert-True (-not (Test-Path (Join-Path $rd 'ready'))) 'agent took the clipboard'
 }
 Test-Case 'NB-03' 'dialog-act refuses a window that is not a live Explorer dialog of this run' {
-    $out = & $verifyExe dialog-act --hwnd 1 --names Cancel --tokens 'paste-target-1' --test-root $sandbox 2>&1 | Out-String
+    $out = & $verifyExe dialog-act --hwnd 1 --ids 2 --tokens 'paste-target-1' --test-root $sandbox 2>&1 | Out-String
     $r = $out | ConvertFrom-Json
     Assert-True ($null -eq $r.invoked -and $r.refused) "dialog-act did not refuse: $out"
     $self = (Get-Process -Id $PID).MainWindowHandle.ToInt64()
     if ($self -ne 0) {
-        $r2 = (& $verifyExe dialog-act --hwnd $self --names Cancel --tokens 'paste-target-1' --test-root $sandbox 2>&1 | Out-String) | ConvertFrom-Json
+        $r2 = (& $verifyExe dialog-act --hwnd $self --ids 2 --tokens 'paste-target-1' --test-root $sandbox 2>&1 | Out-String) | ConvertFrom-Json
         Assert-True ($null -eq $r2.invoked) 'dialog-act invoked a button in a non-Explorer window'
     }
 }

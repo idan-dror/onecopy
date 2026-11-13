@@ -220,6 +220,13 @@ pub fn release(tag: &str, expect_sequence: Option<u32>, probe_only: bool) -> Any
                     available.insert((*name).into(), json!({ "rendered": size.is_some(), "size": size }));
                 }
             }
+            // After the provider process dies, the system drops its delayed-render formats and
+            // leaves only OLE's private formats pointing at the dead process. They are this
+            // run's only if nothing else touched the clipboard since the provider set it.
+            let ole_only = !formats.is_empty() && formats.iter().all(|(_, n)| n == "DataObject" || n == "Ole Private Data");
+            if identified.is_none() && ole_only && expect_sequence.is_some_and(|s| sequence >= s && sequence - s <= 2) {
+                identified = Some("stale_ole_formats_and_sequence");
+            }
             if identified.is_none() && has(MARKER) {
                 match read_small(register(MARKER)) {
                     Some(d) if tag_matches(&d, tag) => identified = Some("marker_data"),
