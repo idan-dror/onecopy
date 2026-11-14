@@ -66,6 +66,7 @@ Source: the owner's review of E-02 Stage B1 (PR #4) and the Stage A closure (PR 
 |---|---|---|---|
 | OD-08 | F1: exact length or failure for native-paste streams; final source-consistency check before a successful end of stream; no claim of universal change detection; verify on T1 and T2 | D-043, PR-037, W-08 | CONFIRMED |
 | OD-09 | F2: unrestricted native overwrite is not approved; no workflow where an interrupted OneCopy transfer can destroy an existing destination file; native-paste replacement unsupported for release until a safe solution is demonstrated; investigate alternatives A–D independently and prepare a decision record | D-044, PR-038, W-09 | CONFIRMED (mechanism OPEN: B-14) |
+| OD-10 | Accept Windows checklist W-02, W-03 and W-04 with explicit evidence limits; record the two further B1 HRESULT findings and their regression tests | W-02–W-04, W-07 | ACCEPTED (W-07 rule additions stay PROPOSED) |
 
 ## Decisions to investigate before commitment
 
