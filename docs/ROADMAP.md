@@ -20,6 +20,7 @@
 *Progress:*
 
 - **2026-11-13: E-02 Stage A complete and accepted** (small-file Explorer paste, T1, no faults; spec §0.1). Stage B (faults, then large files and other targets) is in progress. E-02 and Gate B remain open.
+- **2026-11-14: E-02 Stage B1 findings accepted** (not product acceptance). Owner decisions D-043 (exact length or failure) and D-044 (no destructive replacement; native replace unsupported for release; mechanism OPEN as B-14). B2 preparation and bounded validation authorized; the 1/10/100 GiB matrix is not.
 
 ## Phase 1 — Desktop technical MVP
 

@@ -1,7 +1,7 @@
 # E-02 — Windows clipboard virtual-file paste: experiment specification
 
 **Status:** **APPROVED** by the product owner on 2026-11-12 with the Phase 0 baseline. Implemented in two independently reviewed stages (§0). The implementation PR is not merged without owner approval.
-**Progress (2026-11-13):** **Stage A is complete and accepted** (§0.1). Stage B is in progress. **E-02 as a whole is not complete**, and Gate B (Windows) is not decided.
+**Progress (2026-11-14):** **Stage A is complete and accepted** (§0.1). **Stage B1 (fault matrix, bounded files) is complete as an experiment, and its research findings were accepted on 2026-11-14** (§0.2). That is not product acceptance of native paste. **B2 is authorized for preparation and bounded validation only** (§7.12); the 1/10/100 GiB matrix needs a separate review and hands-off window. **E-02 as a whole is not complete**, and Gate B (Windows) is not decided.
 **Experiment class:** Phase 0 feasibility spike. This is throwaway code, not a product foundation.
 **Related:** PR-019 (CONFIRMED), PR-023 (PROPOSED); PR-028–PR-030, PR-035 (CONFIRMED); D-024, D-033, D-041, D-042 (CONFIRMED); ADR-0002, ADR-0007; Gate B (Windows).
 **Equipment stage:** 0. Runs on the existing Windows development machine; no purchases and no network services.
@@ -40,6 +40,18 @@ These are the cases in §7.1–§7.11 not marked *blocked*.
 
   It shows nothing about large files, faults, cancellation, provider termination, partial-file or false-success outcomes, provenance, other targets or T2. No native-paste guarantee may be claimed from it (D-024).
 - **Carried forward:** the `S_OK` versus `S_FALSE` finding is item W-01 of [`WINDOWS_ENGINEERING_CHECKLIST.md`](../WINDOWS_ENGINEERING_CHECKLIST.md).
+
+### 0.2 Stage B1 outcome and owner review (2026-11-14)
+
+- **Experiment status:** B1 complete (PR #4, report `experiments/e02-windows-virtual-files/reports/E-02-stage-b1-report.md`). PR #4 stays open and unmerged.
+- **Owner review:** the B1 **research findings are accepted as findings**. This is not acceptance of native paste for the product, and no native-paste guarantee follows from it (D-024).
+- **Decisions taken in the review:**
+  - F1 → **D-043** (exact length or failure; checklist W-08). Verified on T1 and T2 in §7.12.
+  - F2 → **D-044** (native-paste replacement unsupported for release; no workflow where an interrupted transfer can destroy an existing file). The enforcing mechanism is OPEN (**B-14**) and needs a decision record.
+  - Outcome classes: a failure that destroys a pre-existing destination file is a separate, **critical** class (§9.1, O6).
+  - Threading: **T2 is the primary B2 experimental candidate**, not production-approved until the §7.12 T2 checks pass. T1 is kept only as a comparison baseline. The read timeout is configurable and bounded; the tested 30 s is not a production default.
+  - Provenance: `ZoneIdentifier` remains an observational experiment (D-033, W-06).
+- **Not authorized yet:** the 1/10/100 GiB matrix; any uncontrolled shell termination on the operator's PC. PROC-06 and SEC-04 stay VM-only; DEST-01 to DEST-04 stay deferred.
 
 **Safety permissions:**
 
@@ -387,6 +399,73 @@ Default destination: `<test-root>\dest\<run-id>\` on the NTFS volume. Default ta
 | TGT-02 | P0 | BASE-02 and ERR-01 through **G-04** (`IFileOperation`) | Supported? Same outcome as G-01? |
 | TGT-03 | P2 | BASE-01 against G-05 and G-06 | Informational |
 
+### 7.12 Stage B2 preparation: bounded validation (owner direction, 2026-11-14)
+
+Runs before any 1/10/100 GiB case. **Small sizes first:** 16 MiB per file, then a 256 MiB step for the cases marked *step*. Nothing above the 256 MiB bound. Synthetic data only. Threading **T2** unless a T1 column is listed. Every case below runs with the **exact-length guard on** (`exact_length`, D-043) unless it is marked *guard off* (a control).
+
+**Exact-length guard (provider, D-043 / W-08).** The descriptor advertises the source size. `Read` serves at most the advertised size. It returns `E_CHANGED_STATE` (`0x8000000C`) instead of data or `S_FALSE` when it finds: a short source read before the advertised size (shrinkage); a source larger than advertised (growth); or changed file identity, size, last-write time or change time since the stream was opened. It checks before every read, again after reading the bytes that complete the file and before returning them, and again on the end-of-stream read before `S_FALSE`. With a synthetic source, a planned early end (`premature_eof`) or overrun becomes this failure.
+
+**File-backed source (`source = "file"`).** For change tests only: the provider writes a synthetic source file in the test root at start, opens it per stream with read, write and delete sharing (D-042: no locking), and reads from it. A `source_change` fault modifies that file through a separate handle when a read reaches a given offset, either before or after the provider's own read: truncate, append, rewrite in place (same size, different synthetic content), the same with timestamps restored (a known blind spot, ADR-0003), the same with the writer handle kept open, and replace-by-rename.
+
+| ID | Pri | Setup | Expect / record |
+|---|---|---|---|
+| EX-01 | P0 | File source, no change (T1, T2); *step* | S. No false positive from the guard |
+| EX-02 | P0 | Truncate to 50% while the transfer is at 25% (T1, T2) | O1 |
+| EX-03 | P0 | Truncate by 1 byte immediately before the final read (T1, T2) | O1. Failure at the final read |
+| EX-04 | P0 | Append 4 KiB while at 50% (T1, T2) | O1 |
+| EX-05 | P0 | Append 4 KiB after the last data read, before the end-of-stream read (T1, T2) | O1 if the target issues an end-of-stream read; record whether it does |
+| EX-06 | P0 | Rewrite in place (same size) during the final read, after the provider read the bytes (T1, T2) | O1. The post-read final check catches it |
+| EX-07 | P1 | Rewrite in place while at 50%, writer handle kept open until the end | Whether last-write or change time is visible to the reader while the writer is open |
+| EX-08 | P1 | Rewrite in place while at 50%, then restore the original timestamps | **Expected blind spot**: likely undetected (mixed content). Recorded as a documented limitation, not a pass |
+| EX-09 | P1 | Replace the source path by rename while at 50% | The open handle keeps reading the original file: consistent content expected. Record |
+| EX-10 | P0 | Synthetic source: `premature_eof` at 50% (DESC-03) and advertised size larger than the stream (DESC-04), guard on (T1, T2) | O1 (B1 without the guard: O4) |
+| EX-11 | P0 | Synthetic source: overrun 4 KiB (DESC-05), guard on | O1 |
+
+| ID | Pri | T2 regression (owner list) | Expect / record |
+|---|---|---|---|
+| T2R-01 | P0 | ERR-01: `error` at 50% | O1 |
+| T2R-02 | P0 | ERR-04e: `error` on the end-of-stream read | O1 |
+| T2R-03 | P0 | ERR-07: 5 files, `error` in file 3 | Files 1–2 correct, 3–5 absent |
+| T2R-04 | P0 | PROC-01: kill the provider during an active, throttled `Read` | O1; time to error |
+| T2R-05 | P0 | PROC-02: kill the provider during a stalled `Read` | O1 |
+| T2R-06 | P0 | CANCEL-01: cancel mid-copy (throttled) | O1; cancel latency |
+| T2R-07 | P0 | CANCEL-03: cancel during a stalled `Read`, RT = 10 s | Latency bounded by RT; O1 |
+| T2R-08 | P0 | Three concurrent pastes, 3 files each, distinct content | S for all; no cross-stream corruption |
+| T2R-09 | P0 | T2R-08 with an `error` that fires once in file 2 | Exactly one paste fails; the others S |
+| T2R-10 | P0 | T2R-08 with one stream stalled 30 s, RT = 10 s | The other pastes progress; the stalled one fails at RT |
+| T2R-11 | P0 | LIFE-03 + STREAM-08: clipboard replaced, and another process reads the clipboard, while a `Read` is stalled | No clipboard starvation; in-flight copy outcome |
+| T2R-12 | P0 | Resource bound: 4 concurrent pastes × 4 files, throttled | Provider private bytes, threads and handles stay bounded; byte budget enforced |
+| T2R-13 | P0 | COM lifetime: provider exits (`clear`) during active transfers; and five sequential pastes then exit | No crash; live-object counts at exit; outcome |
+
+| ID | Pri | Replacement safety (F2, synthetic files only) | Expect / record |
+|---|---|---|---|
+| RP-01 | P0 | *Replace* + `error` at 50% (ERR-08 on T2) | Original kept or destroyed (O1 versus O6) |
+| RP-02 | P0 | *Replace* + `error` on the first read | Can a failure before any data still destroy the original? |
+| RP-03 | P0 | *Replace* + user cancel mid-copy (throttled) | Original kept or destroyed |
+| RP-04 | P0 | *Replace* + provider killed mid-copy | Original kept or destroyed |
+| RP-05 | P0 | *Replace* + source change caught by the guard at the final read | Original kept or destroyed |
+| RP-06 | P0 | *Replace*, no fault (control) | S |
+| RP-07 | P0 | *Don't copy* (skip) + `error` | K |
+| RP-08 | P1 | Third conflict choice (*keep both*), if offered, + `error` | Original intact? New file? |
+| RP-09 | P0 | **Race:** no file at paste time; the harness creates a synthetic file with the destination name after the paste starts and before the target writes (descriptor and contents delays open the window) | Does the target prompt, fail or overwrite silently? |
+| RP-10 | P0 | **Race, multi-file:** 3 files, file 1 throttled; the harness creates file 3's name while file 1 copies | Prompt or silent overwrite when the target reaches file 3? |
+| RP-11 | P0 | **Baseline without virtual files:** `CF_HDROP` of a complete local synthetic file; the provider holds a byte-range lock on part of it so the target's read fails mid-copy; with and without *Replace* | Does the target's ordinary copy engine also destroy the original? (Bears on options C and D of B-14) |
+| RP-12 | P0 | G-04 (`IFileOperation`) with `FOF_RENAMEONCOLLISION` + `error`, over a pre-existing file | Original intact? (Bears on option D) |
+
+| ID | Pri | Compatibility probes | Expect / record |
+|---|---|---|---|
+| TGT-04a | P0 | G-04 in-process (`IFileOperation::CopyItems` on the provider's own data object, `FOF_SILENT` and `FOF_NOERRORUI`, no clipboard): BASE, ERR-01, EX-02, EX-10 guard on and off | Supported? Same outcome classes as G-01? |
+| TGT-03a | P0 | G-03 automated: a Common Item Dialog hosted by the experiment's verifier process, paste posted to its folder view (D2c); BASE, ERR-01, EX-02, CANCEL-01, PROC-01 | Same columns as G-01. **Not calibrated against D1 in Notepad** unless the operator runs the D1 subset; reported accordingly |
+
+| ID | Pri | Provenance recognition (observation only; no protection is disabled) | Expect / record |
+|---|---|---|---|
+| PV-01 | P1 | Paste a benign synthetic PowerShell script (it only prints a marker) with `ZoneIdentifier` = 3, and without | `Zone.Identifier` content; zone reported by the documented `IZoneIdentifier` API; whether `powershell -ExecutionPolicy RemoteSigned -File` (process scope only) refuses it as a remote unsigned script |
+| PV-02 | P1 | Positive and negative controls: the same script with a standard `Zone.Identifier` written by PowerShell, and with none | The test detects Mark-of-the-Web when it is present in the standard form |
+
+**Managed-replacement feasibility (MR, no Explorer, no clipboard; option C of B-14).** Unit and integration tests in an isolated crate, synthetic files in the test root: no-clobber finalize under concurrent racers; atomic rename-over only after verification; `ReplaceFileW` with a backup; the destination held open by another process; cancellation; and repeated forced termination of a child process at random points, after which an invariant is checked (the original content or the complete new content is always recoverable under a known name).
+
+**Not in this stage:** 1/10/100 GiB; PROC-06 and SEC-04 (VM only); DEST-01 to DEST-04 (deferred); any shell termination on the operator's PC.
+
 ## 8. Measurements
 
 | Metric | Method |
@@ -407,18 +486,32 @@ Default destination: `<test-root>\dest\<run-id>\` on the NTFS volume. Default ta
 
 | Class | Definition | Meaning for claims |
 |---|---|---|
-| **O1** | The target reports failure and no destination file remains (or only a target-owned temporary file that is removed) | Native paste may be claimed as "no false success" for this condition |
+| **O1** | The target reports failure (or cancellation); **no new destination file remains** (or only a target-owned temporary file that is removed); and **every pre-existing destination file is intact** (byte-identical) | Native paste may be claimed as "no false success" for this condition |
 | **O2** | The target reports failure; a partial file remains, smaller than the advertised size and/or under a temporary name | Native paste must state the limitation. Owner decision on UX wording (Gate B). |
 | **O3** | A file with the **final name and full advertised size** remains with **wrong content**, whatever the target reported | **False success.** Native paste is not offered for this condition without a demonstrated mitigation. |
 | **O4** | The target reports **success** but the content is wrong or truncated | **False success.** Same consequence as O3. |
 | **O5** | The target hangs for more than 120 s or crashes | Native paste is not offered without a mitigation (for example a read timeout) demonstrated to remove it |
+| **O6 (critical)** | A **pre-existing destination file was destroyed, truncated or altered**, and a complete, correct copy of the new content is not in its place, **whatever the target reported** | **Critical data-loss failure** (D-044, PR-038). The workflow is unsupported for release until a mechanism that prevents it is demonstrated. Takes precedence over O1–O5; the record keeps the base class too. |
+
+Supplementary classes used by the harness (added in Stage B1, revised 2026-11-14):
+
+| Class | Definition |
+|---|---|
+| **S** | The target reports success and every destination file is complete and correct. Where the user chose *Replace*, the pre-existing file was replaced by the complete, correct new content. |
+| **K** | A pre-existing destination file was kept intact by design (the user chose *Skip* / *Don't copy*), and no new file remains. |
+| **N** | The paste had no effect and nothing was reported (silent no-op); pre-existing files intact. |
+| **C** | The target reported a failure, but every destination file is complete and correct (and pre-existing files intact). |
+
+Per-destination verdicts are kept; a run's class is the most severe destination class (O6 > O3/O4 > O5 > O2 > O1 > C > N > K > S).
+
+**Re-evaluation of B1 records (2026-11-14):** the roll-up derives O6 from each record's per-file data (`pre_existing_seed` with a final state that is neither the original content nor complete correct new content). Raw records are not edited. The B1 ERR-08 runs (F2) are O6 under this rule.
 
 ### 9.2 Pass criteria (each must be met for Gate B "go" on the stated condition)
 
 | AC | Criterion |
 |---|---|
 | AC-1 | BASE-02/03/04 complete with a digest match on G-01 in every repeat. Provider private bytes ≤ 256 MiB and memory slope < 1 MiB per GiB served. |
-| AC-2 | No **O3 or O4** in any P0 fault case: DESC-03/04, ERR-01/02/04/05/07/08, CANCEL-01/02/03, PROC-01/02, LIFE-03, for G-01 and G-03. Each **O2** is listed with its exact condition. |
+| AC-2 | No **O3, O4 or O6** in any P0 fault case: DESC-03/04, ERR-01/02/04/05/07/08, CANCEL-01/02/03, PROC-01/02, LIFE-03, for G-01 and G-03. Each **O2** is listed with its exact condition. Any **O6** is reported as a critical finding. |
 | AC-3 | Cancel takes effect within 2 s when no `Read` is blocked. With RT = 30 s, cancel takes effect within 35 s while a `Read` is blocked. No O5. |
 | AC-4 | After the provider is killed (PROC-01/02), the target shows an error within 30 s, does not crash, and the outcome class is recorded |
 | AC-5 | PROC-04 shows no content materialization at exit. PROC-05 quantifies the `flush` risk. |

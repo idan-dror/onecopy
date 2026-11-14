@@ -67,6 +67,10 @@ Source: the owner's review of E-02 Stage B1 (PR #4) and the Stage A closure (PR 
 | OD-08 | F1: exact length or failure for native-paste streams; final source-consistency check before a successful end of stream; no claim of universal change detection; verify on T1 and T2 | D-043, PR-037, W-08 | CONFIRMED |
 | OD-09 | F2: unrestricted native overwrite is not approved; no workflow where an interrupted OneCopy transfer can destroy an existing destination file; native-paste replacement unsupported for release until a safe solution is demonstrated; investigate alternatives A–D independently and prepare a decision record | D-044, PR-038, W-09 | CONFIRMED (mechanism OPEN: B-14) |
 | OD-10 | Accept Windows checklist W-02, W-03 and W-04 with explicit evidence limits; record the two further B1 HRESULT findings and their regression tests | W-02–W-04, W-07 | ACCEPTED (W-07 rule additions stay PROPOSED) |
+| OD-11 | Outcome classes: a failed paste that destroyed a pre-existing file is a separate, critical outcome (O6), distinct from O1 | E-02 §9.1 | ACCEPTED |
+| OD-12 | T2 is the primary B2 experimental candidate, not production-approved until the B2 T2 checks pass; T1 kept as a comparison baseline; configurable bounded read timeout (30 s is not a production default) | E-02 §0.2, §7.12; W-03 | ACCEPTED (experiment direction) |
+| OD-13 | B2: preparation and bounded validation only (small sizes first); no 1/10/100 GiB matrix without review and a separately agreed hands-off window; no uncontrolled shell termination on the operator's PC; PROC-06 and SEC-04 VM-only; elevated VHD deferred | E-02 §7.12 | ACCEPTED |
+| OD-14 | `ZoneIdentifier` stays observational; investigate whether Windows recognizes the resulting stream without suppressing any protection; no undocumented shell formats as production security mechanisms | D-033, W-06; E-02 §7.12 | ACCEPTED |
 
 ## Decisions to investigate before commitment
 
