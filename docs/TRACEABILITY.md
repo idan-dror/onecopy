@@ -39,6 +39,7 @@ Rows below were accepted on 2026-11-12 unless their status says otherwise.
 | Requirement IDs | Status | Decision / ADR | Primary design docs | Phase 0 evidence | Future acceptance |
 |---|---|---|---|---|---|
 | PR-037 | CONFIRMED (2026-11-14) | D-043; ADR-0002, ADR-0003 | TRANSFER_AND_ROUTING (Delivery modes); WINDOWS_ENGINEERING_CHECKLIST W-08 | E-02 B1 F1 (DESC-03/04: O4 without the rule); E-02 §7.12 exact-length cases on T1 and T2 | Adapter tests: no early end of stream; shrink, growth and modification rejected; final check before the last bytes |
+| PR-038 | CONFIRMED (2026-11-14); mechanism OPEN (B-14) | D-044; ADR-0002 | TRANSFER_AND_ROUTING (Delivery modes); WINDOWS_ENGINEERING_CHECKLIST W-09 | E-02 B1 F2 (ERR-08: original destroyed 3 of 3); E-02 §7.12 replacement-safety cases; F2 decision record | Every delivery mode: failure, cancellation and crash leave a pre-existing destination intact; outcome O6 never occurs |
 | PR-036 | CONFIRMED | D-036 | PLATFORM_CAPABILITIES | E-04, E-05 | Published support tiers |
 | NFR-010, NFR-011, NFR-012 | CONFIRMED | D-038–D-040 / ADR-0009 | SECURITY_AND_PRIVACY, ARCHITECTURE | E-11 | IPC authorization, single writer, dump hygiene |
 | NFR-013 | CONFIRMED | D-021, D-022 / ADR-0001 | TRANSFER_AND_ROUTING | E-06a, E-06b | Zero Free inter-device packets through relays |

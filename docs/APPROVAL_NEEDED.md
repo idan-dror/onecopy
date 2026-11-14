@@ -65,6 +65,7 @@ Source: the owner's review of E-02 Stage B1 (PR #4) and the Stage A closure (PR 
 | Review item | Direction (summary) | Decision IDs | Status |
 |---|---|---|---|
 | OD-08 | F1: exact length or failure for native-paste streams; final source-consistency check before a successful end of stream; no claim of universal change detection; verify on T1 and T2 | D-043, PR-037, W-08 | CONFIRMED |
+| OD-09 | F2: unrestricted native overwrite is not approved; no workflow where an interrupted OneCopy transfer can destroy an existing destination file; native-paste replacement unsupported for release until a safe solution is demonstrated; investigate alternatives A–D independently and prepare a decision record | D-044, PR-038, W-09 | CONFIRMED (mechanism OPEN: B-14) |
 
 ## Decisions to investigate before commitment
 
@@ -83,6 +84,7 @@ Source: the owner's review of E-02 Stage B1 (PR #4) and the Stage A closure (PR 
 | B-11 | Transfer-time write prevention and copy-on-write clones | — | **Resolved by D-042** (no default locking; no clones or hidden snapshots) |
 | B-12 | Cross-version compatibility window (review DA-24) | Before first external build | OPEN |
 | B-13 | Mobile local staging quota, expiry default and delete-after-send policy (ADR-0004) | Before Phase 3 | OPEN |
+| B-14 | How D-044 is enforced: (A) provider-side prevention of destructive Explorer replacement, (B) a native workflow that never overwrites an existing destination, including races, (C) OneCopy-managed download with temporary output, verification and controlled replacement, (D) another OS-supported approach within product boundaries | F2 decision record (E-02 B2 preparation); before any Windows native-paste release | OPEN |
 
 ## Approval record
 

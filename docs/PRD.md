@@ -118,6 +118,7 @@ These requirements were accepted with the Phase 0 baseline. Where one refines a 
 | ID | Requirement | Status | Decision / ADR | Target |
 |---|---|---|---|---|
 | PR-037 | **Exact length or failure (native paste).** Each natively pasted file has an explicit advertised size. OneCopy delivers exactly that size or reports a failure to the target, never a successful but incomplete end of stream. Source shrinkage, unexpected growth and detectable incompatible modification are rejected; a final source-consistency check precedes a successful end of stream. Detection is claimed only in tested scenarios. | CONFIRMED | D-043 (2026-11-14); ADR-0002, ADR-0003 | MVP |
+| PR-038 | **Existing destination files are never destroyed by an interrupted transfer.** A failed, cancelled or interrupted OneCopy transfer leaves any pre-existing destination file intact, in every delivery mode. A workflow that cannot guarantee this is unsupported for release; this currently includes native-paste replacement on Windows. | CONFIRMED | D-044 (2026-11-14); ADR-0002. Mechanism OPEN (B-14) | MVP |
 
 ## Explicit non-goals
 
