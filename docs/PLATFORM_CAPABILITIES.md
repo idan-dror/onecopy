@@ -19,7 +19,7 @@
 
 **Phase 0 test:** capture text and file list; native virtual-file paste into Explorer with a lazy content stream; include cancellation, multiple files, delayed read and large-file behavior. Test destinations other than Explorer separately; cannot infer universal app compatibility from one success.
 
-**Adapter requirement (owner direction, 2026-11-13):** the Windows adapter follows [`WINDOWS_ENGINEERING_CHECKLIST.md`](WINDOWS_ENGINEERING_CHECKLIST.md). Item W-01 is required: predicate COM APIs are judged by comparing the raw `HRESULT` with `S_OK`, never by "succeeded". E-02 Stage A showed `S_FALSE` treated as success clearing another application's clipboard. The other items are PROPOSED.
+**Adapter requirement (owner direction, 2026-11-13):** the Windows adapter follows [`WINDOWS_ENGINEERING_CHECKLIST.md`](WINDOWS_ENGINEERING_CHECKLIST.md). Item W-01 is required: predicate COM APIs are judged by comparing the raw `HRESULT` with `S_OK`, never by "succeeded". E-02 Stage A showed `S_FALSE` treated as success clearing another application's clipboard. W-02 to W-04 were accepted on 2026-11-14 with explicit evidence limits. W-08 (exact length or failure, D-043) and W-09 (no native replacement of existing files, D-044) record owner decisions from the E-02 B1 review.
 
 ## macOS
 

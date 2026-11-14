@@ -75,10 +75,13 @@ Proposed chunk size range **4–16 MiB**, with 4 MiB as initial benchmark. Do no
 | Controlled finalization | Atomic rename where supported | Not claimed |
 | Cleanup on failure | Explicit policy | Target-dependent; measured |
 | Provenance marking | Applied by OneCopy (D-033) | Observed per target |
+| Existing destination file (D-044) | Never altered before the new content is complete and verified. The replacement procedure is decided with B-14. | Windows Explorer overwrote the existing file in place and deleted it after a stream failure (E-02 B1 F2). **Native-paste replacement is unsupported for release** until a safe mechanism is demonstrated. |
 
 Rules:
 
 - **No clean end of stream for inconsistent data.** For native paste, OneCopy never returns a clean end of stream for data that failed source-consistency validation. The sender's final consistency result (for example a trailer after post-read revalidation) must arrive before the last bytes are released.
+- **Exact length or failure (D-043, owner decision 2026-11-14).** Each natively pasted file advertises an explicit size. The provider delivers exactly that many bytes, or returns a failure to the target. It never signals end of stream early for an incomplete transfer (on Windows, never `S_FALSE` before the advertised size). Shrinkage, unexpected growth and detectable incompatible modification of the source are failures. The final source-consistency check runs before the bytes that complete the file are released, and again before end of stream. Evidence: E-02 B1 finding F1 (Explorer accepted an early end of stream as a completed copy).
+- **Existing destination files (D-044, owner decision 2026-11-14).** An interrupted, failed or cancelled OneCopy transfer must never destroy an existing destination file, in any delivery mode. Unrestricted native-paste overwrite is not approved. "Small file", "local source" and "high expected success probability" are not mitigations. The enforcing mechanism is OPEN (B-14).
 - **The trailer does not fix the target.** It governs only OneCopy's own end-of-stream and error signal. It does **not** determine what the target does with a partially written file. That behavior is measured, not assumed.
 - **Fallback.** Managed download is offered whenever native paste is unavailable, unverified for the condition, or beyond evidence-based limits (PR-030).
 

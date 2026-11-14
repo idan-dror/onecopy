@@ -4,7 +4,7 @@
 
 | ID | Specification | Status | Implementation |
 |---|---|---|---|
-| E-02 | [Windows clipboard virtual-file paste](E-02_WINDOWS_VIRTUAL_FILE_PASTE.md) | **APPROVED** 2026-11-12 (Stage A, then Stage B after review; SEC-04 and DEST-01 to DEST-04 blocked) | **Stage A complete and accepted 2026-11-13** (PR #2, merge `a4dcf2d`; limited to the tested Explorer behavior, spec §0.1). Stage B in progress in a separate PR. E-02 is not complete. |
+| E-02 | [Windows clipboard virtual-file paste](E-02_WINDOWS_VIRTUAL_FILE_PASTE.md) | **APPROVED** 2026-11-12 (Stage A, then Stage B after review; SEC-04 and DEST-01 to DEST-04 blocked) | **Stage A complete and accepted 2026-11-13** (PR #2, merge `a4dcf2d`; limited to the tested Explorer behavior, spec §0.1). **Stage B1 complete; research findings accepted 2026-11-14** (not product acceptance; PR #4 open). B2 preparation and bounded validation authorized (spec §7.12); the 1/10/100 GiB matrix is not. E-02 is not complete. |
 
 Conventions for every specification:
 
