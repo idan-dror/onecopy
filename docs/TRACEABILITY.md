@@ -33,6 +33,12 @@ Rows below were accepted on 2026-11-12 unless their status says otherwise.
 | PR-033 | CONFIRMED | D-031 / ADR-0006 | DATA_MODEL_AND_PROTOCOL, PREMIUM_GATEWAY | E-11 | Free quotas enforced; no P2P size cap |
 | PR-034 | CONFIRMED | D-032 / ADR-0007 | PLATFORM_CAPABILITIES, SECURITY_AND_PRIVACY | E-01, E-03, E-04 | Markers honored and set; limitations shown |
 | PR-035 | CONFIRMED | D-033 / ADR-0007 | SECURITY_AND_PRIVACY, PLATFORM_CAPABILITIES | E-02, E-09 | Provenance applied (managed) or observed (native) |
+
+## Requirements from owner decisions after the baseline
+
+| Requirement IDs | Status | Decision / ADR | Primary design docs | Phase 0 evidence | Future acceptance |
+|---|---|---|---|---|---|
+| PR-037 | CONFIRMED (2026-11-14) | D-043; ADR-0002, ADR-0003 | TRANSFER_AND_ROUTING (Delivery modes); WINDOWS_ENGINEERING_CHECKLIST W-08 | E-02 B1 F1 (DESC-03/04: O4 without the rule); E-02 §7.12 exact-length cases on T1 and T2 | Adapter tests: no early end of stream; shrink, growth and modification rejected; final check before the last bytes |
 | PR-036 | CONFIRMED | D-036 | PLATFORM_CAPABILITIES | E-04, E-05 | Published support tiers |
 | NFR-010, NFR-011, NFR-012 | CONFIRMED | D-038–D-040 / ADR-0009 | SECURITY_AND_PRIVACY, ARCHITECTURE | E-11 | IPC authorization, single writer, dump hygiene |
 | NFR-013 | CONFIRMED | D-021, D-022 / ADR-0001 | TRANSFER_AND_ROUTING | E-06a, E-06b | Zero Free inter-device packets through relays |

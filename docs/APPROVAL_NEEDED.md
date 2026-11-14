@@ -58,6 +58,14 @@ Notes (2026-11-12):
 | Networking | Per-network-class connectivity targets replace the universal 90% target; the ~70% figure is a conditional DCUtR hole-punch rate, not a OneCopy prediction; defer complex routing | D-034, D-035 | — | CONFIRMED |
 | Product | No automatic or simulated keystroke injection as an initial product feature; isolated keystroke automation allowed inside approved experiments only | D-041 | — | CONFIRMED |
 
+## Owner directions from the E-02 Stage B1 review — 2026-11-14
+
+Source: the owner's review of E-02 Stage B1 (PR #4) and the Stage A closure (PR #3), with an engineering teammate. The B1 research findings were accepted as findings. That is not product acceptance of native paste, and PR #4 stays unmerged.
+
+| Review item | Direction (summary) | Decision IDs | Status |
+|---|---|---|---|
+| OD-08 | F1: exact length or failure for native-paste streams; final source-consistency check before a successful end of stream; no claim of universal change detection; verify on T1 and T2 | D-043, PR-037, W-08 | CONFIRMED |
+
 ## Decisions to investigate before commitment
 
 | ID | Unknown | Trigger for binding decision | Status |
