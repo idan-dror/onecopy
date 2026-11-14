@@ -9,10 +9,11 @@
   elevation is used.
 
   -IncludeDesktop adds tests that use the live clipboard (agent ownership, watchdog, single
-  instance, durable record after an injected fault). Run them only in an agreed hands-off window.
+  instance, durable record after an injected fault, Stage B1 clipboard release identity). Run
+  them only in an agreed hands-off window.
 
 .PARAMETER Out
-  JSON summary path (default: reports\stage-a\safety\harness-safety-<timestamp>.json).
+  JSON summary path (default: reports\stage-b1\safety\harness-safety-<timestamp>.json).
 #>
 param([switch] $IncludeDesktop, [string] $Out = '')
 $ErrorActionPreference = 'Stop'
@@ -22,7 +23,7 @@ $bin = Join-Path $ws 'target\release'
 $agentExe = Join-Path $bin 'e02-agent.exe'
 $verifyExe = Join-Path $bin 'e02-verify.exe'
 $psExe = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
-if (-not $Out) { $Out = Join-Path $ws ("reports\stage-a\safety\harness-safety-" + (Get-Date -Format 'yyyyMMddTHHmmss') + ".json") }
+if (-not $Out) { $Out = Join-Path $ws ("reports\stage-b1\safety\harness-safety-" + (Get-Date -Format 'yyyyMMddTHHmmss') + ".json") }
 
 $results = New-Object System.Collections.ArrayList
 function Test-Case([string] $Id, [string] $Name, [scriptblock] $Body) {
@@ -212,6 +213,72 @@ Test-Case 'PR-04' 'an injected failure before the agent starts still yields a du
     Assert-True ($rec.destination_kept) 'destination should be kept on non-pass'
 }
 
+# --- Stage B1 safeguards (no clipboard, no Explorer) -----------------------------------------
+Test-Case 'NB-01' 'write-synthetic never overwrites an existing file' {
+    $ErrorActionPreference = 'Continue'   # the refusals below write to stderr by design
+    $f = Join-Path $sandbox 'existing-original.bin'
+    Set-Content -LiteralPath $f -Value 'pre-existing content' -Encoding ASCII
+    $null = & $verifyExe write-synthetic --seed 1 --index 0 --size 4096 --out $f 2>&1
+    Assert-True ($LASTEXITCODE -ne 0) 'write-synthetic reported success over an existing file'
+    Assert-True ((Get-Content -LiteralPath $f) -eq 'pre-existing content') 'existing file was modified'
+    Assert-SentinelIntact
+}
+Test-Case 'NB-02' 'unbounded (Stage B2) and unsafe cases are refused before the clipboard is touched' {
+    $ErrorActionPreference = 'Continue'   # the refusals below write to stderr by design
+    $big = Join-Path $sandbox 'big.toml'
+    Set-Content -LiteralPath $big -Encoding ASCII -Value "case_id = `"BIG-01`"`ndescription = `"x`"`nseed = 1`n[[files]]`nname = `"a.bin`"`nsize = 1073741824`n"
+    $null = & $verifyExe case-files --case $big 2>&1
+    Assert-True ($LASTEXITCODE -ne 0) '1 GiB case accepted without large = true'
+    $flush = Join-Path $sandbox 'flush.toml'
+    Set-Content -LiteralPath $flush -Encoding ASCII -Value "case_id = `"FL-01`"`ndescription = `"x`"`nseed = 1`n[harness]`nexit_mode = `"flush`"`n[[files]]`nname = `"a.bin`"`nsize = 134217728`n"
+    $null = & $verifyExe case-files --case $flush 2>&1
+    Assert-True ($LASTEXITCODE -ne 0) 'flush of a 128 MiB case accepted'
+    $sfalse = Join-Path $sandbox 'sfalse.toml'
+    Set-Content -LiteralPath $sfalse -Encoding ASCII -Value "case_id = `"SF-01`"`ndescription = `"x`"`nseed = 1`n[[files]]`nname = `"a.bin`"`nsize = 10`n[[files.faults]]`nkind = `"error`"`nat_offset = 1`nhresult = 1`n"
+    $null = & $verifyExe case-files --case $sfalse 2>&1
+    Assert-True ($LASTEXITCODE -ne 0) 'an injected success code (S_FALSE) was accepted as a fault'
+    # The provider refuses the unbounded case before it takes the clipboard (no ready file).
+    $rd = Join-Path $sandbox 'agent-big'
+    $a = Start-OwnedProcess -FilePath $agentExe -ArgumentList @('--case', "`"$big`"", '--run-dir', "`"$rd`"", '--run-id', 'selftest-nb02', '--hold-secs', '5')
+    Assert-True ($a.Process.WaitForExit(10000)) 'agent did not exit'
+    Assert-True ($a.Process.ExitCode -ne 0) 'agent accepted the unbounded case'
+    Assert-True (-not (Test-Path (Join-Path $rd 'ready'))) 'agent took the clipboard'
+}
+Test-Case 'NB-03' 'dialog-act refuses a window that is not a live Explorer dialog of this run' {
+    $out = & $verifyExe dialog-act --hwnd 1 --ids 2 --tokens 'paste-target-1' --test-root $sandbox 2>&1 | Out-String
+    $r = $out | ConvertFrom-Json
+    Assert-True ($null -eq $r.invoked -and $r.refused) "dialog-act did not refuse: $out"
+    $self = (Get-Process -Id $PID).MainWindowHandle.ToInt64()
+    if ($self -ne 0) {
+        $r2 = (& $verifyExe dialog-act --hwnd $self --ids 2 --tokens 'paste-target-1' --test-root $sandbox 2>&1 | Out-String) | ConvertFrom-Json
+        Assert-True ($null -eq $r2.invoked) 'dialog-act invoked a button in a non-Explorer window'
+    }
+}
+Test-Case 'NB-04' 'Stage B1 run ids are accepted and validated by cleanup' {
+    $root = Assert-SafeTestRoot -Path (Join-Path $sandbox 'root-nb04') -Create
+    $a = New-RunLayout -TestRoot $root -Case 'CANCEL-01b' -Pastes 2
+    Assert-True ($a.RunId -match '^CANCEL-01b-\d{8}T\d{6}-[0-9a-f]{8}$') "unexpected run id $($a.RunId)"
+    foreach ($t in $a.Targets) { Set-Content -LiteralPath (Join-Path $t 'e02-CANCEL-01b-f0.bin') -Value 'x' -Encoding ASCII }
+    Set-Content -LiteralPath (Join-Path $a.Targets[0] 'e02-CANCEL-01b-f0 (2).bin') -Value 'renamed copy' -Encoding ASCII
+    $r = Remove-RunDestination -TestRoot $root -RunId $a.RunId -ExpectedFileNames @('e02-CANCEL-01b-f0.bin') -Pastes 2
+    Assert-True ($r.deleted_files -eq 2) "deleted $($r.deleted_files)"
+    Assert-True (Test-Path -LiteralPath (Join-Path $a.Targets[0] 'e02-CANCEL-01b-f0 (2).bin')) 'an unexpected name was deleted'
+    foreach ($bad in @('cancel-01b-20261113T000000-00000000', 'CANCEL-01B-20261113T000000-00000000', 'ERR-1-20261113T000000-00000000')) {
+        Assert-True ([bool](Remove-RunDestination -TestRoot $root -RunId $bad -ExpectedFileNames @('x.bin')).refused) "run id accepted: $bad"
+    }
+}
+Test-Case 'PR-05' 'Stage B1 runner: an injected failure before the provider starts yields a durable inconclusive record' {
+    $rep = Join-Path $ws 'evidence\selftest-reports'
+    $before = @(Get-ChildItem $rep -Filter 'ERR-01-*.json' -ErrorAction SilentlyContinue).Count
+    $out = & (Join-Path $PSScriptRoot 'run-stage-b.ps1') -Case ERR-01 -InjectHarnessFault after-layout -ReportDir $rep -TestRoot (Join-Path $sandbox 'root-pr05') *>&1 | Out-String
+    $recs = @(Get-ChildItem $rep -Filter 'ERR-01-*.json' | Sort-Object LastWriteTime)
+    Assert-True ($recs.Count -eq $before + 1) "no new record. output: $out"
+    $rec = Get-Content -Raw $recs[-1].FullName | ConvertFrom-Json
+    Assert-True ($rec.result -eq 'inconclusive') "result $($rec.result)"
+    Assert-True ($rec.harness.post.agent_stop -eq 'none') 'a provider was started'
+    Assert-True ($rec.destination_kept) 'destination should be kept on an inconclusive run'
+}
+
 # --- Desktop safeguards (clipboard; hands-off window only) ------------------------------------
 if ($IncludeDesktop) {
     $caseFile = Join-Path $ws 'cases\A-01.toml'
@@ -285,6 +352,24 @@ if ($IncludeDesktop) {
         Assert-True ($rec.agent_exit_code -eq 0) "agent exit $($rec.agent_exit_code)"
         Assert-True (-not $rec.clipboard_after_exit.has_onecopy_marker) 'clipboard not released'
         Assert-True (@(Get-Process e02-agent -ErrorAction SilentlyContinue).Count -eq 0) 'an agent is still running'
+    }
+    Test-Case 'DT-05' 'clipboard-release never empties another application''s clipboard' {
+        $text = 'e02-selftest-' + [guid]::NewGuid().ToString('N')
+        Set-Clipboard -Value $text
+        $r = (& $verifyExe clipboard-release --tag 'ERR-01-20261113T000000-00000000' --expect-sequence 1 | Out-String) | ConvertFrom-Json
+        Assert-True (-not $r.cleared -and $null -eq $r.identified_as_this_run) 'foreign clipboard identified as ours'
+        Assert-True ((Get-Clipboard -Format Text -Raw).Trim() -eq $text) 'foreign clipboard content changed'
+    }
+    Test-Case 'DT-06' 'clipboard-release removes only content tagged with this run' {
+        $tag = 'LIFE-03-20261113T000000-' + [guid]::NewGuid().ToString('N').Substring(0, 8)
+        $set = (& $verifyExe clipboard-replace --tag $tag | Out-String) | ConvertFrom-Json
+        Assert-True ($set.replaced) 'replacement helper failed'
+        $other = (& $verifyExe clipboard-release --tag 'LIFE-03-20261113T000000-ffffffff' | Out-String) | ConvertFrom-Json
+        Assert-True (-not $other.cleared) 'content of another run was cleared'
+        Assert-True ((Get-Clipboard -Format Text -Raw).Trim() -eq 'E-02 synthetic clipboard replacement') 'replacement text missing'
+        $mine = (& $verifyExe clipboard-release --tag $tag | Out-String) | ConvertFrom-Json
+        Assert-True ($mine.cleared -and $mine.identified_as_this_run -eq 'replacement_tag') 'own tagged content not released'
+        Assert-True (-not (Get-Clipboard -Format Text -Raw)) 'clipboard not empty after release'
     }
 }
 

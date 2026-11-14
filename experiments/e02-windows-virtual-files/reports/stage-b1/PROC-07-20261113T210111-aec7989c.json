@@ -1,0 +1,486 @@
+﻿{
+    "experiment_id":  "E-02",
+    "stage":  "B1",
+    "case_id":  "PROC-07",
+    "run_id":  "PROC-07-20261113T210111-aec7989c",
+    "description":  "Exit without releasing the clipboard (leave), 8 MiB",
+    "driver":  "D2c",
+    "dialog_driver":  "D2u",
+    "target":  "G-01",
+    "threading":  "T1",
+    "injected_harness_fault":  "none",
+    "case":  {
+                 "case_id":  "PROC-07",
+                 "description":  "Exit without releasing the clipboard (leave), 8 MiB",
+                 "files":  [
+                               {
+                                   "advertised_size":  8388608,
+                                   "faults":  [
+
+                                              ],
+                                   "name":  "e02-PROC-07-f0.bin",
+                                   "size":  8388608
+                               }
+                           ],
+                 "harness":  {
+                                 "close_window_after_event":  null,
+                                 "concurrent":  false,
+                                 "dialog_actions":  [
+
+                                                    ],
+                                 "exit_mode":  "leave",
+                                 "expect":  "success",
+                                 "kill_after_event":  null,
+                                 "kill_before_paste":  false,
+                                 "kill_delay_ms":  0,
+                                 "operator_note":  "",
+                                 "pastes":  1,
+                                 "pre_existing_seed":  null,
+                                 "probe_clipboard":  false,
+                                 "replace_clipboard_after_event":  null,
+                                 "replace_delay_ms":  0,
+                                 "timeout_secs":  60
+                             },
+                 "large":  false,
+                 "read_timeout_ms":  null,
+                 "threading":  "T1",
+                 "zone_identifier":  null
+             },
+    "env":  {
+                "os_caption":  "Microsoft Windows 11 Home",
+                "os_version":  "10.0.26200",
+                "os_build":  "26200",
+                "os_ubr":  9711,
+                "os_display_version":  "25H2",
+                "explorer_version":  "10.0.26100.8875",
+                "explorer_separate_process":  0,
+                "clipboard_history_enabled":  null,
+                "cloud_clipboard_enabled":  null,
+                "defender_product_version":  "4.18.26100.4",
+                "defender_realtime_protection":  true,
+                "test_volume_filesystem":  "NTFS",
+                "test_volume_free_gib":  1309.8,
+                "cpu":  "AMD Ryzen 7 5700X3D 8-Core Processor",
+                "ram_gib":  31.9,
+                "experiment_commit":  "cb3a6813e898dcef454e5277622704264e2acb8c",
+                "experiment_tree_dirty":  false,
+                "rustc":  "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+                "cargo_lock_sha256":  "76215d10f491622601c608a061db959f8a67c758d4254eae40692b46bed5c830"
+            },
+    "progress":  {
+                     "completed":  true,
+                     "timed_out":  false,
+                     "seconds":  10.32,
+                     "reason":  null,
+                     "pending_dialog_actions":  [
+
+                                                ]
+                 },
+    "timeline":  [
+                     {
+                         "t_ms":  322,
+                         "source":  "agent",
+                         "event":  "ready",
+                         "detail":  {
+                                        "sequence":  2715
+                                    }
+                     },
+                     {
+                         "t_ms":  1910,
+                         "source":  "driver",
+                         "event":  "paste",
+                         "detail":  {
+                                        "target":  "paste-target-1",
+                                        "exit":  0
+                                    }
+                     },
+                     {
+                         "t_ms":  1922,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1922,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1922,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1922,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1922,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1922,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1923,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1923,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4080421792,
+                                        "format":  "TargetCLSID"
+                                    }
+                     },
+                     {
+                         "t_ms":  2148,
+                         "source":  "agent",
+                         "event":  "eof_returned",
+                         "detail":  {
+                                        "offset":  8388608,
+                                        "stream_id":  1
+                                    }
+                     },
+                     {
+                         "t_ms":  2148,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "Performed DropEffect"
+                                    }
+                     },
+                     {
+                         "t_ms":  2148,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "Logical Performed DropEffect"
+                                    }
+                     },
+                     {
+                         "t_ms":  2148,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "Logical Performed DropEffect"
+                                    }
+                     },
+                     {
+                         "t_ms":  2148,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  2148,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     }
+                 ],
+    "explorer_windows":  [
+                             {
+                                 "destination":  "paste-target-1",
+                                 "found":  true,
+                                 "top_hwnd":  4720974,
+                                 "top_preexisting":  false,
+                                 "tabs_on_top":  1,
+                                 "close_decision":  "close"
+                             }
+                         ],
+    "explorer_processes":  {
+                               "watched":  [
+                                               {
+                                                   "role":  "shell",
+                                                   "id":  9300,
+                                                   "name":  "explorer",
+                                                   "start":  "2026-11-12T18:48:36.7863513+02:00"
+                                               },
+                                               {
+                                                   "role":  "run_window_host",
+                                                   "id":  24680,
+                                                   "name":  "explorer",
+                                                   "start":  "2026-11-13T21:01:11.6607306+02:00"
+                                               }
+                                           ],
+                               "lost":  [
+
+                                        ]
+                           },
+    "dialogs":  {
+                    "appeared":  0,
+                    "attributed":  0,
+                    "error_dialog_seen":  false,
+                    "progress_dialog_seen":  false,
+                    "error_texts":  [
+
+                                    ],
+                    "events":  [
+
+                               ]
+                },
+    "dialog_actions":  [
+
+                       ],
+    "agent_exit_code":  0,
+    "agent_summary":  {
+                          "owner_thread_id":  3556,
+                          "com_call_threads":  {
+                                                   "3556":  98
+                                               },
+                          "calls":  {
+                                        "IDataObject::EnumFormatEtc":  9,
+                                        "IDataObject::GetData":  34,
+                                        "IDataObject::QueryGetData":  4,
+                                        "IDataObject::SetData":  15,
+                                        "IStream::Read":  33,
+                                        "IStream::Seek":  3
+                                    },
+                          "first_descriptor_get_data_ms":  1705.8968000000002,
+                          "first_contents_get_data_ms":  1706.9106000000002,
+                          "first_read_ms":  1708.001,
+                          "last_read_ms":  1724.7542,
+                          "last_stream_release_ms":  1725.3562,
+                          "clipboard_lost_ms":  null,
+                          "streams_created":  1,
+                          "streams_released":  1,
+                          "bytes_served":  8388608,
+                          "read_calls":  33,
+                          "short_reads":  1,
+                          "failed_reads":  0,
+                          "peak_private_bytes":  2093056,
+                          "peak_working_set_bytes":  12079104,
+                          "memory_samples":  12,
+                          "os_peak_commit_bytes":  2363392,
+                          "os_peak_working_set_bytes":  12451840,
+                          "per_stream":  [
+                                             {
+                                                 "stream_id":  1,
+                                                 "file_index":  0,
+                                                 "advertised_size":  8388608,
+                                                 "bytes_served":  8388608,
+                                                 "final_position":  0,
+                                                 "max_position":  8388608,
+                                                 "read_calls":  33,
+                                                 "failed_reads":  0,
+                                                 "min_request":  262144,
+                                                 "max_request":  262144,
+                                                 "seeks":  3,
+                                                 "stats_calls":  0,
+                                                 "eof_read":  true
+                                             }
+                                         ]
+                      },
+    "agent_fault_events":  [
+                               "eof_returned"
+                           ],
+    "set_data":  [
+                     {
+                         "format":  "TargetCLSID",
+                         "dword":  4080421792
+                     },
+                     {
+                         "format":  "Performed DropEffect",
+                         "dword":  1
+                     },
+                     {
+                         "format":  "Logical Performed DropEffect",
+                         "dword":  1
+                     },
+                     {
+                         "format":  "Logical Performed DropEffect",
+                         "dword":  1
+                     }
+                 ],
+    "performed_drop_effect":  [
+                                  1
+                              ],
+    "streams":  {
+                    "created":  1,
+                    "released":  1,
+                    "all_reached_eof":  true
+                },
+    "destinations":  [
+                         {
+                             "all_files_match":  true,
+                             "case_id":  "PROC-07",
+                             "files":  [
+                                           {
+                                               "advertised_size":  8388608,
+                                               "digest_match":  true,
+                                               "exists":  true,
+                                               "expected_size":  8388608,
+                                               "index":  0,
+                                               "mistakable_as_complete":  true,
+                                               "name":  "e02-PROC-07-f0.bin",
+                                               "original_preserved":  null,
+                                               "prefix_match":  null,
+                                               "size":  8388608,
+                                               "state":  "complete_correct",
+                                               "zone_identifier":  {
+                                                                       "present":  false
+                                                                   }
+                                           }
+                                       ],
+                             "unexpected_entries":  [
+
+                                                    ]
+                         }
+                     ],
+    "observer":  {
+                     "paste-target-1":  {
+                                            "events":  3,
+                                            "names_seen":  [
+                                                               "e02-PROC-07-f0.bin"
+                                                           ],
+                                            "removals":  [
+
+                                                         ],
+                                            "max_sizes":  [
+                                                              {
+                                                                  "name":  "e02-PROC-07-f0.bin",
+                                                                  "max_size":  8388608
+                                                              }
+                                                          ]
+                                        }
+                 },
+    "clipboard":  {
+                      "set_sequence":  2715,
+                      "before_release":  {
+                                             "formats":  [
+                                                             "DataObject",
+                                                             "Ole Private Data"
+                                                         ],
+                                             "has_file_contents":  false,
+                                             "has_file_descriptor":  false,
+                                             "has_onecopy_marker":  false,
+                                             "sequence":  2716
+                                         },
+                      "release":  {
+                                      "available":  {
+                                                        "DataObject":  {
+                                                                           "rendered":  true,
+                                                                           "size":  8
+                                                                       },
+                                                        "Ole Private Data":  {
+                                                                                 "rendered":  true,
+                                                                                 "size":  312
+                                                                             }
+                                                    },
+                                      "cleared":  true,
+                                      "formats":  [
+                                                      "DataObject",
+                                                      "Ole Private Data"
+                                                  ],
+                                      "identified_as_this_run":  "stale_ole_formats_and_sequence",
+                                      "owner_alive":  false,
+                                      "owner_present":  false,
+                                      "refused_reason":  null,
+                                      "sequence":  2716
+                                  },
+                      "after":  {
+                                    "formats":  [
+
+                                                ],
+                                    "has_file_contents":  false,
+                                    "has_file_descriptor":  false,
+                                    "has_onecopy_marker":  false,
+                                    "sequence":  2717
+                                },
+                      "clean_after":  true,
+                      "replacement":  null,
+                      "probe":  null
+                  },
+    "classification":  {
+                           "target_report":  "success",
+                           "per_file":  [
+                                            {
+                                                "target":  "PROC-07",
+                                                "name":  "e02-PROC-07-f0.bin",
+                                                "state":  "complete_correct",
+                                                "size":  8388608,
+                                                "mistakable":  true,
+                                                "class":  "S"
+                                            }
+                                        ],
+                           "outcome_class":  "S",
+                           "expectation_met":  true
+                       },
+    "harness":  {
+                    "failed_stage":  null,
+                    "exception":  null,
+                    "driver_errors":  [
+
+                                      ],
+                    "post":  {
+                                 "agent_stop":  "exited",
+                                 "watcher_stops":  [
+                                                       "exited"
+                                                   ],
+                                 "dialog_watch_stop":  "exited",
+                                 "probe_stop":  "none",
+                                 "helper_stops":  [
+
+                                                  ],
+                                 "cleanup_dialogs":  [
+
+                                                     ]
+                             }
+                },
+    "interference":  [
+
+                     ],
+    "destination_cleanup":  {
+                                "deleted_files":  1,
+                                "removed_dirs":  2,
+                                "left_entries":  [
+
+                                                 ],
+                                "refused":  null
+                            },
+    "destination_kept":  false,
+    "result":  "completed"
+}

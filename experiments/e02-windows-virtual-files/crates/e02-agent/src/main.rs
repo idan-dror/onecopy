@@ -1,9 +1,11 @@
-//! E-02 provider agent (Stage A).
+//! E-02 provider agent (Stage A and Stage B1).
 //!
 //! Places a synthetic virtual-file `IDataObject` on the Windows clipboard from an
 //! STA owner thread, serves `IStream` reads from a deterministic generator, logs
 //! COM calls without content, samples its own memory and exits on a stop file or
-//! deadline. No networking, no encryption, no product code.
+//! deadline. Stage B1 adds the per-file fault plan, the T2/T2A threading variants, a provider-wide
+//! byte budget and the `leave` / guarded `flush` exit modes. No networking, no encryption, no
+//! product code.
 
 #[cfg(not(windows))]
 fn main() {
@@ -11,6 +13,8 @@ fn main() {
     std::process::exit(2);
 }
 
+#[cfg(windows)]
+mod control;
 #[cfg(windows)]
 mod data_object;
 #[cfg(windows)]
@@ -37,16 +41,16 @@ fn main() {
 
 #[cfg(windows)]
 mod app {
-    use crate::data_object::{Formats, Shared, VirtualFileDataObject, format_name};
+    use crate::control::{self, StopCondition};
+    use crate::data_object::{self, Formats, Shared, format_name};
     use crate::{log, memory, stats};
     use clap::{Parser, ValueEnum};
-    use e02_synth::Case;
+    use e02_synth::{Case, FLUSH_MAX_CASE_BYTES, Threading};
     use serde_json::json;
     use std::path::PathBuf;
-    use std::sync::OnceLock;
     use std::time::{Duration, Instant};
-    use windows::Win32::Foundation::{ERROR_ALREADY_EXISTS, GetLastError, HANDLE, HWND, LPARAM, LRESULT, WAIT_TIMEOUT, WPARAM};
-    use windows::Win32::System::Threading::{CreateMutexW, OpenProcess, PROCESS_SYNCHRONIZE, WaitForSingleObject};
+    use windows::Win32::Foundation::{ERROR_ALREADY_EXISTS, GetLastError, HWND, LPARAM, LRESULT, WPARAM};
+    use windows::Win32::System::Threading::{CreateMutexW, OpenProcess, PROCESS_SYNCHRONIZE};
     use windows::Win32::System::Com::IDataObject;
     use windows::Win32::System::DataExchange::{
         AddClipboardFormatListener, GetClipboardSequenceNumber, RemoveClipboardFormatListener,
@@ -61,16 +65,19 @@ mod app {
     };
     use windows::core::w;
 
-    #[derive(Clone, Copy, ValueEnum, Debug)]
+    #[derive(Clone, Copy, ValueEnum, Debug, PartialEq)]
     enum ExitMode {
-        /// OleSetClipboard(NULL) if our object is still current (default).
+        /// Release the clipboard only if our object is still current (default).
         Clear,
-        /// Exit without touching the clipboard.
+        /// Exit without touching the clipboard (PROC-07): observes what OLE does at uninitialize.
         Leave,
+        /// OleFlushClipboard before exit (PROC-05). Refused for cases above 64 MiB; reads stay
+        /// under the provider-wide byte budget.
+        Flush,
     }
 
     #[derive(Parser, Debug)]
-    #[command(about = "E-02 Stage A provider: synthetic virtual files on the clipboard")]
+    #[command(about = "E-02 provider: synthetic virtual files on the clipboard")]
     struct Args {
         /// Case file (cases/<id>.toml).
         #[arg(long)]
@@ -91,21 +98,8 @@ mod app {
         parent_pid: Option<u32>,
     }
 
-    struct StopCondition {
-        stop_file: PathBuf,
-        deadline: Instant,
-        /// SYNCHRONIZE handle to the harness process, if a parent was given.
-        parent: Option<HANDLE>,
-    }
-
-    // SAFETY: the handle is only waited on (never closed) while the process runs.
-    unsafe impl Send for StopCondition {}
-    unsafe impl Sync for StopCondition {}
-
     /// Named mutex that prevents two agents from fighting over the clipboard.
     const INSTANCE_MUTEX: windows::core::PCWSTR = w!("Local\\OneCopyE02Agent");
-
-    static STOP: OnceLock<StopCondition> = OnceLock::new();
 
     thread_local! {
         /// Our clipboard object, visible to the window procedure on the owner STA thread.
@@ -129,8 +123,11 @@ mod app {
                 "agent_version": env!("CARGO_PKG_VERSION"),
                 "files": case.files.iter().map(|f| json!({ "name": f.name, "size": f.size })).collect::<Vec<_>>(),
                 "seed": case.seed,
-                "variants": { "threading": case.variants.threading, "advertise_size": case.variants.advertise_size,
-                              "progress_ui": case.variants.progress_ui },
+                "variants": serde_json::to_value(&case.variants).unwrap_or_default(),
+                "faults": case.files.iter().map(|f| serde_json::to_value(&f.faults).unwrap_or_default()).collect::<Vec<_>>(),
+                "advertised_sizes": case.files.iter().map(|f| f.descriptor_size()).collect::<Vec<_>>(),
+                "stat_sizes": case.files.iter().map(|f| f.stat_size).collect::<Vec<_>>(),
+                "byte_budget": case.byte_budget(),
                 "exit_mode": format!("{:?}", args.exit_mode), "hold_secs": args.hold_secs,
             }),
         );
@@ -139,7 +136,10 @@ mod app {
             None => None,
         };
         log::event("watchdog", json!({ "parent_watched": parent.is_some(), "hold_secs": args.hold_secs }));
-        let _ = STOP.set(StopCondition {
+        if args.exit_mode == ExitMode::Flush && case.stream_bytes() > FLUSH_MAX_CASE_BYTES {
+            return Err("exit mode flush is refused for cases above 64 MiB".into());
+        }
+        control::install(StopCondition {
             stop_file: args.run_dir.join("stop"),
             deadline: Instant::now() + Duration::from_secs(args.hold_secs),
             parent,
@@ -149,7 +149,12 @@ mod app {
         unsafe { OleInitialize(None)? };
         let owner = unsafe { windows::Win32::System::Threading::GetCurrentThreadId() };
         stats::with(|s| s.owner_thread_id = owner);
-        log::event("apartment", json!({ "owner_thread_id": owner, "apartment": "STA (OleInitialize)", "objects_agile": false }));
+        let threading = case.variants.threading;
+        log::event(
+            "apartment",
+            json!({ "owner_thread_id": owner, "apartment": "STA (OleInitialize)", "threading": threading,
+                    "data_object_agile": threading == Threading::T2A, "streams_agile": threading != Threading::T1 }),
+        );
         let hwnd = create_listener_window()?;
         let formats = Formats::register()?;
         log::event(
@@ -160,21 +165,26 @@ mod app {
             }),
         );
         let shared = Shared::new(case, formats, args.run_id.clone());
-        let object: IDataObject = VirtualFileDataObject::create(shared);
+        let object: IDataObject = data_object::create(shared);
 
         set_clipboard_with_retry(&object)?;
         CURRENT.with(|c| *c.borrow_mut() = Some(object.clone()));
         log::event("set_clipboard", json!({ "sequence": unsafe { GetClipboardSequenceNumber() } }));
         std::fs::write(args.run_dir.join("ready"), b"ready")?;
 
-        unsafe { SetTimer(Some(hwnd), TIMER_ID, 200, None) };
-        pump_messages();
+        // HRESULT/return-code audit: SetTimer returns 0 on failure. Without the timer nothing
+        // would poll the stop conditions, so a failure releases the clipboard and exits at once.
+        if unsafe { SetTimer(Some(hwnd), TIMER_ID, 200, None) } == 0 {
+            log::event("fatal", json!({ "error": "SetTimer failed; releasing the clipboard and exiting" }));
+        } else {
+            pump_messages();
+        }
         unsafe {
             let _ = KillTimer(Some(hwnd), TIMER_ID);
         }
 
         // Never OleSetClipboard(NULL): it empties the clipboard whoever owns it.
-        let (ours, cleared, detail) = if matches!(args.exit_mode, ExitMode::Clear) {
+        let (ours, cleared, detail) = if args.exit_mode == ExitMode::Clear {
             let r = ownership::release_if_ours(&object, hwnd);
             (r.before.ours(), r.cleared, json!({
                 "opened": r.opened, "ole_hresult_before": r.before.ole_hresult,
@@ -182,7 +192,17 @@ mod app {
             }))
         } else {
             let o = ownership::check(&object);
-            (o.ours(), false, json!({ "ole_hresult_before": o.ole_hresult, "owner_is_our_process_before": o.owner_is_our_process }))
+            let mut detail = json!({ "ole_hresult_before": o.ole_hresult, "owner_is_our_process_before": o.owner_is_our_process });
+            if args.exit_mode == ExitMode::Flush && o.ours() {
+                // Guarded (case <= 64 MiB, byte budget): renders every offered format into memory.
+                let before = stats::snapshot().bytes_served;
+                let t0 = Instant::now();
+                let hr = unsafe { OleFlushClipboard() }.err().map_or(0, |e| e.code().0);
+                let after = stats::snapshot().bytes_served;
+                detail["flush"] = json!({ "hr": format!("{hr:#010x}"), "ms": t0.elapsed().as_millis() as u64,
+                                          "bytes_read_during_flush": after - before });
+            }
+            (o.ours(), false, detail)
         };
         if !ours {
             let now = log::now_ms();
@@ -194,16 +214,25 @@ mod app {
         CURRENT.with(|c| *c.borrow_mut() = None);
         drop(object);
 
+        let before_uninit = stats::snapshot();
+        let t0 = Instant::now();
         unsafe {
             let _ = RemoveClipboardFormatListener(hwnd);
             let _ = DestroyWindow(hwnd);
             OleUninitialize();
         }
+        let after_uninit = stats::snapshot();
+        log::event(
+            "uninitialized",
+            json!({ "ms": t0.elapsed().as_millis() as u64,
+                    "reads_during_uninitialize": after_uninit.read_calls - before_uninit.read_calls,
+                    "bytes_during_uninitialize": after_uninit.bytes_served - before_uninit.bytes_served,
+                    "get_data_during_uninitialize": after_uninit.calls.get("IDataObject::GetData").copied().unwrap_or(0)
+                        - before_uninit.calls.get("IDataObject::GetData").copied().unwrap_or(0) }),
+        );
         sampler.stop();
         let summary = stats::snapshot();
         std::fs::write(args.run_dir.join("summary.json"), serde_json::to_vec_pretty(&summary)?)?;
-        // Keep OleFlushClipboard referenced only to document that it is never called here (PROC-05 is Stage B).
-        let _never_called: unsafe fn() -> windows::core::Result<()> = OleFlushClipboard;
         Ok(())
     }
 
@@ -252,7 +281,8 @@ mod app {
     fn pump_messages() {
         let mut msg = MSG::default();
         unsafe {
-            while GetMessageW(&mut msg, None, 0, 0).as_bool() {
+            // GetMessageW returns -1 on error, which BOOL::as_bool() treats as true (endless loop).
+            while control::keep_pumping(GetMessageW(&mut msg, None, 0, 0)) {
                 let _ = TranslateMessage(&msg);
                 DispatchMessageW(&msg);
             }
@@ -281,14 +311,11 @@ mod app {
                 LRESULT(0)
             }
             WM_TIMER if wparam.0 == TIMER_ID => {
-                if let Some(stop) = STOP.get() {
-                    let by_file = stop.stop_file.exists();
-                    let by_deadline = Instant::now() >= stop.deadline;
-                    let by_parent = stop.parent.is_some_and(|h| unsafe { WaitForSingleObject(h, 0) } != WAIT_TIMEOUT);
-                    if by_file || by_deadline || by_parent {
-                        log::event("stop_requested", json!({ "stop_file": by_file, "deadline": by_deadline, "parent_exited": by_parent }));
-                        unsafe { PostQuitMessage(0) };
-                    }
+                let (by_file, by_deadline, by_parent) = control::reasons();
+                if by_file || by_deadline || by_parent {
+                    let _ = control::stop_requested();
+                    log::event("stop_requested", json!({ "stop_file": by_file, "deadline": by_deadline, "parent_exited": by_parent }));
+                    unsafe { PostQuitMessage(0) };
                 }
                 LRESULT(0)
             }

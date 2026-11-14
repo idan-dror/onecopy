@@ -1,0 +1,20 @@
+# Stage B1 (P0).
+case_id = "PROC-02"
+description = "Provider killed by the harness 2 s into a 60 s stall at 50%"
+seed = 2036
+
+[harness]
+dialog_actions = ["cancel"]
+expect = "failure"
+kill_after_event = "stall_begin"
+kill_delay_ms = 2000
+timeout_secs = 150
+
+[[files]]
+name = "e02-PROC-02-f0.bin"
+size = 67108864
+
+[[files.faults]]
+kind = "stall"
+at_offset = 33554432
+duration_ms = 60000

@@ -1,13 +1,17 @@
 //! IDataObject offering synthetic virtual files:
 //! CFSTR_FILEDESCRIPTORW (HGLOBAL), CFSTR_FILECONTENTS (IStream per lindex),
 //! CFSTR_PREFERREDDROPEFFECT (DWORD copy) and a private run marker. No CF_HDROP.
+//! Variant: `ZoneIdentifier` (DWORD), observation only.
+//!
+//! The logic lives in `DataObjectCore`; `StaDataObject` (T1, T2) and `AgileDataObject` (T2A)
+//! are thin COM wrappers that differ only in agility.
 
-use crate::{descriptor, log, stats, stream::VirtualFileStream};
-use e02_synth::{Case, Synth};
+use crate::{control, descriptor, log, stats, stream};
+use e02_synth::{Case, Synth, Threading};
 use serde_json::json;
 use std::mem::ManuallyDrop;
 use std::sync::Arc;
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use windows::Win32::Foundation::{
     DATA_S_SAMEFORMATETC, DV_E_FORMATETC, DV_E_LINDEX, DV_E_TYMED, E_INVALIDARG, E_POINTER, HGLOBAL, OLE_E_ADVISENOTSUPPORTED,
     S_OK,
@@ -20,7 +24,7 @@ use windows::Win32::System::DataExchange::{GetClipboardFormatNameW, RegisterClip
 use windows::Win32::System::Memory::{GMEM_MOVEABLE, GlobalAlloc, GlobalLock, GlobalSize, GlobalUnlock};
 use windows::Win32::System::Ole::ReleaseStgMedium;
 use windows::Win32::UI::Shell::{
-    CFSTR_FILECONTENTS, CFSTR_FILEDESCRIPTORW, CFSTR_PREFERREDDROPEFFECT, SHCreateStdEnumFmtEtc,
+    CFSTR_FILECONTENTS, CFSTR_FILEDESCRIPTORW, CFSTR_PREFERREDDROPEFFECT, CFSTR_ZONEIDENTIFIER, SHCreateStdEnumFmtEtc,
 };
 use windows::core::{BOOL, HRESULT, PCWSTR, Ref, Result, implement, w};
 
@@ -32,6 +36,7 @@ pub struct Formats {
     pub contents: u16,
     pub preferred_effect: u16,
     pub marker: u16,
+    pub zone_identifier: u16,
 }
 
 impl Formats {
@@ -45,6 +50,7 @@ impl Formats {
             contents: reg(CFSTR_FILECONTENTS)?,
             preferred_effect: reg(CFSTR_PREFERREDDROPEFFECT)?,
             marker: reg(w!("OneCopyE02Marker"))?,
+            zone_identifier: reg(CFSTR_ZONEIDENTIFIER)?,
         })
     }
 }
@@ -71,29 +77,47 @@ pub struct Shared {
     pub synth: Synth,
     pub formats: Formats,
     pub run_id: String,
+    /// Once-fault claims, per file and fault index (shared by every stream of the file).
+    pub fired: Vec<Vec<AtomicBool>>,
+    /// Provider-wide byte budget and bytes served so far (render-all guard).
+    pub byte_budget: u64,
+    pub total_served: AtomicU64,
     next_stream_id: AtomicU64,
 }
 
 impl Shared {
     pub fn new(case: Case, formats: Formats, run_id: String) -> Arc<Self> {
         let synth = Synth::new(case.seed);
-        Arc::new(Self { case, synth, formats, run_id, next_stream_id: AtomicU64::new(1) })
+        let fired = case.files.iter().map(|f| f.faults.iter().map(|_| AtomicBool::new(false)).collect()).collect();
+        let byte_budget = case.byte_budget();
+        Arc::new(Self {
+            case,
+            synth,
+            formats,
+            run_id,
+            fired,
+            byte_budget,
+            total_served: AtomicU64::new(0),
+            next_stream_id: AtomicU64::new(1),
+        })
     }
 }
 
-// Agile = false: windows-rs objects are agile (IAgileObject + free-threaded IMarshal) by default,
-// which dispatches cross-process calls on RPC threads. Variant T1 requires STA-bound objects.
-#[implement(IDataObject, Agile = false)]
-pub struct VirtualFileDataObject {
+/// Creates the clipboard data object in the case's threading variant.
+pub fn create(shared: Arc<Shared>) -> IDataObject {
+    let core = DataObjectCore { shared };
+    match core.shared.case.variants.threading {
+        Threading::T1 | Threading::T2 => StaDataObject(core).into(),
+        Threading::T2A => AgileDataObject(core).into(),
+    }
+}
+
+pub struct DataObjectCore {
     shared: Arc<Shared>,
 }
 
-impl VirtualFileDataObject {
-    pub fn create(shared: Arc<Shared>) -> IDataObject {
-        VirtualFileDataObject { shared }.into()
-    }
-
-    fn offered(&self) -> [FORMATETC; 4] {
+impl DataObjectCore {
+    fn offered(&self) -> Vec<FORMATETC> {
         let f = &self.shared.formats;
         let fe = |cf: u16, tymed: i32| FORMATETC {
             cfFormat: cf,
@@ -102,12 +126,16 @@ impl VirtualFileDataObject {
             lindex: -1,
             tymed: tymed as u32,
         };
-        [
+        let mut v = vec![
             fe(f.descriptor, TYMED_HGLOBAL.0),
             fe(f.contents, TYMED_ISTREAM.0),
             fe(f.preferred_effect, TYMED_HGLOBAL.0),
             fe(f.marker, TYMED_HGLOBAL.0),
-        ]
+        ];
+        if self.shared.case.variants.zone_identifier.is_some() {
+            v.push(fe(f.zone_identifier, TYMED_HGLOBAL.0));
+        }
+        v
     }
 
     /// Validates a request; returns the resolved file index for contents requests.
@@ -125,7 +153,9 @@ impl VirtualFileDataObject {
                 return Err(DV_E_LINDEX);
             }
             Ok(Some(index as u32))
-        } else if [f.descriptor, f.preferred_effect, f.marker].contains(&fe.cfFormat) {
+        } else if [f.descriptor, f.preferred_effect, f.marker].contains(&fe.cfFormat)
+            || (fe.cfFormat == f.zone_identifier && self.shared.case.variants.zone_identifier.is_some())
+        {
             if !wants(TYMED_HGLOBAL.0) { Err(DV_E_TYMED) } else { Ok(None) }
         } else {
             Err(DV_E_FORMATETC)
@@ -150,8 +180,8 @@ fn hglobal_from_bytes(bytes: &[u8]) -> Result<HGLOBAL> {
     }
 }
 
-impl IDataObject_Impl for VirtualFileDataObject_Impl {
-    fn GetData(&self, pformatetcin: *const FORMATETC) -> Result<STGMEDIUM> {
+impl DataObjectCore {
+    fn get_data(&self, pformatetcin: *const FORMATETC) -> Result<STGMEDIUM> {
         stats::count("IDataObject::GetData");
         let fe = unsafe { pformatetcin.as_ref() }.ok_or(windows::core::Error::from(E_POINTER))?;
         let name = format_name(fe.cfFormat);
@@ -163,9 +193,13 @@ impl IDataObject_Impl for VirtualFileDataObject_Impl {
                 stats::with(|s| {
                     s.first_contents_get_data_ms.get_or_insert(now);
                 });
-                let file = &self.shared.case.files[index as usize];
+                let delay = self.shared.case.variants.contents_getdata_delay_ms;
+                if delay > 0 {
+                    log::event("fault", json!({ "action": "contents_getdata_delay", "ms": delay, "file_index": index }));
+                    let _ = control::sleep_interruptible(delay);
+                }
                 let id = self.shared.next_stream_id.fetch_add(1, Ordering::Relaxed);
-                let stream = VirtualFileStream::create(id, index, &file.name, file.size, &self.shared.synth);
+                let stream = stream::create(id, index, &self.shared);
                 Ok(STGMEDIUM {
                     tymed: TYMED_ISTREAM.0 as u32,
                     u: STGMEDIUM_0 { pstm: ManuallyDrop::new(Some(stream)) },
@@ -177,6 +211,11 @@ impl IDataObject_Impl for VirtualFileDataObject_Impl {
                 stats::with(|s| {
                     s.first_descriptor_get_data_ms.get_or_insert(now);
                 });
+                let delay = self.shared.case.variants.descriptor_delay_ms;
+                if delay > 0 {
+                    log::event("fault", json!({ "action": "descriptor_delay", "ms": delay }));
+                    let _ = control::sleep_interruptible(delay);
+                }
                 descriptor::build(&self.shared.case).map(|(h, info)| {
                     log::event("descriptor_built", json!({ "entries": info.entries, "bytes": info.bytes }));
                     hglobal_medium(h)
@@ -184,6 +223,11 @@ impl IDataObject_Impl for VirtualFileDataObject_Impl {
             }
             Ok(None) if fe.cfFormat == self.shared.formats.preferred_effect => {
                 hglobal_from_bytes(&DROPEFFECT_COPY.to_le_bytes()).map(hglobal_medium)
+            }
+            Ok(None) if fe.cfFormat == self.shared.formats.zone_identifier => {
+                let zone = self.shared.case.variants.zone_identifier.unwrap_or_default();
+                log::event("zone_identifier_served", json!({ "zone": zone }));
+                hglobal_from_bytes(&zone.to_le_bytes()).map(hglobal_medium)
             }
             Ok(None) => hglobal_from_bytes(self.shared.run_id.as_bytes()).map(hglobal_medium),
         };
@@ -198,14 +242,14 @@ impl IDataObject_Impl for VirtualFileDataObject_Impl {
         result
     }
 
-    fn GetDataHere(&self, pformatetc: *const FORMATETC, _pmedium: *mut STGMEDIUM) -> Result<()> {
+    fn get_data_here(&self, pformatetc: *const FORMATETC) -> Result<()> {
         stats::count("IDataObject::GetDataHere");
         let name = unsafe { pformatetc.as_ref() }.map(|fe| format_name(fe.cfFormat));
         log::event("get_data_here", json!({ "format": name, "hr": format!("{:#010x}", DV_E_FORMATETC.0) }));
         Err(DV_E_FORMATETC.into())
     }
 
-    fn QueryGetData(&self, pformatetc: *const FORMATETC) -> HRESULT {
+    fn query_get_data(&self, pformatetc: *const FORMATETC) -> HRESULT {
         stats::count("IDataObject::QueryGetData");
         let Some(fe) = (unsafe { pformatetc.as_ref() }) else { return E_POINTER };
         let hr = match self.check(fe) {
@@ -219,7 +263,7 @@ impl IDataObject_Impl for VirtualFileDataObject_Impl {
         hr
     }
 
-    fn GetCanonicalFormatEtc(&self, _pformatectin: *const FORMATETC, pformatetcout: *mut FORMATETC) -> HRESULT {
+    fn get_canonical_format_etc(&self, pformatetcout: *mut FORMATETC) -> HRESULT {
         stats::count("IDataObject::GetCanonicalFormatEtc");
         if !pformatetcout.is_null() {
             unsafe { (*pformatetcout).ptd = std::ptr::null_mut() };
@@ -227,7 +271,7 @@ impl IDataObject_Impl for VirtualFileDataObject_Impl {
         DATA_S_SAMEFORMATETC
     }
 
-    fn SetData(&self, pformatetc: *const FORMATETC, pmedium: *const STGMEDIUM, frelease: BOOL) -> Result<()> {
+    fn set_data(&self, pformatetc: *const FORMATETC, pmedium: *const STGMEDIUM, frelease: BOOL) -> Result<()> {
         stats::count("IDataObject::SetData");
         let Some(fe) = (unsafe { pformatetc.as_ref() }) else { return Err(E_INVALIDARG.into()) };
         // Shell communication formats carry a DWORD in an HGLOBAL; log only that value.
@@ -256,28 +300,62 @@ impl IDataObject_Impl for VirtualFileDataObject_Impl {
         Ok(())
     }
 
-    fn EnumFormatEtc(&self, dwdirection: u32) -> Result<IEnumFORMATETC> {
+    fn enum_format_etc(&self, dwdirection: u32) -> Result<IEnumFORMATETC> {
         stats::count("IDataObject::EnumFormatEtc");
         log::event("enum_format_etc", json!({ "direction": dwdirection }));
         // DATADIR_GET = 1; nothing is offered for DATADIR_SET.
         if dwdirection != 1 {
             return Err(windows::Win32::Foundation::E_NOTIMPL.into());
         }
-        unsafe { SHCreateStdEnumFmtEtc(&self.offered()) }
+        let offered = self.offered();
+        unsafe { SHCreateStdEnumFmtEtc(&offered) }
     }
 
-    fn DAdvise(&self, _pformatetc: *const FORMATETC, _advf: u32, _padvsink: Ref<'_, IAdviseSink>) -> Result<u32> {
-        stats::count("IDataObject::DAdvise");
-        Err(OLE_E_ADVISENOTSUPPORTED.into())
-    }
-
-    fn DUnadvise(&self, _dwconnection: u32) -> Result<()> {
-        stats::count("IDataObject::DUnadvise");
-        Err(OLE_E_ADVISENOTSUPPORTED.into())
-    }
-
-    fn EnumDAdvise(&self) -> Result<IEnumSTATDATA> {
-        stats::count("IDataObject::EnumDAdvise");
-        Err(OLE_E_ADVISENOTSUPPORTED.into())
-    }
 }
+
+/// Generates a COM `IDataObject` wrapper around `DataObjectCore` with the given agility.
+macro_rules! data_object_wrapper {
+    ($name:ident, $impl_name:ident, $agile:tt) => {
+        #[implement(IDataObject, Agile = $agile)]
+        pub struct $name(DataObjectCore);
+
+        impl IDataObject_Impl for $impl_name {
+            fn GetData(&self, pformatetcin: *const FORMATETC) -> Result<STGMEDIUM> {
+                self.0.get_data(pformatetcin)
+            }
+            fn GetDataHere(&self, pformatetc: *const FORMATETC, _pmedium: *mut STGMEDIUM) -> Result<()> {
+                self.0.get_data_here(pformatetc)
+            }
+            fn QueryGetData(&self, pformatetc: *const FORMATETC) -> HRESULT {
+                self.0.query_get_data(pformatetc)
+            }
+            fn GetCanonicalFormatEtc(&self, _pformatectin: *const FORMATETC, pformatetcout: *mut FORMATETC) -> HRESULT {
+                self.0.get_canonical_format_etc(pformatetcout)
+            }
+            fn SetData(&self, pformatetc: *const FORMATETC, pmedium: *const STGMEDIUM, frelease: BOOL) -> Result<()> {
+                self.0.set_data(pformatetc, pmedium, frelease)
+            }
+            fn EnumFormatEtc(&self, dwdirection: u32) -> Result<IEnumFORMATETC> {
+                self.0.enum_format_etc(dwdirection)
+            }
+            fn DAdvise(&self, _pformatetc: *const FORMATETC, _advf: u32, _padvsink: Ref<'_, IAdviseSink>) -> Result<u32> {
+                stats::count("IDataObject::DAdvise");
+                Err(OLE_E_ADVISENOTSUPPORTED.into())
+            }
+            fn DUnadvise(&self, _dwconnection: u32) -> Result<()> {
+                stats::count("IDataObject::DUnadvise");
+                Err(OLE_E_ADVISENOTSUPPORTED.into())
+            }
+            fn EnumDAdvise(&self) -> Result<IEnumSTATDATA> {
+                stats::count("IDataObject::EnumDAdvise");
+                Err(OLE_E_ADVISENOTSUPPORTED.into())
+            }
+        }
+    };
+}
+
+// Agile = false: windows-rs objects are agile (IAgileObject + free-threaded IMarshal) by default,
+// which dispatches cross-process calls on RPC threads. T1 and T2 keep the data object on the STA.
+data_object_wrapper!(StaDataObject, StaDataObject_Impl, false);
+// T2A: the data object is agile as well.
+data_object_wrapper!(AgileDataObject, AgileDataObject_Impl, true);

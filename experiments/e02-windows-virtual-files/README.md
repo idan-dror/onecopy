@@ -1,6 +1,40 @@
 # E-02 — Windows clipboard virtual-file paste (experiment workspace)
 
-**Phase 0 feasibility experiment.** Isolated and throwaway; not OneCopy product code. Specification: [`docs/experiments/E-02_WINDOWS_VIRTUAL_FILE_PASTE.md`](../../docs/experiments/E-02_WINDOWS_VIRTUAL_FILE_PASTE.md). **Current scope: Stage A only** (small files, lifecycle, correctness, memory). Stage B starts only after owner review.
+**Phase 0 feasibility experiment.** Isolated and throwaway; not OneCopy product code. Specification: [`docs/experiments/E-02_WINDOWS_VIRTUAL_FILE_PASTE.md`](../../docs/experiments/E-02_WINDOWS_VIRTUAL_FILE_PASTE.md).
+
+- **Stage A** (small files, lifecycle, correctness, memory) is complete and accepted (2026-11-13).
+- **Current scope: Stage B1**, fault handling and correctness on bounded synthetic files of at most 256 MiB per case. Report: `reports/E-02-stage-b1-report.md`.
+- **Stage B2** (1, 10 and 100 GiB, other targets) starts only after owner review of B1. The case loader refuses large cases unless they are marked `large = true`, and the B1 runner refuses those too.
+
+## Stage B1 additions
+
+**Fault plan.** Each case can give each file a deterministic fault plan, applied by the provider on `IStream::Read`: latency, throttle, stall, error HRESULT at an offset, premature EOF, overrun, short reads, self-termination, and marks. Injected HRESULTs must be failure codes.
+
+**Variants:**
+
+- threading T1 (STA-bound), T2 (agile streams) or T2A (agile data object and streams);
+- provider read timeout (RT);
+- `GetData` delays;
+- wrong descriptor or `Stat` sizes;
+- `ZoneIdentifier` offered (observation only).
+
+**Safety bounds:**
+
+- a provider-wide byte budget (render-all guard);
+- interruptible stalls (they end on the stop file or when the harness exits);
+- `leave` and guarded `flush` exit modes (flush is refused above 64 MiB).
+
+**Harness (`scripts/run-stage-b.ps1`).** It always writes a record to `reports/stage-b1/<run>.json` and:
+
+- pre-creates synthetic originals where the case needs them;
+- watches the destination (polling plus change notifications) and Explorer's dialogs (read-only UI Automation);
+- kills the provider by PID and identity, or replaces the clipboard with tagged synthetic text, on provider events;
+- answers this run's dialogs by Win32 control id. Dialogs are attributed by owner chain or run token and re-validated before any click; the UI language is not assumed;
+- verifies the destination: complete, correct prefix, wrong content, or original kept;
+- releases only clipboard content tagged with this run;
+- classifies the outcome as O1–O5.
+
+**Batches.** `scripts/run-b1-batch.ps1` runs a list of cases. It stops on an `evidence\ABORT` file, a lost `explorer.exe`, OneCopy content left on the clipboard, or a stray provider.
 
 ## What it does
 

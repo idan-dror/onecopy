@@ -1,0 +1,14 @@
+# Stage B1 (P0).
+case_id = "STREAM-05"
+description = "Descriptor GetData delayed 10 s"
+seed = 2023
+
+[variants]
+descriptor_delay_ms = 10000
+
+[harness]
+timeout_secs = 120
+
+[[files]]
+name = "e02-STREAM-05-f0.bin"
+size = 1048576

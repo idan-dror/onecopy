@@ -1,0 +1,528 @@
+﻿{
+    "experiment_id":  "E-02",
+    "stage":  "B1",
+    "case_id":  "ERR-03",
+    "run_id":  "ERR-03-20261113T205647-fe6b80f6",
+    "description":  "HRESULT_FROM_WIN32(ERROR_NETWORK_UNREACHABLE) at 50%",
+    "driver":  "D2c",
+    "dialog_driver":  "D2u",
+    "target":  "G-01",
+    "threading":  "T1",
+    "injected_harness_fault":  "none",
+    "case":  {
+                 "case_id":  "ERR-03",
+                 "description":  "HRESULT_FROM_WIN32(ERROR_NETWORK_UNREACHABLE) at 50%",
+                 "files":  [
+                               {
+                                   "advertised_size":  67108864,
+                                   "faults":  [
+                                                  {
+                                                      "at_offset":  33554432,
+                                                      "hresult":  2147943631,
+                                                      "kind":  "error",
+                                                      "once":  false
+                                                  }
+                                              ],
+                                   "name":  "e02-ERR-03-f0.bin",
+                                   "size":  67108864
+                               }
+                           ],
+                 "harness":  {
+                                 "close_window_after_event":  null,
+                                 "concurrent":  false,
+                                 "dialog_actions":  [
+                                                        "cancel"
+                                                    ],
+                                 "exit_mode":  "clear",
+                                 "expect":  "failure",
+                                 "kill_after_event":  null,
+                                 "kill_before_paste":  false,
+                                 "kill_delay_ms":  0,
+                                 "operator_note":  "",
+                                 "pastes":  1,
+                                 "pre_existing_seed":  null,
+                                 "probe_clipboard":  false,
+                                 "replace_clipboard_after_event":  null,
+                                 "replace_delay_ms":  0,
+                                 "timeout_secs":  90
+                             },
+                 "large":  false,
+                 "read_timeout_ms":  null,
+                 "threading":  "T1",
+                 "zone_identifier":  null
+             },
+    "env":  {
+                "os_caption":  "Microsoft Windows 11 Home",
+                "os_version":  "10.0.26200",
+                "os_build":  "26200",
+                "os_ubr":  9711,
+                "os_display_version":  "25H2",
+                "explorer_version":  "10.0.26100.8875",
+                "explorer_separate_process":  0,
+                "clipboard_history_enabled":  null,
+                "cloud_clipboard_enabled":  null,
+                "defender_product_version":  "4.18.26100.4",
+                "defender_realtime_protection":  true,
+                "test_volume_filesystem":  "NTFS",
+                "test_volume_free_gib":  1309.9,
+                "cpu":  "AMD Ryzen 7 5700X3D 8-Core Processor",
+                "ram_gib":  31.9,
+                "experiment_commit":  "cb3a6813e898dcef454e5277622704264e2acb8c",
+                "experiment_tree_dirty":  false,
+                "rustc":  "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+                "cargo_lock_sha256":  "76215d10f491622601c608a061db959f8a67c758d4254eae40692b46bed5c830"
+            },
+    "progress":  {
+                     "completed":  true,
+                     "timed_out":  false,
+                     "seconds":  11.35,
+                     "reason":  null,
+                     "pending_dialog_actions":  [
+
+                                                ]
+                 },
+    "timeline":  [
+                     {
+                         "t_ms":  326,
+                         "source":  "agent",
+                         "event":  "ready",
+                         "detail":  {
+                                        "sequence":  2573
+                                    }
+                     },
+                     {
+                         "t_ms":  1922,
+                         "source":  "driver",
+                         "event":  "paste",
+                         "detail":  {
+                                        "target":  "paste-target-1",
+                                        "exit":  0
+                                    }
+                     },
+                     {
+                         "t_ms":  1934,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1934,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1934,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1934,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1934,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1934,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1934,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1935,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4080421792,
+                                        "format":  "TargetCLSID"
+                                    }
+                     },
+                     {
+                         "t_ms":  2175,
+                         "source":  "agent",
+                         "event":  "error_returned",
+                         "detail":  {
+                                        "offset":  33554432,
+                                        "stream_id":  1
+                                    }
+                     },
+                     {
+                         "t_ms":  2181,
+                         "source":  "dialog",
+                         "event":  "appear",
+                         "detail":  {
+                                        "ours":  true,
+                                        "hwnd":  7210762,
+                                        "title":  "‏‏שגיאה בהעתקת קובץ או תיקיה"
+                                    }
+                     },
+                     {
+                         "t_ms":  2262,
+                         "source":  "harness",
+                         "event":  "dialog_cancel",
+                         "detail":  {
+                                        "class":  "#32770",
+                                        "invoked":  "CommandButton_1",
+                                        "name":  "╫נ╫ש╫⌐╫ץ╫¿",
+                                        "ours_by":  "owner_text",
+                                        "refused":  null
+                                    }
+                     },
+                     {
+                         "t_ms":  3188,
+                         "source":  "dialog",
+                         "event":  "gone",
+                         "detail":  {
+                                        "ours":  true,
+                                        "hwnd":  7210762,
+                                        "title":  null
+                                    }
+                     }
+                 ],
+    "explorer_windows":  [
+                             {
+                                 "destination":  "paste-target-1",
+                                 "found":  true,
+                                 "top_hwnd":  8259712,
+                                 "top_preexisting":  false,
+                                 "tabs_on_top":  1,
+                                 "close_decision":  "close"
+                             }
+                         ],
+    "explorer_processes":  {
+                               "watched":  [
+                                               {
+                                                   "role":  "shell",
+                                                   "id":  9300,
+                                                   "name":  "explorer",
+                                                   "start":  "2026-11-12T18:48:36.7863513+02:00"
+                                               },
+                                               {
+                                                   "role":  "run_window_host",
+                                                   "id":  23120,
+                                                   "name":  "explorer",
+                                                   "start":  "2026-11-13T20:56:47.4291231+02:00"
+                                               }
+                                           ],
+                               "lost":  [
+
+                                        ]
+                           },
+    "dialogs":  {
+                    "appeared":  1,
+                    "attributed":  1,
+                    "error_dialog_seen":  true,
+                    "progress_dialog_seen":  false,
+                    "error_texts":  [
+                                        "MainInstructionIcon",
+                                        "The network location cannot be reached. For information about network troubleshooting, see Windows Help.",
+                                        "אישור",
+                                        "סגור",
+                                        "‏‏שגיאה בהעתקת קובץ או תיקיה"
+                                    ],
+                    "events":  [
+                                   {
+                                       "buttons":  [
+                                                       {
+                                                           "enabled":  true,
+                                                           "id":  "CommandButton_1",
+                                                           "name":  "אישור"
+                                                       },
+                                                       {
+                                                           "enabled":  true,
+                                                           "id":  "",
+                                                           "name":  "סגור"
+                                                       }
+                                                   ],
+                                       "class":  "#32770",
+                                       "event":  "appear",
+                                       "hwnd":  7210762,
+                                       "names":  [
+                                                     "‏‏שגיאה בהעתקת קובץ או תיקיה",
+                                                     "MainInstructionIcon",
+                                                     "The network location cannot be reached. For information about network troubleshooting, see Windows Help.",
+                                                     "אישור",
+                                                     "סגור"
+                                                 ],
+                                       "ours":  true,
+                                       "ours_by":  "owner_text",
+                                       "owner":  7080242,
+                                       "owner_classes":  [
+                                                             "#32770",
+                                                             "CabinetWClass"
+                                                         ],
+                                       "owner_texts":  [
+                                                           "‏‏מעתיק...",
+                                                           "‏‏השהה את הפעולה",
+                                                           "ביטול",
+                                                           "paste-target-1 - סייר הקבצים",
+                                                           "Non Client Input Sink Window",
+                                                           "paste-target-1",
+                                                           "‏‏פקד עץ של מרחב שמות",
+                                                           "‏‏פקד עץ של מרחב שמות",
+                                                           "חלונית הניווט",
+                                                           "Shell Preview Extension Host",
+                                                           "ShellView"
+                                                       ],
+                                       "progress_bar":  false,
+                                       "root_owner":  6097654,
+                                       "t_ms":  1903.2415999999998,
+                                       "title":  "‏‏שגיאה בהעתקת קובץ או תיקיה"
+                                   },
+                                   {
+                                       "class":  "#32770",
+                                       "event":  "gone",
+                                       "hwnd":  7210762,
+                                       "lifetime_ms":  287.6109999999999,
+                                       "ours":  true,
+                                       "progress_bar":  false,
+                                       "t_ms":  2190.8525999999997
+                                   }
+                               ]
+                },
+    "dialog_actions":  [
+                           {
+                               "t_ms":  2262,
+                               "action":  "cancel",
+                               "dialog_class":  "#32770",
+                               "dialog_progress":  false,
+                               "result":  {
+                                              "class":  "#32770",
+                                              "invoked":  "CommandButton_1",
+                                              "name":  "╫נ╫ש╫⌐╫ץ╫¿",
+                                              "ours_by":  "owner_text",
+                                              "refused":  null
+                                          },
+                               "raw_exit":  0
+                           }
+                       ],
+    "agent_exit_code":  0,
+    "agent_summary":  {
+                          "owner_thread_id":  23224,
+                          "com_call_threads":  {
+                                                   "23224":  181
+                                               },
+                          "calls":  {
+                                        "IDataObject::EnumFormatEtc":  7,
+                                        "IDataObject::GetData":  29,
+                                        "IDataObject::QueryGetData":  3,
+                                        "IDataObject::SetData":  10,
+                                        "IStream::Read":  129,
+                                        "IStream::Seek":  3
+                                    },
+                          "first_descriptor_get_data_ms":  1712.5416,
+                          "first_contents_get_data_ms":  1714.2498,
+                          "first_read_ms":  1715.3025,
+                          "last_read_ms":  1780.8355,
+                          "last_stream_release_ms":  1782.4246,
+                          "clipboard_lost_ms":  null,
+                          "streams_created":  1,
+                          "streams_released":  1,
+                          "bytes_served":  33554432,
+                          "read_calls":  129,
+                          "short_reads":  0,
+                          "failed_reads":  1,
+                          "peak_private_bytes":  2367488,
+                          "peak_working_set_bytes":  12218368,
+                          "memory_samples":  13,
+                          "os_peak_commit_bytes":  2367488,
+                          "os_peak_working_set_bytes":  12484608,
+                          "per_stream":  [
+                                             {
+                                                 "stream_id":  1,
+                                                 "file_index":  0,
+                                                 "advertised_size":  67108864,
+                                                 "bytes_served":  33554432,
+                                                 "final_position":  0,
+                                                 "max_position":  33554432,
+                                                 "read_calls":  129,
+                                                 "failed_reads":  1,
+                                                 "min_request":  262144,
+                                                 "max_request":  262144,
+                                                 "seeks":  3,
+                                                 "stats_calls":  0,
+                                                 "eof_read":  false
+                                             }
+                                         ]
+                      },
+    "agent_fault_events":  [
+                               "error_returned"
+                           ],
+    "set_data":  [
+                     {
+                         "format":  "TargetCLSID",
+                         "dword":  4080421792
+                     }
+                 ],
+    "performed_drop_effect":  [
+
+                              ],
+    "streams":  {
+                    "created":  1,
+                    "released":  1,
+                    "all_reached_eof":  false
+                },
+    "destinations":  [
+                         {
+                             "all_files_match":  false,
+                             "case_id":  "ERR-03",
+                             "files":  [
+                                           {
+                                               "advertised_size":  67108864,
+                                               "digest_match":  null,
+                                               "exists":  false,
+                                               "expected_size":  67108864,
+                                               "index":  0,
+                                               "mistakable_as_complete":  false,
+                                               "name":  "e02-ERR-03-f0.bin",
+                                               "original_preserved":  null,
+                                               "prefix_match":  null,
+                                               "size":  null,
+                                               "state":  "absent",
+                                               "zone_identifier":  null
+                                           }
+                                       ],
+                             "unexpected_entries":  [
+
+                                                    ]
+                         }
+                     ],
+    "observer":  {
+                     "paste-target-1":  {
+                                            "events":  5,
+                                            "names_seen":  [
+                                                               "e02-ERR-03-f0.bin"
+                                                           ],
+                                            "removals":  [
+                                                             "e02-ERR-03-f0.bin"
+                                                         ],
+                                            "max_sizes":  [
+                                                              {
+                                                                  "name":  "e02-ERR-03-f0.bin",
+                                                                  "max_size":  67108864
+                                                              }
+                                                          ]
+                                        }
+                 },
+    "clipboard":  {
+                      "set_sequence":  2573,
+                      "before_release":  {
+                                             "formats":  [
+
+                                                         ],
+                                             "has_file_contents":  false,
+                                             "has_file_descriptor":  false,
+                                             "has_onecopy_marker":  false,
+                                             "sequence":  2574
+                                         },
+                      "release":  {
+                                      "available":  {
+
+                                                    },
+                                      "cleared":  false,
+                                      "formats":  [
+
+                                                  ],
+                                      "identified_as_this_run":  null,
+                                      "owner_alive":  false,
+                                      "owner_present":  false,
+                                      "refused_reason":  null,
+                                      "sequence":  2574
+                                  },
+                      "after":  {
+                                    "formats":  [
+
+                                                ],
+                                    "has_file_contents":  false,
+                                    "has_file_descriptor":  false,
+                                    "has_onecopy_marker":  false,
+                                    "sequence":  2574
+                                },
+                      "clean_after":  true,
+                      "replacement":  null,
+                      "probe":  null
+                  },
+    "classification":  {
+                           "target_report":  "failure",
+                           "per_file":  [
+                                            {
+                                                "target":  "ERR-03",
+                                                "name":  "e02-ERR-03-f0.bin",
+                                                "state":  "absent",
+                                                "size":  null,
+                                                "mistakable":  false,
+                                                "class":  "O1"
+                                            }
+                                        ],
+                           "outcome_class":  "O1",
+                           "expectation_met":  true
+                       },
+    "harness":  {
+                    "failed_stage":  null,
+                    "exception":  null,
+                    "driver_errors":  [
+
+                                      ],
+                    "post":  {
+                                 "agent_stop":  "exited",
+                                 "watcher_stops":  [
+                                                       "exited"
+                                                   ],
+                                 "dialog_watch_stop":  "exited",
+                                 "probe_stop":  "none",
+                                 "helper_stops":  [
+
+                                                  ],
+                                 "cleanup_dialogs":  [
+
+                                                     ]
+                             }
+                },
+    "interference":  [
+
+                     ],
+    "destination_cleanup":  {
+                                "deleted_files":  0,
+                                "removed_dirs":  2,
+                                "left_entries":  [
+
+                                                 ],
+                                "refused":  null
+                            },
+    "destination_kept":  false,
+    "result":  "completed"
+}

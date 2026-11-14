@@ -1,0 +1,12 @@
+# Stage B1 (P1).
+case_id = "PROC-07"
+description = "Exit without releasing the clipboard (leave), 8 MiB"
+seed = 2039
+
+[harness]
+exit_mode = "leave"
+timeout_secs = 60
+
+[[files]]
+name = "e02-PROC-07-f0.bin"
+size = 8388608

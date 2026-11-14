@@ -1,0 +1,19 @@
+# Stage B1 (P0).
+case_id = "ERR-05"
+description = "E_FAIL at 50% once, then Try Again"
+seed = 2015
+
+[harness]
+dialog_actions = ["try_again", "cancel"]
+expect = "observe"
+timeout_secs = 120
+
+[[files]]
+name = "e02-ERR-05-f0.bin"
+size = 67108864
+
+[[files.faults]]
+kind = "error"
+at_offset = 33554432
+hresult = 0x80004005
+once = true

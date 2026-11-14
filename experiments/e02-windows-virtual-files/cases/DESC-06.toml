@@ -1,0 +1,14 @@
+# Stage B1 (P1).
+case_id = "DESC-06"
+description = "IStream::Stat cbSize (32 MiB) differs from FD_FILESIZE (64 MiB)"
+seed = 2008
+
+[harness]
+dialog_actions = ["cancel"]
+expect = "observe"
+timeout_secs = 120
+
+[[files]]
+name = "e02-DESC-06-f0.bin"
+size = 67108864
+stat_size = 33554432

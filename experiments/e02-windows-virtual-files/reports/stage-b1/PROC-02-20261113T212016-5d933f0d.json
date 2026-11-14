@@ -1,0 +1,591 @@
+﻿{
+    "experiment_id":  "E-02",
+    "stage":  "B1",
+    "case_id":  "PROC-02",
+    "run_id":  "PROC-02-20261113T212016-5d933f0d",
+    "description":  "Provider killed by the harness 2 s into a 60 s stall at 50%",
+    "driver":  "D2c",
+    "dialog_driver":  "D2u",
+    "target":  "G-01",
+    "threading":  "T1",
+    "injected_harness_fault":  "none",
+    "case":  {
+                 "case_id":  "PROC-02",
+                 "description":  "Provider killed by the harness 2 s into a 60 s stall at 50%",
+                 "files":  [
+                               {
+                                   "advertised_size":  67108864,
+                                   "faults":  [
+                                                  {
+                                                      "at_offset":  33554432,
+                                                      "duration_ms":  60000,
+                                                      "kind":  "stall",
+                                                      "once":  true
+                                                  }
+                                              ],
+                                   "name":  "e02-PROC-02-f0.bin",
+                                   "size":  67108864
+                               }
+                           ],
+                 "harness":  {
+                                 "close_window_after_event":  null,
+                                 "concurrent":  false,
+                                 "dialog_actions":  [
+                                                        "cancel"
+                                                    ],
+                                 "exit_mode":  "clear",
+                                 "expect":  "failure",
+                                 "kill_after_event":  "stall_begin",
+                                 "kill_before_paste":  false,
+                                 "kill_delay_ms":  2000,
+                                 "operator_note":  "",
+                                 "pastes":  1,
+                                 "pre_existing_seed":  null,
+                                 "probe_clipboard":  false,
+                                 "replace_clipboard_after_event":  null,
+                                 "replace_delay_ms":  0,
+                                 "timeout_secs":  150
+                             },
+                 "large":  false,
+                 "read_timeout_ms":  null,
+                 "threading":  "T1",
+                 "zone_identifier":  null
+             },
+    "env":  {
+                "os_caption":  "Microsoft Windows 11 Home",
+                "os_version":  "10.0.26200",
+                "os_build":  "26200",
+                "os_ubr":  9711,
+                "os_display_version":  "25H2",
+                "explorer_version":  "10.0.26100.8875",
+                "explorer_separate_process":  0,
+                "clipboard_history_enabled":  null,
+                "cloud_clipboard_enabled":  null,
+                "defender_product_version":  "4.18.26100.4",
+                "defender_realtime_protection":  true,
+                "test_volume_filesystem":  "NTFS",
+                "test_volume_free_gib":  1309.8,
+                "cpu":  "AMD Ryzen 7 5700X3D 8-Core Processor",
+                "ram_gib":  31.9,
+                "experiment_commit":  "cb3a6813e898dcef454e5277622704264e2acb8c",
+                "experiment_tree_dirty":  false,
+                "rustc":  "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+                "cargo_lock_sha256":  "76215d10f491622601c608a061db959f8a67c758d4254eae40692b46bed5c830"
+            },
+    "progress":  {
+                     "completed":  true,
+                     "timed_out":  false,
+                     "seconds":  14.22,
+                     "reason":  null,
+                     "pending_dialog_actions":  [
+
+                                                ]
+                 },
+    "timeline":  [
+                     {
+                         "t_ms":  319,
+                         "source":  "agent",
+                         "event":  "ready",
+                         "detail":  {
+                                        "sequence":  2969
+                                    }
+                     },
+                     {
+                         "t_ms":  1914,
+                         "source":  "driver",
+                         "event":  "paste",
+                         "detail":  {
+                                        "target":  "paste-target-1",
+                                        "exit":  0
+                                    }
+                     },
+                     {
+                         "t_ms":  1926,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1926,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1927,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1927,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1927,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1927,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1927,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1927,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4080421792,
+                                        "format":  "TargetCLSID"
+                                    }
+                     },
+                     {
+                         "t_ms":  2165,
+                         "source":  "agent",
+                         "event":  "stall_begin",
+                         "detail":  {
+                                        "offset":  33554432,
+                                        "stream_id":  1
+                                    }
+                     },
+                     {
+                         "t_ms":  3223,
+                         "source":  "dialog",
+                         "event":  "appear",
+                         "detail":  {
+                                        "ours":  true,
+                                        "hwnd":  7997986,
+                                        "title":  "‏‏מעתיק..."
+                                    }
+                     },
+                     {
+                         "t_ms":  4308,
+                         "source":  "harness",
+                         "event":  "kill_agent",
+                         "detail":  "stopped"
+                     },
+                     {
+                         "t_ms":  4528,
+                         "source":  "dialog",
+                         "event":  "appear",
+                         "detail":  {
+                                        "ours":  true,
+                                        "hwnd":  7277256,
+                                        "title":  "‏‏שגיאה בהעתקת קובץ או תיקיה"
+                                    }
+                     },
+                     {
+                         "t_ms":  4528,
+                         "source":  "agent",
+                         "event":  "process_exited",
+                         "detail":  {
+                                        "exit_code":  -1
+                                    }
+                     },
+                     {
+                         "t_ms":  4612,
+                         "source":  "harness",
+                         "event":  "dialog_cancel",
+                         "detail":  {
+                                        "class":  "#32770",
+                                        "invoked":  "CommandButton_1",
+                                        "name":  "╫נ╫ש╫⌐╫ץ╫¿",
+                                        "ours_by":  "owner_text",
+                                        "refused":  null
+                                    }
+                     },
+                     {
+                         "t_ms":  5537,
+                         "source":  "dialog",
+                         "event":  "gone",
+                         "detail":  {
+                                        "ours":  true,
+                                        "hwnd":  7277256,
+                                        "title":  null
+                                    }
+                     },
+                     {
+                         "t_ms":  6178,
+                         "source":  "dialog",
+                         "event":  "gone",
+                         "detail":  {
+                                        "ours":  true,
+                                        "hwnd":  7997986,
+                                        "title":  null
+                                    }
+                     }
+                 ],
+    "explorer_windows":  [
+                             {
+                                 "destination":  "paste-target-1",
+                                 "found":  true,
+                                 "top_hwnd":  8260040,
+                                 "top_preexisting":  false,
+                                 "tabs_on_top":  1,
+                                 "close_decision":  "close"
+                             }
+                         ],
+    "explorer_processes":  {
+                               "watched":  [
+                                               {
+                                                   "role":  "shell",
+                                                   "id":  9300,
+                                                   "name":  "explorer",
+                                                   "start":  "2026-11-12T18:48:36.7863513+02:00"
+                                               },
+                                               {
+                                                   "role":  "run_window_host",
+                                                   "id":  20624,
+                                                   "name":  "explorer",
+                                                   "start":  "2026-11-13T21:20:17.2022834+02:00"
+                                               }
+                                           ],
+                               "lost":  [
+
+                                        ]
+                           },
+    "dialogs":  {
+                    "appeared":  2,
+                    "attributed":  2,
+                    "error_dialog_seen":  true,
+                    "progress_dialog_seen":  true,
+                    "error_texts":  [
+                                        "MainInstructionIcon",
+                                        "The remote procedure call failed.",
+                                        "אישור",
+                                        "סגור",
+                                        "‏‏שגיאה בהעתקת קובץ או תיקיה"
+                                    ],
+                    "events":  [
+                                   {
+                                       "buttons":  [
+                                                       {
+                                                           "enabled":  true,
+                                                           "id":  "CancelButton",
+                                                           "name":  "ביטול"
+                                                       },
+                                                       {
+                                                           "enabled":  true,
+                                                           "id":  "",
+                                                           "name":  "‏‏מזער"
+                                                       },
+                                                       {
+                                                           "enabled":  false,
+                                                           "id":  "",
+                                                           "name":  "הגדל"
+                                                       },
+                                                       {
+                                                           "enabled":  true,
+                                                           "id":  "",
+                                                           "name":  "סגור"
+                                                       }
+                                                   ],
+                                       "class":  "#32770",
+                                       "event":  "appear",
+                                       "hwnd":  7997986,
+                                       "names":  [
+                                                     "‏‏מעתיק...",
+                                                     "‏‏מעתיק את \u0027e02-PROC-02-f0.bin\u0027",
+                                                     "‏‏אל \u0027\u003ctestroot\u003e\\dest\\PROC-02-20261113T212016-5d933f0d\\paste-target-1\u0027",
+                                                     "ביטול",
+                                                     "‏‏מד התקדמות",
+                                                     "מערכת",
+                                                     "‏‏מזער",
+                                                     "הגדל",
+                                                     "סגור"
+                                                 ],
+                                       "ours":  true,
+                                       "ours_by":  "token",
+                                       "owner":  6359754,
+                                       "owner_classes":  [
+                                                             "CabinetWClass"
+                                                         ],
+                                       "owner_texts":  [
+                                                           "paste-target-1 - סייר הקבצים",
+                                                           "Non Client Input Sink Window",
+                                                           "paste-target-1",
+                                                           "‏‏פקד עץ של מרחב שמות",
+                                                           "‏‏פקד עץ של מרחב שמות",
+                                                           "חלונית הניווט",
+                                                           "Shell Preview Extension Host",
+                                                           "ShellView"
+                                                       ],
+                                       "progress_bar":  true,
+                                       "root_owner":  6359754,
+                                       "t_ms":  2934.6437,
+                                       "title":  "‏‏מעתיק..."
+                                   },
+                                   {
+                                       "buttons":  [
+                                                       {
+                                                           "enabled":  true,
+                                                           "id":  "CommandButton_1",
+                                                           "name":  "אישור"
+                                                       },
+                                                       {
+                                                           "enabled":  true,
+                                                           "id":  "",
+                                                           "name":  "סגור"
+                                                       }
+                                                   ],
+                                       "class":  "#32770",
+                                       "event":  "appear",
+                                       "hwnd":  7277256,
+                                       "names":  [
+                                                     "‏‏שגיאה בהעתקת קובץ או תיקיה",
+                                                     "MainInstructionIcon",
+                                                     "The remote procedure call failed.",
+                                                     "אישור",
+                                                     "סגור"
+                                                 ],
+                                       "ours":  true,
+                                       "ours_by":  "owner_text",
+                                       "owner":  7997986,
+                                       "owner_classes":  [
+                                                             "#32770",
+                                                             "CabinetWClass"
+                                                         ],
+                                       "owner_texts":  [
+                                                           "‏‏מעתיק...",
+                                                           "‏‏השהה את הפעולה",
+                                                           "ביטול",
+                                                           "paste-target-1 - סייר הקבצים",
+                                                           "Non Client Input Sink Window",
+                                                           "paste-target-1",
+                                                           "‏‏פקד עץ של מרחב שמות",
+                                                           "‏‏פקד עץ של מרחב שמות",
+                                                           "חלונית הניווט",
+                                                           "Shell Preview Extension Host",
+                                                           "ShellView"
+                                                       ],
+                                       "progress_bar":  false,
+                                       "root_owner":  6359754,
+                                       "t_ms":  4268.9966,
+                                       "title":  "‏‏שגיאה בהעתקת קובץ או תיקיה"
+                                   },
+                                   {
+                                       "class":  "#32770",
+                                       "event":  "gone",
+                                       "hwnd":  7277256,
+                                       "lifetime_ms":  274.4339999999993,
+                                       "ours":  true,
+                                       "progress_bar":  false,
+                                       "t_ms":  4543.4306
+                                   },
+                                   {
+                                       "class":  "#32770",
+                                       "event":  "gone",
+                                       "hwnd":  7997986,
+                                       "lifetime_ms":  2896.2147,
+                                       "ours":  true,
+                                       "progress_bar":  true,
+                                       "t_ms":  5830.8584
+                                   }
+                               ]
+                },
+    "dialog_actions":  [
+                           {
+                               "t_ms":  4612,
+                               "action":  "cancel",
+                               "dialog_class":  "#32770",
+                               "dialog_progress":  false,
+                               "result":  {
+                                              "class":  "#32770",
+                                              "invoked":  "CommandButton_1",
+                                              "name":  "╫נ╫ש╫⌐╫ץ╫¿",
+                                              "ours_by":  "owner_text",
+                                              "refused":  null
+                                          },
+                               "raw_exit":  0
+                           }
+                       ],
+    "agent_exit_code":  -1,
+    "agent_summary":  null,
+    "agent_fault_events":  [
+                               "stall_begin"
+                           ],
+    "set_data":  [
+                     {
+                         "format":  "TargetCLSID",
+                         "dword":  4080421792
+                     }
+                 ],
+    "performed_drop_effect":  [
+
+                              ],
+    "streams":  {
+                    "created":  1,
+                    "released":  0,
+                    "all_reached_eof":  false
+                },
+    "destinations":  [
+                         {
+                             "all_files_match":  false,
+                             "case_id":  "PROC-02",
+                             "files":  [
+                                           {
+                                               "advertised_size":  67108864,
+                                               "digest_match":  null,
+                                               "exists":  false,
+                                               "expected_size":  67108864,
+                                               "index":  0,
+                                               "mistakable_as_complete":  false,
+                                               "name":  "e02-PROC-02-f0.bin",
+                                               "original_preserved":  null,
+                                               "prefix_match":  null,
+                                               "size":  null,
+                                               "state":  "absent",
+                                               "zone_identifier":  null
+                                           }
+                                       ],
+                             "unexpected_entries":  [
+
+                                                    ]
+                         }
+                     ],
+    "observer":  {
+                     "paste-target-1":  {
+                                            "events":  5,
+                                            "names_seen":  [
+                                                               "e02-PROC-02-f0.bin"
+                                                           ],
+                                            "removals":  [
+                                                             "e02-PROC-02-f0.bin"
+                                                         ],
+                                            "max_sizes":  [
+                                                              {
+                                                                  "name":  "e02-PROC-02-f0.bin",
+                                                                  "max_size":  67108864
+                                                              }
+                                                          ]
+                                        }
+                 },
+    "clipboard":  {
+                      "set_sequence":  2969,
+                      "before_release":  {
+                                             "formats":  [
+                                                             "DataObject",
+                                                             "Ole Private Data"
+                                                         ],
+                                             "has_file_contents":  false,
+                                             "has_file_descriptor":  false,
+                                             "has_onecopy_marker":  false,
+                                             "sequence":  2970
+                                         },
+                      "release":  {
+                                      "available":  {
+                                                        "DataObject":  {
+                                                                           "rendered":  true,
+                                                                           "size":  8
+                                                                       },
+                                                        "Ole Private Data":  {
+                                                                                 "rendered":  true,
+                                                                                 "size":  312
+                                                                             }
+                                                    },
+                                      "cleared":  true,
+                                      "formats":  [
+                                                      "DataObject",
+                                                      "Ole Private Data"
+                                                  ],
+                                      "identified_as_this_run":  "stale_ole_formats_and_sequence",
+                                      "owner_alive":  false,
+                                      "owner_present":  false,
+                                      "refused_reason":  null,
+                                      "sequence":  2970
+                                  },
+                      "after":  {
+                                    "formats":  [
+
+                                                ],
+                                    "has_file_contents":  false,
+                                    "has_file_descriptor":  false,
+                                    "has_onecopy_marker":  false,
+                                    "sequence":  2971
+                                },
+                      "clean_after":  true,
+                      "replacement":  null,
+                      "probe":  null
+                  },
+    "classification":  {
+                           "target_report":  "failure",
+                           "per_file":  [
+                                            {
+                                                "target":  "PROC-02",
+                                                "name":  "e02-PROC-02-f0.bin",
+                                                "state":  "absent",
+                                                "size":  null,
+                                                "mistakable":  false,
+                                                "class":  "O1"
+                                            }
+                                        ],
+                           "outcome_class":  "O1",
+                           "expectation_met":  true
+                       },
+    "harness":  {
+                    "failed_stage":  null,
+                    "exception":  null,
+                    "driver_errors":  [
+
+                                      ],
+                    "post":  {
+                                 "agent_stop":  "exited",
+                                 "watcher_stops":  [
+                                                       "exited"
+                                                   ],
+                                 "dialog_watch_stop":  "exited",
+                                 "probe_stop":  "none",
+                                 "helper_stops":  [
+
+                                                  ],
+                                 "cleanup_dialogs":  [
+
+                                                     ]
+                             }
+                },
+    "interference":  [
+
+                     ],
+    "destination_cleanup":  {
+                                "deleted_files":  0,
+                                "removed_dirs":  2,
+                                "left_entries":  [
+
+                                                 ],
+                                "refused":  null
+                            },
+    "destination_kept":  false,
+    "result":  "completed"
+}

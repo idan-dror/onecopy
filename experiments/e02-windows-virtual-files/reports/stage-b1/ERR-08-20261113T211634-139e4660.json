@@ -1,0 +1,574 @@
+﻿{
+    "experiment_id":  "E-02",
+    "stage":  "B1",
+    "case_id":  "ERR-08",
+    "run_id":  "ERR-08-20261113T211634-139e4660",
+    "description":  "Destination holds a synthetic original; Replace; E_FAIL at 50%; Cancel. Is the original lost?",
+    "driver":  "D2c",
+    "dialog_driver":  "D2u",
+    "target":  "G-01",
+    "threading":  "T1",
+    "injected_harness_fault":  "none",
+    "case":  {
+                 "case_id":  "ERR-08",
+                 "description":  "Destination holds a synthetic original; Replace; E_FAIL at 50%; Cancel. Is the original lost?",
+                 "files":  [
+                               {
+                                   "advertised_size":  67108864,
+                                   "faults":  [
+                                                  {
+                                                      "at_offset":  33554432,
+                                                      "hresult":  2147500037,
+                                                      "kind":  "error",
+                                                      "once":  false
+                                                  }
+                                              ],
+                                   "name":  "e02-ERR-08-f0.bin",
+                                   "size":  67108864
+                               }
+                           ],
+                 "harness":  {
+                                 "close_window_after_event":  null,
+                                 "concurrent":  false,
+                                 "dialog_actions":  [
+                                                        "replace",
+                                                        "cancel"
+                                                    ],
+                                 "exit_mode":  "clear",
+                                 "expect":  "failure",
+                                 "kill_after_event":  null,
+                                 "kill_before_paste":  false,
+                                 "kill_delay_ms":  0,
+                                 "operator_note":  "",
+                                 "pastes":  1,
+                                 "pre_existing_seed":  9008,
+                                 "probe_clipboard":  false,
+                                 "replace_clipboard_after_event":  null,
+                                 "replace_delay_ms":  0,
+                                 "timeout_secs":  90
+                             },
+                 "large":  false,
+                 "read_timeout_ms":  null,
+                 "threading":  "T1",
+                 "zone_identifier":  null
+             },
+    "env":  {
+                "os_caption":  "Microsoft Windows 11 Home",
+                "os_version":  "10.0.26200",
+                "os_build":  "26200",
+                "os_ubr":  9711,
+                "os_display_version":  "25H2",
+                "explorer_version":  "10.0.26100.8875",
+                "explorer_separate_process":  0,
+                "clipboard_history_enabled":  null,
+                "cloud_clipboard_enabled":  null,
+                "defender_product_version":  "4.18.26100.4",
+                "defender_realtime_protection":  true,
+                "test_volume_filesystem":  "NTFS",
+                "test_volume_free_gib":  1309.8,
+                "cpu":  "AMD Ryzen 7 5700X3D 8-Core Processor",
+                "ram_gib":  31.9,
+                "experiment_commit":  "cb3a6813e898dcef454e5277622704264e2acb8c",
+                "experiment_tree_dirty":  false,
+                "rustc":  "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+                "cargo_lock_sha256":  "76215d10f491622601c608a061db959f8a67c758d4254eae40692b46bed5c830"
+            },
+    "progress":  {
+                     "completed":  true,
+                     "timed_out":  false,
+                     "seconds":  25.26,
+                     "reason":  null,
+                     "pending_dialog_actions":  [
+
+                                                ]
+                 },
+    "timeline":  [
+                     {
+                         "t_ms":  149,
+                         "source":  "harness",
+                         "event":  "originals_created",
+                         "detail":  {
+                                        "seed":  9008
+                                    }
+                     },
+                     {
+                         "t_ms":  401,
+                         "source":  "agent",
+                         "event":  "ready",
+                         "detail":  {
+                                        "sequence":  2857
+                                    }
+                     },
+                     {
+                         "t_ms":  2006,
+                         "source":  "driver",
+                         "event":  "paste",
+                         "detail":  {
+                                        "target":  "paste-target-1",
+                                        "exit":  0
+                                    }
+                     },
+                     {
+                         "t_ms":  2018,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  2018,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  2018,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  2018,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  2018,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  2018,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  2019,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  2019,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4080421792,
+                                        "format":  "TargetCLSID"
+                                    }
+                     },
+                     {
+                         "t_ms":  2463,
+                         "source":  "dialog",
+                         "event":  "appear",
+                         "detail":  {
+                                        "ours":  true,
+                                        "hwnd":  31327882,
+                                        "title":  "‏‏העתק קובץ"
+                                    }
+                     },
+                     {
+                         "t_ms":  8637,
+                         "source":  "harness",
+                         "event":  "dialog_replace_not_offered",
+                         "detail":  {
+                                        "offered_ids":  [
+                                                            "tileMain",
+                                                            "tileMain",
+                                                            "btnCancel",
+                                                            ""
+                                                        ]
+                                    }
+                     },
+                     {
+                         "t_ms":  8774,
+                         "source":  "harness",
+                         "event":  "dialog_cancel",
+                         "detail":  {
+                                        "class":  "#32770",
+                                        "invoked":  "btnCancel",
+                                        "name":  "╫ס╫ש╫ר╫ץ╫£",
+                                        "ours_by":  "token",
+                                        "refused":  null
+                                    }
+                     },
+                     {
+                         "t_ms":  9699,
+                         "source":  "dialog",
+                         "event":  "gone",
+                         "detail":  {
+                                        "ours":  true,
+                                        "hwnd":  31327882,
+                                        "title":  null
+                                    }
+                     }
+                 ],
+    "explorer_windows":  [
+                             {
+                                 "destination":  "paste-target-1",
+                                 "found":  true,
+                                 "top_hwnd":  9177394,
+                                 "top_preexisting":  false,
+                                 "tabs_on_top":  1,
+                                 "close_decision":  "close"
+                             }
+                         ],
+    "explorer_processes":  {
+                               "watched":  [
+                                               {
+                                                   "role":  "shell",
+                                                   "id":  9300,
+                                                   "name":  "explorer",
+                                                   "start":  "2026-11-12T18:48:36.7863513+02:00"
+                                               },
+                                               {
+                                                   "role":  "run_window_host",
+                                                   "id":  1368,
+                                                   "name":  "explorer",
+                                                   "start":  "2026-11-13T21:16:35.0292148+02:00"
+                                               }
+                                           ],
+                               "lost":  [
+
+                                        ]
+                           },
+    "dialogs":  {
+                    "appeared":  1,
+                    "attributed":  1,
+                    "error_dialog_seen":  true,
+                    "progress_dialog_seen":  false,
+                    "error_texts":  [
+                                        "‏‏e02-ERR-08-f0 (‪\u003ctestroot\u003e\\dest\\ERR-08-20261113T211634-139e4660\\paste-target-1‬)",
+                                        "‏‏e02-ERR-08-f0 (‪C:\\WINDOWS‬)",
+                                        "e02-ERR-08-f0.bin",
+                                        "‏‏אל תעתיק",
+                                        "‏‏אף קובץ לא ישתנה. השאר קובץ זה בתיקיית היעד:",
+                                        "ביטול",
+                                        "בצע פעולה זו עבור כל ההתנגשויות",
+                                        "‏‏גודל: ‏‏‎64.0 MB",
+                                        "‏‏החלף את הקובץ הנמצא בתיקיית היעד בקובץ שאתה מעתיק:",
+                                        "‏‏העתק והחלף",
+                                        "‏‏העתק קובץ",
+                                        "‏‏לחץ על הקובץ שברצונך לשמור",
+                                        "סגור",
+                                        "‏‏קיים כבר קובץ בעל שם זהה במיקום זה.",
+                                        "‏‏תאריך שינוי: ‎13/‎11/‎2026 ‏‎21:16"
+                                    ],
+                    "events":  [
+                                   {
+                                       "buttons":  [
+                                                       {
+                                                           "enabled":  true,
+                                                           "id":  "tileMain",
+                                                           "name":  "‏‏העתק והחלף"
+                                                       },
+                                                       {
+                                                           "enabled":  true,
+                                                           "id":  "tileMain",
+                                                           "name":  "‏‏אל תעתיק"
+                                                       },
+                                                       {
+                                                           "enabled":  true,
+                                                           "id":  "btnCancel",
+                                                           "name":  "ביטול"
+                                                       },
+                                                       {
+                                                           "enabled":  true,
+                                                           "id":  "",
+                                                           "name":  "סגור"
+                                                       }
+                                                   ],
+                                       "class":  "#32770",
+                                       "event":  "appear",
+                                       "hwnd":  31327882,
+                                       "names":  [
+                                                     "‏‏העתק קובץ",
+                                                     "‏‏קיים כבר קובץ בעל שם זהה במיקום זה.",
+                                                     "‏‏לחץ על הקובץ שברצונך לשמור",
+                                                     "‏‏העתק והחלף",
+                                                     "‏‏החלף את הקובץ הנמצא בתיקיית היעד בקובץ שאתה מעתיק:",
+                                                     "e02-ERR-08-f0.bin",
+                                                     "‏‏e02-ERR-08-f0 (‪C:\\WINDOWS‬)",
+                                                     "‏‏גודל: ‏‏‎64.0 MB",
+                                                     "‏‏אל תעתיק",
+                                                     "‏‏אף קובץ לא ישתנה. השאר קובץ זה בתיקיית היעד:",
+                                                     "‏‏e02-ERR-08-f0 (‪\u003ctestroot\u003e\\dest\\ERR-08-20261113T211634-139e4660\\paste-target-1‬)",
+                                                     "‏‏תאריך שינוי: ‎13/‎11/‎2026 ‏‎21:16",
+                                                     "בצע פעולה זו עבור כל ההתנגשויות",
+                                                     "ביטול",
+                                                     "סגור"
+                                                 ],
+                                       "ours":  true,
+                                       "ours_by":  "token",
+                                       "owner":  5048784,
+                                       "owner_classes":  [
+                                                             "#32770",
+                                                             "CabinetWClass"
+                                                         ],
+                                       "owner_texts":  [
+                                                           "‏‏מעתיק...",
+                                                           "‏‏השהה את הפעולה",
+                                                           "ביטול",
+                                                           "paste-target-1 - סייר הקבצים",
+                                                           "Non Client Input Sink Window",
+                                                           "paste-target-1",
+                                                           "‏‏פקד עץ של מרחב שמות",
+                                                           "‏‏פקד עץ של מרחב שמות",
+                                                           "חלונית הניווט",
+                                                           "Shell Preview Extension Host",
+                                                           "ShellView"
+                                                       ],
+                                       "progress_bar":  false,
+                                       "root_owner":  9964030,
+                                       "t_ms":  2009.0074000000002,
+                                       "title":  "‏‏העתק קובץ"
+                                   },
+                                   {
+                                       "class":  "#32770",
+                                       "event":  "gone",
+                                       "hwnd":  31327882,
+                                       "lifetime_ms":  6580.416499999999,
+                                       "ours":  true,
+                                       "progress_bar":  false,
+                                       "t_ms":  8589.4239
+                                   }
+                               ]
+                },
+    "dialog_actions":  [
+                           {
+                               "t_ms":  8636,
+                               "action":  "replace",
+                               "dialog_class":  "#32770",
+                               "dialog_progress":  false,
+                               "result":  {
+                                              "invoked":  null,
+                                              "refused":  "not offered by the target dialog",
+                                              "offered_ids":  [
+                                                                  "tileMain",
+                                                                  "tileMain",
+                                                                  "btnCancel",
+                                                                  ""
+                                                              ]
+                                          },
+                               "raw_exit":  null
+                           },
+                           {
+                               "t_ms":  8773,
+                               "action":  "cancel",
+                               "dialog_class":  "#32770",
+                               "dialog_progress":  false,
+                               "result":  {
+                                              "class":  "#32770",
+                                              "invoked":  "btnCancel",
+                                              "name":  "╫ס╫ש╫ר╫ץ╫£",
+                                              "ours_by":  "token",
+                                              "refused":  null
+                                          },
+                               "raw_exit":  0
+                           }
+                       ],
+    "agent_exit_code":  0,
+    "agent_summary":  {
+                          "owner_thread_id":  22696,
+                          "com_call_threads":  {
+                                                   "22696":  48
+                                               },
+                          "calls":  {
+                                        "IDataObject::EnumFormatEtc":  7,
+                                        "IDataObject::GetData":  28,
+                                        "IDataObject::QueryGetData":  3,
+                                        "IDataObject::SetData":  10
+                                    },
+                          "first_descriptor_get_data_ms":  1712.8694,
+                          "first_contents_get_data_ms":  null,
+                          "first_read_ms":  null,
+                          "last_read_ms":  null,
+                          "last_stream_release_ms":  null,
+                          "clipboard_lost_ms":  null,
+                          "streams_created":  0,
+                          "streams_released":  0,
+                          "bytes_served":  0,
+                          "read_calls":  0,
+                          "short_reads":  0,
+                          "failed_reads":  0,
+                          "peak_private_bytes":  2113536,
+                          "peak_working_set_bytes":  11976704,
+                          "memory_samples":  26,
+                          "os_peak_commit_bytes":  2113536,
+                          "os_peak_working_set_bytes":  12029952,
+                          "per_stream":  [
+
+                                         ]
+                      },
+    "agent_fault_events":  [
+
+                           ],
+    "set_data":  [
+                     {
+                         "format":  "TargetCLSID",
+                         "dword":  4080421792
+                     }
+                 ],
+    "performed_drop_effect":  [
+
+                              ],
+    "streams":  {
+                    "created":  0,
+                    "released":  0,
+                    "all_reached_eof":  false
+                },
+    "destinations":  [
+                         {
+                             "all_files_match":  false,
+                             "case_id":  "ERR-08",
+                             "files":  [
+                                           {
+                                               "advertised_size":  67108864,
+                                               "digest_match":  false,
+                                               "exists":  true,
+                                               "expected_size":  67108864,
+                                               "index":  0,
+                                               "mistakable_as_complete":  true,
+                                               "name":  "e02-ERR-08-f0.bin",
+                                               "original_preserved":  true,
+                                               "prefix_match":  null,
+                                               "size":  67108864,
+                                               "state":  "original_preserved",
+                                               "zone_identifier":  {
+                                                                       "present":  false
+                                                                   }
+                                           }
+                                       ],
+                             "unexpected_entries":  [
+
+                                                    ]
+                         }
+                     ],
+    "observer":  {
+                     "paste-target-1":  {
+                                            "events":  1,
+                                            "names_seen":  [
+                                                               "e02-ERR-08-f0.bin"
+                                                           ],
+                                            "removals":  [
+
+                                                         ],
+                                            "max_sizes":  [
+                                                              {
+                                                                  "name":  "e02-ERR-08-f0.bin",
+                                                                  "max_size":  67108864
+                                                              }
+                                                          ]
+                                        }
+                 },
+    "clipboard":  {
+                      "set_sequence":  2857,
+                      "before_release":  {
+                                             "formats":  [
+
+                                                         ],
+                                             "has_file_contents":  false,
+                                             "has_file_descriptor":  false,
+                                             "has_onecopy_marker":  false,
+                                             "sequence":  2858
+                                         },
+                      "release":  {
+                                      "available":  {
+
+                                                    },
+                                      "cleared":  false,
+                                      "formats":  [
+
+                                                  ],
+                                      "identified_as_this_run":  null,
+                                      "owner_alive":  false,
+                                      "owner_present":  false,
+                                      "refused_reason":  null,
+                                      "sequence":  2858
+                                  },
+                      "after":  {
+                                    "formats":  [
+
+                                                ],
+                                    "has_file_contents":  false,
+                                    "has_file_descriptor":  false,
+                                    "has_onecopy_marker":  false,
+                                    "sequence":  2858
+                                },
+                      "clean_after":  true,
+                      "replacement":  null,
+                      "probe":  null
+                  },
+    "classification":  {
+                           "target_report":  "failure",
+                           "per_file":  [
+                                            {
+                                                "target":  "ERR-08",
+                                                "name":  "e02-ERR-08-f0.bin",
+                                                "state":  "original_preserved",
+                                                "size":  67108864,
+                                                "mistakable":  true,
+                                                "class":  "O1"
+                                            }
+                                        ],
+                           "outcome_class":  "O1",
+                           "expectation_met":  true
+                       },
+    "harness":  {
+                    "failed_stage":  null,
+                    "exception":  null,
+                    "driver_errors":  [
+
+                                      ],
+                    "post":  {
+                                 "agent_stop":  "exited",
+                                 "watcher_stops":  [
+                                                       "exited"
+                                                   ],
+                                 "dialog_watch_stop":  "exited",
+                                 "probe_stop":  "none",
+                                 "helper_stops":  [
+
+                                                  ],
+                                 "cleanup_dialogs":  [
+
+                                                     ]
+                             }
+                },
+    "interference":  [
+
+                     ],
+    "destination_cleanup":  {
+                                "deleted_files":  1,
+                                "removed_dirs":  2,
+                                "left_entries":  [
+
+                                                 ],
+                                "refused":  null
+                            },
+    "destination_kept":  false,
+    "result":  "completed"
+}

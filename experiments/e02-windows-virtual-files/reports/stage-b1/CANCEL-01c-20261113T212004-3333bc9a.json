@@ -1,0 +1,574 @@
+﻿{
+    "experiment_id":  "E-02",
+    "stage":  "B1",
+    "case_id":  "CANCEL-01c",
+    "run_id":  "CANCEL-01c-20261113T212004-3333bc9a",
+    "description":  "Cancel near 99%: fast to 99%, then 0.05 MiB/s",
+    "driver":  "D2c",
+    "dialog_driver":  "D2u",
+    "target":  "G-01",
+    "threading":  "T1",
+    "injected_harness_fault":  "none",
+    "case":  {
+                 "case_id":  "CANCEL-01c",
+                 "description":  "Cancel near 99%: fast to 99%, then 0.05 MiB/s",
+                 "files":  [
+                               {
+                                   "advertised_size":  67108864,
+                                   "faults":  [
+                                                  {
+                                                      "from_offset":  66437775,
+                                                      "kind":  "throttle",
+                                                      "mib_per_s":  0.05
+                                                  }
+                                              ],
+                                   "name":  "e02-CANCEL-01c-f0.bin",
+                                   "size":  67108864
+                               }
+                           ],
+                 "harness":  {
+                                 "close_window_after_event":  null,
+                                 "concurrent":  false,
+                                 "dialog_actions":  [
+                                                        "cancel"
+                                                    ],
+                                 "exit_mode":  "clear",
+                                 "expect":  "cancel",
+                                 "kill_after_event":  null,
+                                 "kill_before_paste":  false,
+                                 "kill_delay_ms":  0,
+                                 "operator_note":  "",
+                                 "pastes":  1,
+                                 "pre_existing_seed":  null,
+                                 "probe_clipboard":  false,
+                                 "replace_clipboard_after_event":  null,
+                                 "replace_delay_ms":  0,
+                                 "timeout_secs":  180
+                             },
+                 "large":  false,
+                 "read_timeout_ms":  null,
+                 "threading":  "T1",
+                 "zone_identifier":  null
+             },
+    "env":  {
+                "os_caption":  "Microsoft Windows 11 Home",
+                "os_version":  "10.0.26200",
+                "os_build":  "26200",
+                "os_ubr":  9711,
+                "os_display_version":  "25H2",
+                "explorer_version":  "10.0.26100.8875",
+                "explorer_separate_process":  0,
+                "clipboard_history_enabled":  null,
+                "cloud_clipboard_enabled":  null,
+                "defender_product_version":  "4.18.26100.4",
+                "defender_realtime_protection":  true,
+                "test_volume_filesystem":  "NTFS",
+                "test_volume_free_gib":  1309.8,
+                "cpu":  "AMD Ryzen 7 5700X3D 8-Core Processor",
+                "ram_gib":  31.9,
+                "experiment_commit":  "cb3a6813e898dcef454e5277622704264e2acb8c",
+                "experiment_tree_dirty":  false,
+                "rustc":  "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+                "cargo_lock_sha256":  "76215d10f491622601c608a061db959f8a67c758d4254eae40692b46bed5c830"
+            },
+    "progress":  {
+                     "completed":  true,
+                     "timed_out":  false,
+                     "seconds":  10.62,
+                     "reason":  null,
+                     "pending_dialog_actions":  [
+
+                                                ]
+                 },
+    "timeline":  [
+                     {
+                         "t_ms":  313,
+                         "source":  "agent",
+                         "event":  "ready",
+                         "detail":  {
+                                        "sequence":  2961
+                                    }
+                     },
+                     {
+                         "t_ms":  1931,
+                         "source":  "driver",
+                         "event":  "paste",
+                         "detail":  {
+                                        "target":  "paste-target-1",
+                                        "exit":  0
+                                    }
+                     },
+                     {
+                         "t_ms":  1947,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1947,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1948,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1948,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1948,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1948,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4294967295,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1948,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  1,
+                                        "format":  "DropDescription"
+                                    }
+                     },
+                     {
+                         "t_ms":  1948,
+                         "source":  "agent",
+                         "event":  "set_data",
+                         "detail":  {
+                                        "dword":  4080421792,
+                                        "format":  "TargetCLSID"
+                                    }
+                     },
+                     {
+                         "t_ms":  3302,
+                         "source":  "dialog",
+                         "event":  "appear",
+                         "detail":  {
+                                        "ours":  true,
+                                        "hwnd":  10684666,
+                                        "title":  "‏‏מעתיק..."
+                                    }
+                     },
+                     {
+                         "t_ms":  3404,
+                         "source":  "harness",
+                         "event":  "dialog_cancel",
+                         "detail":  {
+                                        "class":  "#32770",
+                                        "invoked":  "CancelButton",
+                                        "name":  "╫ס╫ש╫ר╫ץ╫£",
+                                        "ours_by":  "token",
+                                        "refused":  null
+                                    }
+                     },
+                     {
+                         "t_ms":  4334,
+                         "source":  "dialog",
+                         "event":  "change",
+                         "detail":  {
+                                        "ours":  true,
+                                        "hwnd":  10684666,
+                                        "title":  "‏‏מבטל..."
+                                    }
+                     },
+                     {
+                         "t_ms":  7483,
+                         "source":  "dialog",
+                         "event":  "gone",
+                         "detail":  {
+                                        "ours":  true,
+                                        "hwnd":  10684666,
+                                        "title":  null
+                                    }
+                     }
+                 ],
+    "explorer_windows":  [
+                             {
+                                 "destination":  "paste-target-1",
+                                 "found":  true,
+                                 "top_hwnd":  10160434,
+                                 "top_preexisting":  false,
+                                 "tabs_on_top":  1,
+                                 "close_decision":  "close"
+                             }
+                         ],
+    "explorer_processes":  {
+                               "watched":  [
+                                               {
+                                                   "role":  "shell",
+                                                   "id":  9300,
+                                                   "name":  "explorer",
+                                                   "start":  "2026-11-12T18:48:36.7863513+02:00"
+                                               },
+                                               {
+                                                   "role":  "run_window_host",
+                                                   "id":  28208,
+                                                   "name":  "explorer",
+                                                   "start":  "2026-11-13T21:20:04.5267696+02:00"
+                                               }
+                                           ],
+                               "lost":  [
+
+                                        ]
+                           },
+    "dialogs":  {
+                    "appeared":  1,
+                    "attributed":  1,
+                    "error_dialog_seen":  false,
+                    "progress_dialog_seen":  true,
+                    "error_texts":  [
+
+                                    ],
+                    "events":  [
+                                   {
+                                       "buttons":  [
+                                                       {
+                                                           "enabled":  true,
+                                                           "id":  "CancelButton",
+                                                           "name":  "ביטול"
+                                                       },
+                                                       {
+                                                           "enabled":  true,
+                                                           "id":  "",
+                                                           "name":  "‏‏מזער"
+                                                       },
+                                                       {
+                                                           "enabled":  false,
+                                                           "id":  "",
+                                                           "name":  "הגדל"
+                                                       },
+                                                       {
+                                                           "enabled":  true,
+                                                           "id":  "",
+                                                           "name":  "סגור"
+                                                       }
+                                                   ],
+                                       "class":  "#32770",
+                                       "event":  "appear",
+                                       "hwnd":  10684666,
+                                       "names":  [
+                                                     "‏‏מעתיק...",
+                                                     "‏‏מעתיק את \u0027e02-CANCEL-01c-f0.bin\u0027",
+                                                     "‏‏אל \u0027\u003ctestroot\u003e\\dest\\CANCEL-01c-20261113T212004-3333bc9a\\paste-target-1\u0027",
+                                                     "ביטול",
+                                                     "‏‏מד התקדמות",
+                                                     "מערכת",
+                                                     "‏‏מזער",
+                                                     "הגדל",
+                                                     "סגור"
+                                                 ],
+                                       "ours":  true,
+                                       "ours_by":  "token",
+                                       "owner":  9439542,
+                                       "owner_classes":  [
+                                                             "CabinetWClass"
+                                                         ],
+                                       "owner_texts":  [
+                                                           "paste-target-1 - סייר הקבצים",
+                                                           "Non Client Input Sink Window",
+                                                           "paste-target-1",
+                                                           "‏‏פקד עץ של מרחב שמות",
+                                                           "‏‏פקד עץ של מרחב שמות",
+                                                           "חלונית הניווט",
+                                                           "Shell Preview Extension Host",
+                                                           "ShellView"
+                                                       ],
+                                       "progress_bar":  true,
+                                       "root_owner":  9439542,
+                                       "t_ms":  3014.9058,
+                                       "title":  "‏‏מעתיק..."
+                                   },
+                                   {
+                                       "buttons":  [
+                                                       {
+                                                           "enabled":  false,
+                                                           "id":  "CancelButton",
+                                                           "name":  "ביטול"
+                                                       },
+                                                       {
+                                                           "enabled":  true,
+                                                           "id":  "",
+                                                           "name":  "‏‏מזער"
+                                                       },
+                                                       {
+                                                           "enabled":  false,
+                                                           "id":  "",
+                                                           "name":  "הגדל"
+                                                       },
+                                                       {
+                                                           "enabled":  true,
+                                                           "id":  "",
+                                                           "name":  "סגור"
+                                                       }
+                                                   ],
+                                       "event":  "change",
+                                       "hwnd":  10684666,
+                                       "names":  [
+                                                     "‏‏מבטל...",
+                                                     "ביטול",
+                                                     "‏‏מד התקדמות",
+                                                     "מערכת",
+                                                     "‏‏מזער",
+                                                     "הגדל",
+                                                     "סגור"
+                                                 ],
+                                       "ours":  true,
+                                       "ours_by":  "token",
+                                       "progress_bar":  true,
+                                       "t_ms":  4077.9097999999994,
+                                       "title":  "‏‏מבטל..."
+                                   },
+                                   {
+                                       "class":  "#32770",
+                                       "event":  "gone",
+                                       "hwnd":  10684666,
+                                       "lifetime_ms":  4178.781799999999,
+                                       "ours":  true,
+                                       "progress_bar":  true,
+                                       "t_ms":  7193.687599999999
+                                   }
+                               ]
+                },
+    "dialog_actions":  [
+                           {
+                               "t_ms":  3404,
+                               "action":  "cancel",
+                               "dialog_class":  "#32770",
+                               "dialog_progress":  true,
+                               "result":  {
+                                              "class":  "#32770",
+                                              "invoked":  "CancelButton",
+                                              "name":  "╫ס╫ש╫ר╫ץ╫£",
+                                              "ours_by":  "token",
+                                              "refused":  null
+                                          },
+                               "raw_exit":  0
+                           }
+                       ],
+    "agent_exit_code":  0,
+    "agent_summary":  {
+                          "owner_thread_id":  27144,
+                          "com_call_threads":  {
+                                                   "27144":  307
+                                               },
+                          "calls":  {
+                                        "IDataObject::EnumFormatEtc":  7,
+                                        "IDataObject::GetData":  29,
+                                        "IDataObject::QueryGetData":  3,
+                                        "IDataObject::SetData":  10,
+                                        "IStream::Read":  255,
+                                        "IStream::Seek":  3
+                                    },
+                          "first_descriptor_get_data_ms":  1729.1275,
+                          "first_contents_get_data_ms":  1730.2762,
+                          "first_read_ms":  1731.3909999999998,
+                          "last_read_ms":  1874.1697,
+                          "last_stream_release_ms":  6880.0909,
+                          "clipboard_lost_ms":  null,
+                          "streams_created":  1,
+                          "streams_released":  1,
+                          "bytes_served":  66846720,
+                          "read_calls":  255,
+                          "short_reads":  0,
+                          "failed_reads":  0,
+                          "peak_private_bytes":  2367488,
+                          "peak_working_set_bytes":  12222464,
+                          "memory_samples":  12,
+                          "os_peak_commit_bytes":  2367488,
+                          "os_peak_working_set_bytes":  12488704,
+                          "per_stream":  [
+                                             {
+                                                 "stream_id":  1,
+                                                 "file_index":  0,
+                                                 "advertised_size":  67108864,
+                                                 "bytes_served":  66846720,
+                                                 "final_position":  0,
+                                                 "max_position":  66846720,
+                                                 "read_calls":  255,
+                                                 "failed_reads":  0,
+                                                 "min_request":  262144,
+                                                 "max_request":  262144,
+                                                 "seeks":  3,
+                                                 "stats_calls":  0,
+                                                 "eof_read":  false
+                                             }
+                                         ]
+                      },
+    "agent_fault_events":  [
+
+                           ],
+    "set_data":  [
+                     {
+                         "format":  "TargetCLSID",
+                         "dword":  4080421792
+                     }
+                 ],
+    "performed_drop_effect":  [
+
+                              ],
+    "streams":  {
+                    "created":  1,
+                    "released":  1,
+                    "all_reached_eof":  false
+                },
+    "destinations":  [
+                         {
+                             "all_files_match":  false,
+                             "case_id":  "CANCEL-01c",
+                             "files":  [
+                                           {
+                                               "advertised_size":  67108864,
+                                               "digest_match":  null,
+                                               "exists":  false,
+                                               "expected_size":  67108864,
+                                               "index":  0,
+                                               "mistakable_as_complete":  false,
+                                               "name":  "e02-CANCEL-01c-f0.bin",
+                                               "original_preserved":  null,
+                                               "prefix_match":  null,
+                                               "size":  null,
+                                               "state":  "absent",
+                                               "zone_identifier":  null
+                                           }
+                                       ],
+                             "unexpected_entries":  [
+
+                                                    ]
+                         }
+                     ],
+    "observer":  {
+                     "paste-target-1":  {
+                                            "events":  5,
+                                            "names_seen":  [
+                                                               "e02-CANCEL-01c-f0.bin"
+                                                           ],
+                                            "removals":  [
+                                                             "e02-CANCEL-01c-f0.bin"
+                                                         ],
+                                            "max_sizes":  [
+                                                              {
+                                                                  "name":  "e02-CANCEL-01c-f0.bin",
+                                                                  "max_size":  67108864
+                                                              }
+                                                          ]
+                                        }
+                 },
+    "clipboard":  {
+                      "set_sequence":  2961,
+                      "before_release":  {
+                                             "formats":  [
+
+                                                         ],
+                                             "has_file_contents":  false,
+                                             "has_file_descriptor":  false,
+                                             "has_onecopy_marker":  false,
+                                             "sequence":  2962
+                                         },
+                      "release":  {
+                                      "available":  {
+
+                                                    },
+                                      "cleared":  false,
+                                      "formats":  [
+
+                                                  ],
+                                      "identified_as_this_run":  null,
+                                      "owner_alive":  false,
+                                      "owner_present":  false,
+                                      "refused_reason":  null,
+                                      "sequence":  2962
+                                  },
+                      "after":  {
+                                    "formats":  [
+
+                                                ],
+                                    "has_file_contents":  false,
+                                    "has_file_descriptor":  false,
+                                    "has_onecopy_marker":  false,
+                                    "sequence":  2962
+                                },
+                      "clean_after":  true,
+                      "replacement":  null,
+                      "probe":  null
+                  },
+    "classification":  {
+                           "target_report":  "cancelled",
+                           "per_file":  [
+                                            {
+                                                "target":  "CANCEL-01c",
+                                                "name":  "e02-CANCEL-01c-f0.bin",
+                                                "state":  "absent",
+                                                "size":  null,
+                                                "mistakable":  false,
+                                                "class":  "O1"
+                                            }
+                                        ],
+                           "outcome_class":  "O1",
+                           "expectation_met":  true
+                       },
+    "harness":  {
+                    "failed_stage":  null,
+                    "exception":  null,
+                    "driver_errors":  [
+
+                                      ],
+                    "post":  {
+                                 "agent_stop":  "exited",
+                                 "watcher_stops":  [
+                                                       "exited"
+                                                   ],
+                                 "dialog_watch_stop":  "exited",
+                                 "probe_stop":  "none",
+                                 "helper_stops":  [
+
+                                                  ],
+                                 "cleanup_dialogs":  [
+
+                                                     ]
+                             }
+                },
+    "interference":  [
+
+                     ],
+    "destination_cleanup":  {
+                                "deleted_files":  0,
+                                "removed_dirs":  2,
+                                "left_entries":  [
+
+                                                 ],
+                                "refused":  null
+                            },
+    "destination_kept":  false,
+    "result":  "completed"
+}

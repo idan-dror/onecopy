@@ -1,0 +1,21 @@
+# Stage B1 (P0).
+case_id = "STREAM-04rt"
+description = "180 s stall at 50% with provider read timeout 30 s (variant RT)"
+seed = 2022
+
+[variants]
+read_timeout_ms = 30000
+
+[harness]
+dialog_actions = ["cancel"]
+expect = "failure"
+timeout_secs = 240
+
+[[files]]
+name = "e02-STREAM-04rt-f0.bin"
+size = 67108864
+
+[[files.faults]]
+kind = "stall"
+at_offset = 33554432
+duration_ms = 180000

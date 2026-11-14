@@ -1,0 +1,21 @@
+# Stage B1 (P0).
+case_id = "CANCEL-03"
+description = "CANCEL-02 with provider read timeout 30 s"
+seed = 2033
+
+[variants]
+read_timeout_ms = 30000
+
+[harness]
+dialog_actions = ["cancel", "cancel"]
+expect = "cancel"
+timeout_secs = 240
+
+[[files]]
+name = "e02-CANCEL-03-f0.bin"
+size = 67108864
+
+[[files.faults]]
+kind = "stall"
+at_offset = 33554432
+duration_ms = 90000

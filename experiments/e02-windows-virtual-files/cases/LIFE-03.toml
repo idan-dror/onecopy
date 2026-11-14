@@ -1,0 +1,26 @@
+# Stage B1 (P0).
+case_id = "LIFE-03"
+description = "Another application replaces the clipboard during the copy (T1, 8 MiB/s)"
+seed = 2043
+
+[variants]
+threading = "T1"
+
+[harness]
+replace_clipboard_after_event = "mark"
+dialog_actions = ["cancel"]
+expect = "observe"
+timeout_secs = 120
+
+[[files]]
+name = "e02-LIFE-03-f0.bin"
+size = 67108864
+
+[[files.faults]]
+kind = "throttle"
+mib_per_s = 8
+
+[[files.faults]]
+kind = "mark"
+at_offset = 16777216
+label = "quarter"

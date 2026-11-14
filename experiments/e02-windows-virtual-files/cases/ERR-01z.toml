@@ -1,0 +1,17 @@
+# Stage B1 (P0).
+case_id = "ERR-01z"
+description = "E_FAIL on the first read (offset 0)"
+seed = 2010
+
+[harness]
+dialog_actions = ["cancel"]
+expect = "failure"
+
+[[files]]
+name = "e02-ERR-01z-f0.bin"
+size = 67108864
+
+[[files.faults]]
+kind = "error"
+at_offset = 0
+hresult = 0x80004005

@@ -9,9 +9,13 @@
 //! The 32-bit ChaCha20 block counter limits one (key, nonce) stream to 256 GiB,
 //! which covers every E-02 case (largest: 100 GiB).
 
+pub mod fault;
+
+pub use fault::{Fault, FilePlan, ReadAction, ReadOutcome};
+
 use chacha20::ChaCha20;
 use chacha20::cipher::{KeyIvInit, StreamCipher, StreamCipherSeek};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::path::Path;
 
 /// Domain-separation context for key derivation. Changing it changes every byte.
@@ -19,6 +23,13 @@ pub const KEY_CONTEXT: &str = "onecopy e02 synth v1";
 
 /// Largest stream supported by one ChaCha20 (key, nonce) pair: 2^32 blocks of 64 bytes.
 pub const MAX_STREAM_BYTES: u64 = (1u64 << 32) * 64;
+
+/// Largest total case size without `large = true`. Large-file cases belong to Stage B2, which
+/// needs separate owner review and a separately agreed hands-off window.
+pub const BOUNDED_CASE_MAX_BYTES: u64 = 256 << 20;
+
+/// `OleFlushClipboard` (exit mode `flush`) is refused for cases larger than this.
+pub const FLUSH_MAX_CASE_BYTES: u64 = 64 << 20;
 
 /// Deterministic generator for one run seed.
 #[derive(Clone)]
@@ -97,32 +108,152 @@ pub struct Case {
     pub files: Vec<CaseFile>,
     #[serde(default)]
     pub variants: Variants,
+    /// Instructions for the run script only; the provider ignores them.
+    #[serde(default)]
+    pub harness: Harness,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct CaseFile {
     /// Relative path placed in `FILEDESCRIPTORW.cFileName` (synthetic name only).
     pub name: String,
+    /// True size of the synthetic file (the expected destination content).
     pub size: u64,
+    /// `FD_FILESIZE` value in the descriptor when it must differ from `size` (wrong size).
+    #[serde(default)]
+    pub advertised_size: Option<u64>,
+    /// `IStream::Stat` `cbSize` when it must differ from `size` (DESC-06).
+    #[serde(default)]
+    pub stat_size: Option<u64>,
+    #[serde(default)]
+    pub faults: Vec<Fault>,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+impl CaseFile {
+    pub fn plan(&self) -> FilePlan {
+        FilePlan::new(self.size, self.faults.clone())
+    }
+
+    /// Size written into the descriptor (when `FD_FILESIZE` is set).
+    pub fn descriptor_size(&self) -> u64 {
+        self.advertised_size.unwrap_or(self.size)
+    }
+}
+
+/// COM threading variant (spec §3.2, §5).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
+pub enum Threading {
+    /// Data object and streams bound to the owner STA (`Agile = false`).
+    T1,
+    /// Data object bound to the STA; streams agile (free-threaded marshaler), so cross-process
+    /// `Read` calls run on RPC threads and a blocked `Read` does not occupy the STA.
+    T2,
+    /// Data object and streams agile.
+    T2A,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(deny_unknown_fields, default)]
 pub struct Variants {
-    /// T1 = stream objects live in the owner STA (the only Stage A variant).
-    pub threading: String,
-    /// Set `FD_FILESIZE` with the correct size.
+    pub threading: Threading,
+    /// Set `FD_FILESIZE`.
     pub advertise_size: bool,
     /// Set `FD_PROGRESSUI`.
     pub progress_ui: bool,
+    /// Variant RT: a stalled `Read` returns a timeout error after this many ms.
+    pub read_timeout_ms: Option<u64>,
+    /// Delay before returning the descriptor from `GetData` (STREAM-05).
+    pub descriptor_delay_ms: u64,
+    /// Delay before returning a contents stream from `GetData` (STREAM-06).
+    pub contents_getdata_delay_ms: u64,
+    /// Observation only: answer `ZoneIdentifier` requests with this DWORD (for example 3).
+    /// No Mark-of-the-Web claim follows from offering it (D-033, checklist W-06).
+    pub zone_identifier: Option<u32>,
+    /// Hard cap on bytes served by the whole provider process (render-all guard). Reads beyond
+    /// it fail. Default: 4 x the case's stream bytes + 1 MiB.
+    pub max_total_bytes_served: Option<u64>,
+    /// Must be true for cases above `BOUNDED_CASE_MAX_BYTES` (Stage B2 only).
+    pub large: bool,
 }
 
 impl Default for Variants {
     fn default() -> Self {
-        Self { threading: "T1".into(), advertise_size: true, progress_ui: true }
+        Self {
+            threading: Threading::T1,
+            advertise_size: true,
+            progress_ui: true,
+            read_timeout_ms: None,
+            descriptor_delay_ms: 0,
+            contents_getdata_delay_ms: 0,
+            zone_identifier: None,
+            max_total_bytes_served: None,
+            large: false,
+        }
     }
 }
+
+/// Run-script instructions (not used by the provider).
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(deny_unknown_fields, default)]
+pub struct Harness {
+    /// Number of destination folders pasted into.
+    pub pastes: u32,
+    /// Paste into all folders at once instead of one after another.
+    pub concurrent: bool,
+    /// Provider exit mode: clear | leave | flush.
+    pub exit_mode: String,
+    /// Responses to Explorer dialogs, in order (cancel, try_again, skip, replace, keep_both).
+    pub dialog_actions: Vec<String>,
+    /// Kill the provider this many ms after it logs the named fault event (for example
+    /// "stall_begin"). Killing is done by the harness, by PID and identity.
+    pub kill_after_event: Option<String>,
+    pub kill_delay_ms: u64,
+    /// Kill the provider after it has placed the clipboard and before the paste (PROC-03).
+    pub kill_before_paste: bool,
+    /// Replace the clipboard with harness-owned synthetic text after this provider event.
+    pub replace_clipboard_after_event: Option<String>,
+    pub replace_delay_ms: u64,
+    /// Ask the operator to close the destination window after this provider event (CANCEL-04).
+    pub close_window_after_event: Option<String>,
+    /// Pre-create each destination file from this seed before pasting (ERR-08, DEST-05).
+    pub pre_existing_seed: Option<u64>,
+    /// Run the clipboard latency probe during the run (STREAM-08).
+    pub probe_clipboard: bool,
+    /// Overall run timeout.
+    pub timeout_secs: u64,
+    /// Expected target result: success | failure | cancel | observe.
+    pub expect: String,
+    /// What the operator must do (shown before the run).
+    pub operator_note: String,
+}
+
+impl Default for Harness {
+    fn default() -> Self {
+        Self {
+            pastes: 1,
+            concurrent: false,
+            exit_mode: "clear".into(),
+            dialog_actions: Vec::new(),
+            kill_after_event: None,
+            kill_delay_ms: 0,
+            kill_before_paste: false,
+            replace_clipboard_after_event: None,
+            replace_delay_ms: 0,
+            close_window_after_event: None,
+            pre_existing_seed: None,
+            probe_clipboard: false,
+            timeout_secs: 90,
+            expect: "success".into(),
+            operator_note: String::new(),
+        }
+    }
+}
+
+const DIALOG_ACTIONS: &[&str] = &["cancel", "try_again", "skip", "replace", "keep_both"];
+const EXIT_MODES: &[&str] = &["clear", "leave", "flush"];
+const EXPECTS: &[&str] = &["success", "failure", "cancel", "observe"];
+const EVENTS: &[&str] = &["stall_begin", "mark", "error_returned", "eof_returned"];
 
 #[derive(Debug)]
 pub enum CaseError {
@@ -151,19 +282,64 @@ impl Case {
         Ok(case)
     }
 
-    /// Rejects anything Stage A does not support and any unsafe synthetic name.
+    /// Total bytes the streams deliver (sizes adjusted for premature EOF and overrun).
+    pub fn stream_bytes(&self) -> u64 {
+        self.files.iter().map(|f| f.plan().stream_len()).sum()
+    }
+
+    /// Provider-wide byte budget (render-all guard).
+    pub fn byte_budget(&self) -> u64 {
+        self.variants.max_total_bytes_served.unwrap_or(4 * self.stream_bytes() + (1 << 20))
+    }
+
+    /// Rejects unsafe names, inconsistent fault plans and unbounded cases.
     pub fn validate(&self) -> Result<(), CaseError> {
+        let bad = |m: String| Err(CaseError::Invalid(m));
         if self.files.is_empty() {
-            return Err(CaseError::Invalid("case has no files".into()));
+            return bad("case has no files".into());
         }
-        if self.variants.threading != "T1" {
-            return Err(CaseError::Invalid("only threading variant T1 is implemented (Stage A)".into()));
+        if !self.case_id.chars().all(|c| c.is_ascii_alphanumeric() || c == '-') || self.case_id.len() > 16 {
+            return bad("case_id must be short and [A-Za-z0-9-]".into());
         }
+        let mut total = 0u64;
         for file in &self.files {
             validate_relative_name(&file.name)?;
-            if file.size > MAX_STREAM_BYTES {
-                return Err(CaseError::Invalid(format!("{}: size exceeds stream limit", file.name)));
+            let plan = file.plan();
+            if plan.stream_len() > MAX_STREAM_BYTES || file.descriptor_size() > MAX_STREAM_BYTES {
+                return bad(format!("{}: size exceeds stream limit", file.name));
             }
+            plan.validate().map_err(|e| CaseError::Invalid(format!("{}: {e}", file.name)))?;
+            total += plan.stream_len().max(file.descriptor_size());
+        }
+        if total > BOUNDED_CASE_MAX_BYTES && !self.variants.large {
+            return bad("case exceeds the bounded size; large cases are Stage B2 only".into());
+        }
+        let h = &self.harness;
+        if !(1..=4).contains(&h.pastes) {
+            return bad("harness.pastes must be 1..=4".into());
+        }
+        if !EXIT_MODES.contains(&h.exit_mode.as_str()) {
+            return bad(format!("unknown exit_mode {}", h.exit_mode));
+        }
+        if h.exit_mode == "flush" && total > FLUSH_MAX_CASE_BYTES {
+            return bad("exit_mode flush is refused for cases above 64 MiB".into());
+        }
+        if let Some(a) = h.dialog_actions.iter().find(|a| !DIALOG_ACTIONS.contains(&a.as_str())) {
+            return bad(format!("unknown dialog action {a}"));
+        }
+        if !EXPECTS.contains(&h.expect.as_str()) {
+            return bad(format!("unknown expect {}", h.expect));
+        }
+        for e in [&h.kill_after_event, &h.replace_clipboard_after_event, &h.close_window_after_event].into_iter().flatten() {
+            if !EVENTS.contains(&e.as_str()) {
+                return bad(format!("unknown trigger event {e}"));
+            }
+        }
+        if h.timeout_secs == 0 || h.timeout_secs > 1200 {
+            return bad("harness.timeout_secs must be 1..=1200".into());
+        }
+        if self.byte_budget() < self.stream_bytes() {
+            return bad("max_total_bytes_served is below one copy of the case".into());
         }
         Ok(())
     }
@@ -267,6 +443,57 @@ mod tests {
         }
         // Expect ~256 occurrences per byte value; reject gross bias.
         assert!(counts.iter().all(|&c| (128..=384).contains(&c)));
+    }
+
+    fn parse(text: &str) -> Result<Case, CaseError> {
+        let case: Case = toml::from_str(text).map_err(CaseError::Parse)?;
+        case.validate()?;
+        Ok(case)
+    }
+
+    #[test]
+    fn stage_a_case_still_parses_with_defaults() {
+        let c = parse("case_id = \"A-01\"\ndescription = \"x\"\nseed = 1\n[[files]]\nname = \"a.bin\"\nsize = 1048576\n").unwrap();
+        assert_eq!(c.variants.threading, Threading::T1);
+        assert_eq!(c.harness.pastes, 1);
+        assert_eq!(c.harness.exit_mode, "clear");
+        assert_eq!(c.byte_budget(), 4 * 1048576 + 1048576);
+    }
+
+    #[test]
+    fn fault_case_parses() {
+        let c = parse(r#"
+case_id = "ERR-01"
+description = "x"
+seed = 2
+[variants]
+threading = "T2"
+read_timeout_ms = 30000
+[harness]
+dialog_actions = ["cancel"]
+expect = "failure"
+[[files]]
+name = "a.bin"
+size = 1048576
+[[files.faults]]
+kind = "error"
+at_offset = 524288
+hresult = 0x80004005
+"#).unwrap();
+        assert_eq!(c.variants.threading, Threading::T2);
+        assert_eq!(c.files[0].faults, vec![Fault::Error { at_offset: 524288, hresult: 0x8000_4005, once: false }]);
+    }
+
+    #[test]
+    fn unbounded_and_unsafe_cases_are_rejected() {
+        let big = "case_id = \"B\"\ndescription = \"x\"\nseed = 1\n[[files]]\nname = \"a.bin\"\nsize = 1073741824\n";
+        assert!(parse(big).is_err(), "1 GiB needs large = true (Stage B2)");
+        let flush = "case_id = \"P\"\ndescription = \"x\"\nseed = 1\n[harness]\nexit_mode = \"flush\"\n[[files]]\nname = \"a.bin\"\nsize = 134217728\n";
+        assert!(parse(flush).is_err(), "flush above 64 MiB is refused");
+        let success_hr = "case_id = \"E\"\ndescription = \"x\"\nseed = 1\n[[files]]\nname = \"a.bin\"\nsize = 10\n[[files.faults]]\nkind = \"error\"\nat_offset = 1\nhresult = 1\n";
+        assert!(parse(success_hr).is_err(), "S_FALSE is not an injectable failure");
+        let unknown = "case_id = \"E\"\ndescription = \"x\"\nseed = 1\n[[files]]\nname = \"a.bin\"\nsize = 10\n[[files.faults]]\nkind = \"explode\"\n";
+        assert!(parse(unknown).is_err());
     }
 
     #[test]

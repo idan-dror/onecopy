@@ -1,0 +1,18 @@
+# Stage B1 (P1).
+case_id = "ERR-06"
+description = "E_FAIL at 50%, then Skip"
+seed = 2016
+
+[harness]
+dialog_actions = ["skip"]
+expect = "observe"
+timeout_secs = 90
+
+[[files]]
+name = "e02-ERR-06-f0.bin"
+size = 67108864
+
+[[files.faults]]
+kind = "error"
+at_offset = 33554432
+hresult = 0x80004005

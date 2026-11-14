@@ -1,0 +1,18 @@
+# Stage B1 (P0).
+case_id = "STREAM-04"
+description = "180 s stall at 50%: does Explorer time out?"
+seed = 2021
+
+[harness]
+dialog_actions = ["cancel"]
+expect = "observe"
+timeout_secs = 420
+
+[[files]]
+name = "e02-STREAM-04-f0.bin"
+size = 67108864
+
+[[files.faults]]
+kind = "stall"
+at_offset = 33554432
+duration_ms = 180000
