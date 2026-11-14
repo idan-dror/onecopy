@@ -2,7 +2,7 @@
 
 **Experiment:** E-02, Stage A only (spec §0 and §7.0), Phase 0.
 
-**Status:** Stage A is complete, and the corrections from the owner's review are applied. The report is ready for final approval. **Stage B has not started.**
+**Status:** **Stage A is complete and accepted** by the product owner on 2026-11-13, at reviewed head `0dc3111`, merged in PR #2 (merge commit `a4dcf2d`). Acceptance covers only the tested behavior (spec §0.1). E-02 as a whole is not complete.
 
 **Dates:** first runs 2026-11-12; corrections and D1 calibration 2026-11-12/13.
 

@@ -17,6 +17,10 @@
 - **Transport (D-023).** E-06 evaluates two independent transport tracks.
 - **First experiment.** E-02 is the first implementation-ready experiment.
 
+*Progress:*
+
+- **2026-11-13: E-02 Stage A complete and accepted** (small-file Explorer paste, T1, no faults; spec §0.1). Stage B (faults, then large files and other targets) is in progress. E-02 and Gate B remain open.
+
 ## Phase 1 — Desktop technical MVP
 
 **Goal:** Usable trusted-device clipboard/history with direct P2P transfer.
